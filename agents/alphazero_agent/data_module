@@ -1,6 +1,8 @@
 # alphazero_agent/data_module.py
 
+import pytorch_lightning as pl
 from torch.utils.data import DataLoader, Dataset
+import torch
 
 class ConnectFourDataset(Dataset):
     def __init__(self, memory):
@@ -14,13 +16,13 @@ class ConnectFourDataset(Dataset):
         return torch.FloatTensor(state), torch.FloatTensor(mcts_prob), torch.FloatTensor([value])
 
 class ConnectFourDataModule(pl.LightningDataModule):
-    def __init__(self, memory, batch_size=32):
+    def __init__(self, agent, batch_size=32):
         super().__init__()
-        self.memory = memory
+        self.agent = agent
         self.batch_size = batch_size
 
     def setup(self, stage=None):
-        self.train_dataset = ConnectFourDataset(self.memory)
+        self.train_dataset = ConnectFourDataset(self.agent.memory)
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, batch_size=self.batch_size, shuffle=True)
