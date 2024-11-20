@@ -1,8 +1,8 @@
 # FILE: tournament/run_tournament.py
 
 from game.connect_four_game import ConnectFourGame
-from agents.agent_minimax.agent_code import MinimaxAgent
-from agents.agent_alphazero.agent_code import AlphaZeroAgent
+from agents.minimax_agent.agent_code import MinimaxAgent
+from agents.alphazero_agent.agent_code import AlphaZeroAgent
 import json
 import os
 
@@ -16,11 +16,11 @@ def run_tournament(agents, num_games=100):
         current_player = i % 2  # Alternate starting player
         while not game.is_terminal_node():
             agent = agents[current_player]
-            move = agent.select_move(game)
+            move = agent.select_move(game.get_board_state())
             if move is not None and game.is_valid_location(move):
                 row = game.get_next_open_row(move)
-                game.drop_piece(row, move, PLAYER_PIECE if current_player == 0 else AI_PIECE)
-                if game.winning_move(PLAYER_PIECE if current_player == 0 else AI_PIECE):
+                game.drop_piece(row, move, game.PLAYER_PIECE if current_player == 0 else game.AI_PIECE)
+                if game.winning_move(game.PLAYER_PIECE if current_player == 0 else game.AI_PIECE):
                     results[agent.__class__.__name__] += 1
                     break
                 current_player = 1 - current_player

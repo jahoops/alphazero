@@ -1,0 +1,19 @@
+{
+    "python.defaultInterpreterPath": "/home/j/anaconda3/envs/pytorch_env/bin/python",
+    "terminal.integrated.env.linux": {
+        "PYTHONPATH": "/home/j/GIT/alphazero",
+        "CONDA_DEFAULT_ENV": "pytorch_env",
+        "CONDA_PREFIX": "/home/j/anaconda3/envs/pytorch_env",
+        "PATH": "/home/j/anaconda3/envs/pytorch_env/bin:${env:PATH}"
+    },
+    "terminal.integrated.profiles.linux": {
+        "Conda (pytorch_env)": {
+            "path": "/bin/bash",
+            "args": [
+                "-c",
+                "source /home/j/anaconda3/etc/profile.d/conda.sh && conda activate pytorch_env && exec bash"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.linux": "Conda (pytorch_env)"
+}

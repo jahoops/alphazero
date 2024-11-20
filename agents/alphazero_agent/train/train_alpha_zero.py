@@ -3,11 +3,31 @@
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 from alphazero_agent.lightning_module import Connect4LightningModule
-from alphazero_agent.data_module import ConnectFourDataModule
 from alphazero_agent.agent_code import AlphaZeroAgent
+from game.connect_four_game import ConnectFourGame
+import torch
 import time
+import numpy as np
 
-def train_alphazero(time_limit, load_model=True, model_path="alphazero_agent/model/alphazero_model_final.pth"):
+def self_play(agent, num_games):
+    memory = []
+    for _ in range(num_games):
+        game = ConnectFourGame()
+        states, mcts_probs, values = [], [], []
+        while not game.is_terminal_node():
+            state = game.get_board_state()
+            move, mcts_prob = agent.select_move(state)
+            states.append(state)
+            mcts_probs.append(mcts_prob)
+            game.make_move(move)
+            if game.is_terminal_node():
+                value = game.get_reward()
+                values.extend([value] * len(states))
+                memory.extend(zip(states, mcts_probs, values))
+                break
+    return memory
+
+def train_alphazero(time_limit, num_self_play_games=100, load_model=True, model_path="alphazero_agent/model/alphazero_model_final.pth"):
     # Initialize the agent
     state_dim = 42  # Example: 6 rows * 7 columns
     action_dim = 7  # Number of columns in Connect Four
@@ -20,9 +40,6 @@ def train_alphazero(time_limit, load_model=True, model_path="alphazero_agent/mod
     # Initialize the LightningModule
     lightning_model = Connect4LightningModule(state_dim=state_dim, action_dim=action_dim, learning_rate=0.001)
     
-    # Initialize DataModule
-    data_module = ConnectFourDataModule(agent, batch_size=32)
-    
     # Initialize Trainer with checkpointing
     checkpoint_callback = ModelCheckpoint(
         monitor='train_loss',
@@ -33,26 +50,24 @@ def train_alphazero(time_limit, load_model=True, model_path="alphazero_agent/mod
     )
     
     trainer = pl.Trainer(
-        max_epochs=1000,  # Set a high number and use time-based stopping
-        gpus=1 if torch.cuda.is_available() else 0,
-        callbacks=[checkpoint_callback],
-        progress_bar_refresh_rate=20
+        max_time={"hours": time_limit},
+        gpus=1 if torch.cuda.is_available() else 0,  # Use GPU if available
+        callbacks=[checkpoint_callback]
     )
     
     start_time = time.time()
-    while time.time() - start_time < time_limit:
-        # Perform self-play to generate training data
-        agent.self_play()
+    while time.time() - start_time < time_limit * 3600:
+        # Self-play to generate training data
+        memory = self_play(agent, num_self_play_games)
         
-        # Update the DataModule's dataset if necessary
-        data_module.setup()
+        # Update agent's memory
+        agent.memory = memory
         
-        # Train for one epoch (or more if desired)
-        trainer.fit(lightning_model, datamodule=data_module)
-    
-    # Save the final model
-    trainer.save_checkpoint(model_path)
+        # Train the model
+        trainer.fit(lightning_model)
+        
+        # Save the model
+        agent.save_model(model_path)
 
 if __name__ == "__main__":
-    # Example: Train for 1 hour (3600 seconds)
-    train_alphazero(time_limit=3600, load_model=True)
+    train_alphazero(time_limit=2)  # Example: train for 2 hours

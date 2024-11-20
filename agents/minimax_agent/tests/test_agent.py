@@ -1,6 +1,7 @@
 # FILE: minimax_agent/tests/test_agent.py
 import unittest
-from agent_minimax.agent_code import MinimaxAgent, ConnectFourGame
+from agents.minimax_agent.agent_code import MinimaxAgent
+from game.connect_four_game import ConnectFourGame, PLAYER_PIECE
 
 class TestMinimaxAgent(unittest.TestCase):
     def setUp(self):
@@ -15,8 +16,8 @@ class TestMinimaxAgent(unittest.TestCase):
         # Simulate a simple win scenario
         for i in range(4):
             row = self.game.get_next_open_row(0)
-            self.game.drop_piece(row, 0, 1)
-        self.assertTrue(self.game.winning_move(PLAYER_PIECE))
+            self.game.drop_piece(row, 0, PLAYER_PIECE)
+        self.assertTrue(self.game.check_win(PLAYER_PIECE))
 
 if __name__ == '__main__':
     unittest.main()

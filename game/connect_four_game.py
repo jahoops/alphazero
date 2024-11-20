@@ -84,6 +84,69 @@ class ConnectFourGame:
         else:
             return 0.0  # Draw or ongoing game
 
+    def get_board_state(self):
+        """
+        Returns the current state of the board.
+        
+        :return: Numpy array representing the board state.
+        """
+        return self.board.copy()
+
+    def is_terminal_node(self):
+        """
+        Checks if the game has reached a terminal state.
+        
+        :return: Boolean indicating if the game is over.
+        """
+        return self.is_terminal()
+
+    def get_valid_locations(self):
+        """
+        Returns a list of valid actions (columns that are not full).
+        
+        :return: List of integers representing valid column indices.
+        """
+        return [col for col in range(COLUMN_COUNT) if self.is_valid_location(col)]
+
+    def is_valid_location(self, col):
+        """
+        Checks if the top row of the specified column is empty.
+        
+        :param col: Integer representing the column index.
+        :return: Boolean indicating if a move can be made in the column.
+        """
+        return self.board[0][col] == EMPTY
+
+    def get_next_open_row(self, col):
+        """
+        Returns the next open row in the specified column.
+        
+        :param col: Integer representing the column index.
+        :return: Integer representing the row index.
+        """
+        for row in range(ROW_COUNT-1, -1, -1):
+            if self.board[row][col] == EMPTY:
+                return row
+
+    def drop_piece(self, row, col, piece):
+        """
+        Drops a piece into the specified location on the board.
+        
+        :param row: Integer representing the row index.
+        :param col: Integer representing the column index.
+        :param piece: Integer representing the player's piece.
+        """
+        self.board[row][col] = piece
+
+    def check_win(self, player):
+        """
+        Checks if the specified player has won the game.
+        
+        :param player: Integer representing the player's piece.
+        :return: Boolean indicating if the player has won.
+        """
+        return len(self.get_win_positions(player)) > 0
+
     def get_win_positions(self, player):
         """
         Identifies all winning positions for a given player.
@@ -118,15 +181,6 @@ class ConnectFourGame:
                     wins.append(((row, col), (-1, 1)))
         return wins
 
-    def check_win(self, player):
-        """
-        Checks if the specified player has won the game.
-        
-        :param player: Integer representing the player's piece.
-        :return: Boolean indicating if the player has won.
-        """
-        return len(self.get_win_positions(player)) > 0
-
     def is_board_full(self):
         """
         Checks if the board is full.
@@ -134,23 +188,6 @@ class ConnectFourGame:
         :return: Boolean indicating if the board is full.
         """
         return not (self.board == EMPTY).any()
-
-    def get_valid_locations(self):
-        """
-        Returns a list of valid actions (columns that are not full).
-        
-        :return: List of integers representing valid column indices.
-        """
-        return [col for col in range(COLUMN_COUNT) if self.is_valid_location(col)]
-
-    def is_valid_location(self, col):
-        """
-        Checks if the top row of the specified column is empty.
-        
-        :param col: Integer representing the column index.
-        :return: Boolean indicating if a move can be made in the column.
-        """
-        return self.board[0][col] == EMPTY
 
     def get_winner(self):
         """
@@ -229,6 +266,3 @@ class ConnectFourGame:
             score -= 4
 
         return score
-
-
-
