@@ -1,7 +1,10 @@
 # game/tests/test_connect_four_game.py
 
 import unittest
-from game.connect_four_game import ConnectFourGame, PLAYER_PIECE, AI_PIECE, EMPTY
+
+from game.connect_four_game import (AI_PIECE, EMPTY, PLAYER_PIECE,
+                                    ConnectFourGame)
+
 
 class TestConnectFourGame(unittest.TestCase):
     def setUp(self):

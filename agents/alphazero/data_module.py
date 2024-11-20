@@ -1,8 +1,9 @@
 # /data_module.py
 
-import torch
-from torch.utils.data import Dataset, DataLoader
 import pytorch_lightning as pl
+import torch
+from torch.utils.data import DataLoader, Dataset
+
 
 class ConnectFourDataset(Dataset):
     def __init__(self, memory):

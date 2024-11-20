@@ -1,7 +1,10 @@
 # /__init__.py
 
 from .agent_code import AlphaZeroAgent
-from .network import Connect4Net, ResidualBlock
-from .mcts import MCTSNode
+from .data_module import ConnectFourDataModule
 from .lightning_module import Connect4LightningModule
-from .data_module import Connect4DataModule
+from .mcts import MCTSNode
+from .network import Connect4Net, ResidualBlock
+
+# Example in agents/alphazero/__init__.py
+__all__ = ['agent_code', 'network', 'lightning_module', 'data_module', 'mcts']

@@ -1,9 +1,15 @@
 # tests/test_train_alpha_zero.py
 
 import unittest
-from unittest.mock import patch, MagicMock
-from agents.alphazero.train.train_alpha_zero import initialize_agent, load_agent_model, save_agent_model, perform_training, train_alphazero
+from unittest.mock import MagicMock, patch
+
 from agents.alphazero.agent_code import AlphaZeroAgent
+from agents.alphazero.train.train_alpha_zero import (initialize_agent,
+                                                     load_agent_model,
+                                                     perform_training,
+                                                     save_agent_model,
+                                                     train_alphazero)
+
 
 class TestTrainAlphaZero(unittest.TestCase):
     def setUp(self):

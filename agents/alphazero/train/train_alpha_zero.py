@@ -1,13 +1,22 @@
-# /train/train_alpha_zero.py
+# agents/alphazero/train/train_alpha_zero.py
 
-import pytorch_lightning as pl
-from pytorch_lightning.callbacks import ModelCheckpoint
-from alphazero.lightning_module import Connect4LightningModule
-from alphazero.agent_code import AlphaZeroAgent
-from game.connect_four_game import ConnectFourGame
-import torch
+import os
+import sys
+
+print("PYTHONPATH:", sys.path)
+print("Current Working Directory:", os.getcwd())
+
 import time
+
 import numpy as np
+import pytorch_lightning as pl
+import torch
+from pytorch_lightning.callbacks import ModelCheckpoint
+
+from agents.alphazero.agent_code import AlphaZeroAgent
+from alphazero.lightning_module import Connect4LightningModule
+from game.connect_four_game import ConnectFourGame
+
 
 def self_play(agent, num_games):
     memory = []
@@ -27,7 +36,7 @@ def self_play(agent, num_games):
                 break
     return memory
 
-def train_alphazero(time_limit, num_self_play_games=100, load_model=True, model_path="/model/alphazero_model_final.pth"):
+def train_alphazero(time_limit, num_self_play_games=100, load_model=True, model_path="alphazero/model/alphazero_model_final.pth"):
     # Initialize the agent
     state_dim = 42  # Example: 6 rows * 7 columns
     action_dim = 7  # Number of columns in Connect Four
@@ -43,7 +52,7 @@ def train_alphazero(time_limit, num_self_play_games=100, load_model=True, model_
     # Initialize Trainer with checkpointing
     checkpoint_callback = ModelCheckpoint(
         monitor='train_loss',
-        dirpath='/checkpoints/',
+        dirpath='alphazero/checkpoints/',
         filename='model-{epoch:02d}-{train_loss:.2f}',
         save_top_k=1,
         mode='min',

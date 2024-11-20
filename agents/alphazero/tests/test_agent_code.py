@@ -1,9 +1,12 @@
 # /tests/test_agent_code.py
 
 import unittest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from alphazero.agent_code import AlphaZeroAgent
-from game.connect_four_game import ConnectFourGame  # Update the import path as needed
+from game.connect_four_game import \
+    ConnectFourGame  # Update the import path as needed
+
 
 class TestAlphaZeroAgent(unittest.TestCase):
     @patch('.agent_code.Connect4Net')

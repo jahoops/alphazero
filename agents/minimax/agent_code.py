@@ -2,6 +2,7 @@
 
 import math
 import random
+
 from agents.base_agent import Agent
 from game.connect_four_game import ConnectFourGame  # Updated import path
 

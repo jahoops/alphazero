@@ -2,6 +2,7 @@
 
 import copy
 
+
 def preprocess_board(board, player):
     """
     Preprocesses the board by applying the player's perspective.

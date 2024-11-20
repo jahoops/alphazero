@@ -1,5 +1,6 @@
 import torch
 
+
 def test_cuda():
     if torch.cuda.is_available():
         print("CUDA is available!")

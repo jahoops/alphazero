@@ -1,18 +1,16 @@
 # /agent_code.py
 
 import logging
-import math
-import numpy as np
-import random
 from collections import deque
-from copy import deepcopy
 
+import numpy as np
 import torch
 
-from .network import Connect4Net
+from game.connect_four_game import \
+    ConnectFourGame  # Update the import path as needed
+
 from .mcts import MCTSNode
-from .utils import preprocess_board  # Assuming you have utility functions
-from game.connect_four_game import ConnectFourGame  # Update the import path as needed
+from .network import Connect4Net
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')

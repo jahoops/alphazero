@@ -1,10 +1,12 @@
 # FILE: tournament/run_tournament.py
 
-from game.connect_four_game import ConnectFourGame
-from agents.minimax.agent_code import MinimaxAgent
-from agents.alphazero.agent_code import AlphaZeroAgent
 import json
 import os
+
+from agents.alphazero.agent_code import AlphaZeroAgent
+from agents.minimax.agent_code import MinimaxAgent
+from game.connect_four_game import ConnectFourGame
+
 
 def run_tournament(agents, num_games=100):
     results = {agent.__class__.__name__: 0 for agent in agents}

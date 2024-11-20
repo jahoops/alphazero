@@ -1,6 +1,7 @@
 # game/connect_four_game.py
 
 import copy
+
 import numpy as np
 
 PLAYER_PIECE = 1
