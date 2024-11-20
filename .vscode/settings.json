@@ -22,7 +22,7 @@
             "icon": "terminal-bash"
         }
     },
-    "terminal.integrated.defaultProfile.linux": "Conda (pytorch_env)",
+    "terminal.integrated.defaultProfile.linux": null,
 
     // settings.json
     "python.linting.enabled": true,
