@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from alphazero_agent.agent_code import AlphaZeroAgent
-from connect_four_game import ConnectFourGame  # Update the import path as needed
+from game.connect_four_game import ConnectFourGame  # Update the import path as needed
 
 class TestAlphaZeroAgent(unittest.TestCase):
     @patch('alphazero_agent.agent_code.Connect4Net')

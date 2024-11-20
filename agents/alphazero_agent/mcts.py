@@ -5,7 +5,7 @@ import logging
 from copy import deepcopy
 
 from .utils import deepcopy_env  # Assuming you have a deepcopy utility
-from connect_four_game import ConnectFourGame  # Update the import path as needed
+from game.connect_four_game import ConnectFourGame  # Update the import path as needed
 
 logger = logging.getLogger(__name__)
 

@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .agent_code import AlphaZeroAgent
 from .network import Connect4Net
 
 class Connect4LightningModule(pl.LightningModule):
