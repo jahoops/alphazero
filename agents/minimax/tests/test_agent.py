@@ -1,6 +1,6 @@
-# FILE: minimax_agent/tests/test_agent.py
+# FILE: minimax/tests/test_agent.py
 import unittest
-from agents.minimax_agent.agent_code import MinimaxAgent
+from agents.minimax.agent_code import MinimaxAgent
 from game.connect_four_game import ConnectFourGame, PLAYER_PIECE
 
 class TestMinimaxAgent(unittest.TestCase):

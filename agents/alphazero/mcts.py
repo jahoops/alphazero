@@ -1,4 +1,4 @@
-# alphazero_agent/mcts.py
+# /mcts.py
 
 import math
 import logging

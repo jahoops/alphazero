@@ -1,4 +1,4 @@
-# alphazero_agent/data_module.py
+# /data_module.py
 
 import torch
 from torch.utils.data import Dataset, DataLoader

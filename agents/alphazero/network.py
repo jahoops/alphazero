@@ -1,4 +1,4 @@
-# alphazero_agent/network.py
+# /network.py
 
 import torch.nn as nn
 import torch.nn.functional as F

@@ -1,4 +1,4 @@
-# alphazero_agent/utils.py
+# /utils.py
 
 import copy
 

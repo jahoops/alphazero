@@ -1,26 +1,26 @@
-# alphazero_agent/tests/test_agent_code.py
+# /tests/test_agent_code.py
 
 import unittest
 from unittest.mock import patch, MagicMock
-from alphazero_agent.agent_code import AlphaZeroAgent
+from alphazero.agent_code import AlphaZeroAgent
 from game.connect_four_game import ConnectFourGame  # Update the import path as needed
 
 class TestAlphaZeroAgent(unittest.TestCase):
-    @patch('alphazero_agent.agent_code.Connect4Net')
-    @patch('alphazero_agent.agent_code.MCTSNode')
+    @patch('.agent_code.Connect4Net')
+    @patch('.agent_code.MCTSNode')
     def setUp(self, mock_mcts_node, mock_connect4net):
         self.agent = AlphaZeroAgent(
             state_dim=42,
             action_dim=7,
             use_gpu=False,
-            model_path="alphazero_agent/model/test_model.pth"
+            model_path="/model/test_model.pth"
         )
         # Mock the neural network and MCTSNode
         self.agent.model = mock_connect4net.return_value
         self.agent.model.eval = MagicMock()
         mock_mcts_node.return_value = MagicMock()
 
-    @patch('alphazero_agent.agent_code.torch.load')
+    @patch('.agent_code.torch.load')
     def test_load_model_success(self, mock_torch_load):
         # Simulate successful model loading
         mock_torch_load.return_value = {}
@@ -28,7 +28,7 @@ class TestAlphaZeroAgent(unittest.TestCase):
         self.assertTrue(self.agent.model_loaded)
         self.agent.model.load_state_dict.assert_called()
 
-    @patch('alphazero_agent.agent_code.torch.load')
+    @patch('.agent_code.torch.load')
     def test_load_model_failure(self, mock_torch_load):
         # Simulate model loading failure
         mock_torch_load.side_effect = Exception("Load failed")

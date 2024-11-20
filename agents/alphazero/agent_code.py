@@ -1,4 +1,4 @@
-# alphazero_agent/agent_code.py
+# /agent_code.py
 
 import logging
 import math
@@ -24,7 +24,7 @@ class AlphaZeroAgent:
         state_dim,
         action_dim,
         use_gpu=False,
-        model_path="alphazero_agent/model/alphazero_model_final.pth",
+        model_path="alphazero/model/alphazero_model_final.pth",
         num_simulations=800,
         c_puct=1.4
     ):

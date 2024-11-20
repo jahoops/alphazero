@@ -1,4 +1,4 @@
-# alphazero_agent/lightning_module.py
+# /lightning_module.py
 
 import pytorch_lightning as pl
 import torch

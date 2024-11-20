@@ -1,8 +1,8 @@
 # FILE: tournament/run_tournament.py
 
 from game.connect_four_game import ConnectFourGame
-from agents.minimax_agent.agent_code import MinimaxAgent
-from agents.alphazero_agent.agent_code import AlphaZeroAgent
+from agents.minimax.agent_code import MinimaxAgent
+from agents.alphazero.agent_code import AlphaZeroAgent
 import json
 import os
 
