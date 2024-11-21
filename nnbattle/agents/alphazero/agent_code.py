@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 class AlphaZeroAgent(Agent):
     def __init__(
         self,
-        state_dim,
         action_dim,
+        state_dim=2,  # Updated default value
         use_gpu=False,
         model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",
         num_simulations=800,
@@ -68,12 +68,15 @@ class AlphaZeroAgent(Agent):
     def preprocess(self, board):
         """
         Preprocesses the board state for the neural network.
-        Multiplies the board by the current player to get the perspective.
+        Creates a 2-channel tensor: one for the current player and one for the opponent.
 
         :param board: Current game board as a NumPy array.
-        :return: Preprocessed board as a Torch tensor.
+        :return: Preprocessed board as a Torch tensor with shape [2, 6, 7].
         """
-        tensor_board = torch.FloatTensor(board * self.current_player).unsqueeze(0).unsqueeze(0).to(self.device)
+        opponent_player = 2 if self.current_player == 1 else 1
+        current_board = (board == self.current_player).astype(float)
+        opponent_board = (board == opponent_player).astype(float)
+        tensor_board = torch.FloatTensor([current_board, opponent_board]).to(self.device)  # Shape: [2,6,7]
         return tensor_board
 
     def load_model(self):
@@ -189,7 +192,7 @@ class AlphaZeroAgent(Agent):
                 node.backpropagate(0)
                 continue
 
-            state_tensor = self.preprocess(env_copy.board)
+            state_tensor = self.preprocess(env_copy.board).unsqueeze(0)  # Shape: [1, 2, 6, 7]
             with torch.no_grad():
                 log_policy, value = self.model(state_tensor)
                 policy = torch.exp(log_policy).cpu().numpy().flatten()

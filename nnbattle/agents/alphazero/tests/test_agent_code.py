@@ -12,7 +12,7 @@ class TestAlphaZeroAgent(unittest.TestCase):
     @patch('.agent_code.MCTSNode')
     def setUp(self, mock_mcts_node, mock_connect4net):
         self.agent = AlphaZeroAgent(
-            state_dim=42,
+            state_dim=2,  # Updated from previous value
             action_dim=7,
             use_gpu=False,
             model_path="/model/test_model.pth"
@@ -61,6 +61,13 @@ class TestAlphaZeroAgent(unittest.TestCase):
         self.agent.mcts_simulate = MagicMock(return_value=(None, [], []))
         action = self.agent.select_move(ConnectFourGame())
         self.assertIsNone(action)
+
+    def test_select_move_different_channels(self):
+        # Create a dummy state with 2 channels
+        dummy_state = torch.randn(1, 2, 6, 7)  # [1, 2, 6, 7]
+        with patch.object(self.agent, 'preprocess', return_value=dummy_state.squeeze(0)):  # Ensure [2,6,7]
+            action = self.agent.select_move(ConnectFourGame())
+            self.assertIsNotNone(action, "Action should be selected with correct input channels.")
 
     def test_self_play_deterministic(self):
         # Test self-play game data storage

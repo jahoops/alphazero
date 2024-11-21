@@ -44,20 +44,22 @@ def self_play(agent, num_games):
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
         result = game.get_result()
-        # Assuming mcts_prob is generated during the game
+        # Ensure that state is preprocessed correctly
+        preprocessed_state = agent.preprocess(game.get_state())  # Shape: [2,6,7]
         mcts_prob = [0] * agent.action_dim  # Placeholder for MCTS probabilities
-        memory.append((game.get_state(), mcts_prob, result))
+        memory.append((preprocessed_state, mcts_prob, result))
         logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
     agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
 
 def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_model=True):
+    torch.set_float32_matmul_precision('medium')  # Set precision to utilize Tensor Cores
     start_time = time.time()
     
     # Initialize Agent with GPU support and control model loading
-    state_dim = 8 * 8          # Adjusted dimensions
-    action_dim = 7             # Seven possible actions
-    num_simulations = 800      # Number of MCTS simulations
+    state_dim = 2          # Updated to match number of channels
+    action_dim = 7         # Seven possible actions
+    num_simulations = 800  # Number of MCTS simulations
     agent = AlphaZeroAgent(state_dim=state_dim, action_dim=action_dim, use_gpu=use_gpu, load_model=load_model, num_simulations=num_simulations)
     
     # Log GPU usage during training

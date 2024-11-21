@@ -2,7 +2,7 @@
 
 import unittest
 
-from nnbattle.game.connect_four_game import ConnectFourGame 
+from nnbattle.game.connect_four_game import ConnectFourGame, EMPTY, PLAYER_PIECE, AI_PIECE
 
 
 class TestConnectFourGame(unittest.TestCase):

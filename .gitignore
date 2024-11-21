@@ -1,2 +1,5 @@
-zJunk/
-.venv/
+__pycache__/
+*.pyc
+*.pyo
+lightning_logs/
+nnbattle.egg-info/

@@ -1,5 +1,6 @@
 # /network.py
 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -25,7 +26,7 @@ class Connect4Net(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(Connect4Net, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(1, 128, kernel_size=4, stride=1, padding=2),
+            nn.Conv2d(state_dim, 128, kernel_size=4, stride=1, padding=2),  # Use state_dim for flexibility
             nn.ReLU(),
             nn.Conv2d(128, 128, kernel_size=4, stride=1, padding=2),
             nn.ReLU(),
@@ -33,13 +34,17 @@ class Connect4Net(nn.Module):
             nn.ReLU(),
         )
         self.fc_layers = nn.Sequential(
-            nn.Linear(128 * 8 * 9, 1024),  # Adjusted dimensions
+            nn.Linear(128 * 9 * 10, 1024),
             nn.ReLU(),
-            nn.Linear(1024, action_dim)
         )
+        self.policy_head = nn.Linear(1024, action_dim)
+        self.value_head = nn.Linear(1024, 1)
 
     def forward(self, x):
+        assert x.shape[1] == 2, f"Expected input with 2 channels, got {x.shape[1]} channels."
         x = self.conv_layers(x)
         x = x.view(x.size(0), -1)
         x = self.fc_layers(x)
-        return x
+        log_policy = F.log_softmax(self.policy_head(x), dim=1)
+        value = torch.tanh(self.value_head(x))
+        return log_policy, value
