@@ -1,44 +1,77 @@
-# agents/alphazero/train/train_alpha_zero.py
+# nnbattle/agents/alphazero/train/train_alpha_zero.py
+
 import os
 import time
 from datetime import timedelta
-
+import logging
+import torch
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-from nnbattle.agents.alphazero import AlphaZeroAgent, Connect4LightningModule, ConnectFourDataModule
+from nnbattle.agents.alphazero import AlphaZeroAgent
+from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
+from nnbattle.agents.alphazero.lightning_module import Connect4LightningModule
 from nnbattle.game import ConnectFourGame
+from nnbattle.agents.base_agent import Agent
 
+# Configure logging at the start of the file
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+def log_gpu_info(agent):
+    """Log GPU information."""
+    if torch.cuda.is_available():
+        logger.info(f"Training on GPU: {torch.cuda.get_device_name()}")
+        allocated = torch.cuda.memory_allocated()/1e9
+        reserved = torch.cuda.memory_reserved()/1e9
+        logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
 
 def self_play(agent, num_games):
     memory = []
     game = ConnectFourGame()
-    for _ in range(num_games):
+    for game_num in range(num_games):
         game.reset()
+        agent.current_player = 1  # Initialize current player at the start of the game
+        logger.info(f"Starting game {game_num + 1}/{num_games}")
+        game_start_time = time.time()
         while not game.is_terminal():
             move = agent.select_move(game)
             game.make_move(move)
+            agent.current_player = game.current_player  # Update current player
+        game_end_time = time.time()
+        logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
         result = game.get_result()
-        memory.append((game.get_state(), result))
+        # Assuming mcts_prob is generated during the game
+        mcts_prob = [0] * agent.action_dim  # Placeholder for MCTS probabilities
+        memory.append((game.get_state(), mcts_prob, result))
+        logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
+    agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
 
-
-def train_alphazero(time_limit, num_self_play_games=100, load_model=True, model_path="alphazero/model/alphazero_model_final.pth"):
+def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_model=True):
     start_time = time.time()
     
-    # Initialize Data Module
-    data_module = ConnectFourDataModule(memory_size=num_self_play_games)
+    # Initialize Agent with GPU support and control model loading
+    state_dim = 8 * 8          # Adjusted dimensions
+    action_dim = 7             # Seven possible actions
+    num_simulations = 800      # Number of MCTS simulations
+    agent = AlphaZeroAgent(state_dim=state_dim, action_dim=action_dim, use_gpu=use_gpu, load_model=load_model, num_simulations=num_simulations)
     
-    # Initialize Agent
-    agent = AlphaZeroAgent()
+    # Log GPU usage during training
+    if torch.cuda.is_available() and use_gpu:
+        log_gpu_info(agent)
     
-    # Initialize Lightning Module
-    model = Connect4LightningModule(agent=agent)
+    # Perform Self-Play to populate agent's memory
+    self_play(agent, num_self_play_games)
     
-    # Load existing model if required
-    if load_model and os.path.exists(model_path):
-        model.load_state_dict(torch.load(model_path))
-        print(f"Loaded model from {model_path}")
+    # Initialize Data Module with the agent
+    data_module = ConnectFourDataModule(agent=agent, batch_size=32)  # Adjust batch_size as needed
+    
+    # Initialize Lightning Module with state_dim and action_dim
+    model = Connect4LightningModule(state_dim=state_dim, action_dim=action_dim)
     
     # Set up Model Checkpoint callback
     checkpoint_callback = ModelCheckpoint(
@@ -53,21 +86,24 @@ def train_alphazero(time_limit, num_self_play_games=100, load_model=True, model_
     trainer = pl.Trainer(
         max_time=timedelta(hours=time_limit),
         callbacks=[checkpoint_callback],
-        gpus=1 if torch.cuda.is_available() else 0,
+        accelerator='gpu' if torch.cuda.is_available() and use_gpu else 'cpu',
+        devices=1 if torch.cuda.is_available() and use_gpu else None,
     )
     
     # Start Training
     trainer.fit(model, datamodule=data_module)
     
+    # Log GPU stats after training
+    agent.log_gpu_stats()
+    
     # Save the final model
-    os.makedirs(os.path.dirname(model_path), exist_ok=True)
-    torch.save(model.state_dict(), model_path)
-    print(f"Model saved to {model_path}")
+    os.makedirs(os.path.dirname(agent.model_path), exist_ok=True)
+    torch.save(model.state_dict(), agent.model_path)
+    logger.info(f"Model saved to {agent.model_path}")
     
     end_time = time.time()
     elapsed_time = end_time - start_time
-    print(f"Training completed in {timedelta(seconds=elapsed_time)}")
-
+    logger.info(f"Training completed in {timedelta(seconds=elapsed_time)}")
 
 if __name__ == "__main__":
-    train_alphazero(time_limit=2)  # Example: train for 2 hours
+    train_alphazero(time_limit=0.1, num_self_play_games=2, load_model=False)  # Example: train for 6 minutes without loading existing model

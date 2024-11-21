@@ -267,3 +267,29 @@ class ConnectFourGame:
             score -= 4
 
         return score
+
+    def get_result(self):
+        """Get the game result.
+        Returns:
+            1: player 1 wins
+            -1: player 2 wins
+            0: draw
+            None: game not finished
+        """
+        if self.is_terminal():
+            # Check win for both players
+            if self.check_win(1):
+                return 1
+            elif self.check_win(2):
+                return -1
+            # If no winner and terminal, it's a draw
+            return 0
+        return None
+
+    def get_state(self):
+        """Get the current state of the game board.
+        
+        Returns:
+            numpy.ndarray: Current board state
+        """
+        return self.board.copy()  # Return a copy to prevent external modifications

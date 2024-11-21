@@ -1,4 +1,4 @@
-# /data_module.py
+# nnbattle/agents/alphazero/data_module.py
 
 import pytorch_lightning as pl
 import torch
@@ -15,6 +15,7 @@ class ConnectFourDataset(Dataset):
     def __getitem__(self, idx):
         state, mcts_prob, value = self.memory[idx]
         return torch.FloatTensor(state), torch.FloatTensor(mcts_prob), torch.FloatTensor([value])
+
 
 class ConnectFourDataModule(pl.LightningDataModule):
     def __init__(self, agent, batch_size=32):

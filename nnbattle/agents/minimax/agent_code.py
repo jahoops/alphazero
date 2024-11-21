@@ -3,7 +3,7 @@
 import math
 import random
 
-from agents.base_agent import Agent
+from nnbattle.agents.base_agent import Agent
 from nnbattle.game.connect_four_game import ConnectFourGame 
 
 PLAYER_PIECE = 1

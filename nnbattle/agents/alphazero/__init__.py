@@ -1,14 +1,11 @@
 # /__init__.py
 
-from .agent_code import AlphaZeroAgent, Connect4LightningModule, ConnectFourDataModule
-from .mcts import MCTSNode
-from .network import Connect4Net, ResidualBlock
-from .train import train_alphazero
+from .agent_code import AlphaZeroAgent
+from .lightning_module import Connect4LightningModule
+from .data_module import ConnectFourDataModule
 
-# Example in agents/alphazero/__init__.py
 __all__ = [
     'AlphaZeroAgent',
     'Connect4LightningModule',
     'ConnectFourDataModule',
-    'train_alphazero',
 ]

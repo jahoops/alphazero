@@ -2,6 +2,8 @@
 
 import logging
 from collections import deque
+import os
+import time
 
 import numpy as np
 import torch
@@ -10,40 +12,58 @@ from nnbattle.game.connect_four_game import ConnectFourGame  # Update the import
 
 from .mcts import MCTSNode
 from .network import Connect4Net
+from nnbattle.agents.base_agent import Agent
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
 
-class AlphaZeroAgent:
+class AlphaZeroAgent(Agent):
     def __init__(
         self,
         state_dim,
         action_dim,
         use_gpu=False,
-        model_path="alphazero/model/alphazero_model_final.pth",
+        model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",
         num_simulations=800,
-        c_puct=1.4
+        c_puct=1.4,
+        load_model=True  # Add this parameter
     ):
-        """
-        Initializes the AlphaZeroAgent.
-        """
+        super().__init__()
         self.state_dim = state_dim
         self.action_dim = action_dim
-        self.device = torch.device("cuda" if use_gpu else "cpu")
-        self.model = Connect4Net(state_dim, action_dim).to(self.device)
-        self.model.eval()  # Set to evaluation mode for inference
-        self.env = ConnectFourGame()  # Initialize the game environment/state
+        self.device = torch.device("cuda" if use_gpu and torch.cuda.is_available() else "cpu")
         self.model_path = model_path
-        self.model_loaded = False  # Flag to check if model is loaded
-        self.num_simulations = num_simulations
-        self.c_puct = c_puct
+        self.model_loaded = False
+        self.load_model_flag = load_model  # Store the flag
+        self.num_simulations = num_simulations  # Initialize num_simulations
+        self.c_puct = c_puct  # Initialize c_puct
+        self.current_player = 1  # Initialize current_player
+        self.memory = []  # Initialize empty memory list
+        self.model = Connect4Net(state_dim, action_dim).to(self.device)
+        
+        logger.info(f"Using device: {self.device}")
+        if self.device.type == "cuda":
+            logger.info(f"GPU: {torch.cuda.get_device_name()}")
+            logger.info(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
+        
+        if load_model:
+            self.load_model()
 
-        # Memory for storing training samples
-        self.memory = deque(maxlen=10000)  # Use deque for efficient FIFO operations
-
-        # Initialize current_player
-        self.current_player = 1  # Player 1 starts by default
+    def log_gpu_stats(self):
+        """Log detailed GPU statistics."""
+        if torch.cuda.is_available():
+            logger.info(f"GPU: {torch.cuda.get_device_name()}")
+            allocated = torch.cuda.memory_allocated()/1e9
+            reserved = torch.cuda.memory_reserved()/1e9
+            max_memory = torch.cuda.max_memory_allocated()/1e9
+            
+            logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB")
+            logger.info(f"GPU Memory - Reserved: {reserved:.2f} GB")
+            logger.info(f"GPU Memory - Peak: {max_memory:.2f} GB")
+            
+            # Reset peak stats
+            torch.cuda.reset_peak_memory_stats()
 
     def preprocess(self, board):
         """
@@ -57,18 +77,17 @@ class AlphaZeroAgent:
         return tensor_board
 
     def load_model(self):
-        """
-        Loads model weights from the specified path.
-        """
-        try:
-            self.model.load_state_dict(torch.load(self.model_path, map_location=self.device))
-            self.model.to(self.device)
-            self.model.eval()
-            self.model_loaded = True
+        """Load the model with weights_only=True for security."""
+        if os.path.exists(self.model_path):
+            self.model.load_state_dict(
+                torch.load(
+                    self.model_path,
+                    map_location=self.device,
+                    weights_only=True  # Add this parameter
+                )
+            )
             logger.info(f"Model loaded successfully from {self.model_path}")
-        except Exception as e:
-            logger.error(f"Error loading model from {self.model_path}: {e}")
-            raise e
+            self.model_loaded = True
 
     def save_model(self, path):
         """
@@ -86,17 +105,19 @@ class AlphaZeroAgent:
         :param game: Instance of ConnectFourGame representing the current game state.
         :return: Selected action (column number).
         """
-        if not self.model_loaded:
+        if self.load_model_flag and not self.model_loaded:
             self.load_model()
 
+        start_time = time.time()
         # Perform MCTS to get action probabilities
         selected_action, actions, probs = self.act(game.board, game, self.num_simulations)
+        end_time = time.time()
+        logger.info(f"Time taken for select_move: {end_time - start_time:.4f} seconds")
 
         if selected_action is None:
             logger.warning("No possible actions available.")
             return None
 
-        logger.info(f"Selected action: {selected_action}")
         return selected_action
 
     def act(self, state, env, num_simulations=800):
@@ -113,7 +134,6 @@ class AlphaZeroAgent:
         - actions: List of possible actions.
         - action_probs: Probability distribution over actions.
         """
-        # Perform MCTS simulations
         selected_action, actions, probabilities = self.mcts_simulate(state, env, num_simulations)
 
         if selected_action is None:

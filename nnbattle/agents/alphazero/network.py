@@ -22,43 +22,24 @@ class ResidualBlock(nn.Module):
         return out
 
 class Connect4Net(nn.Module):
-    def __init__(self, state_dim, action_dim, num_res_blocks=5, num_filters=128):
+    def __init__(self, state_dim, action_dim):
         super(Connect4Net, self).__init__()
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(1, num_filters, kernel_size=4, padding=2, stride=2),  # Output: (num_filters, 4, 4)
-            nn.BatchNorm2d(num_filters),
+            nn.Conv2d(1, 128, kernel_size=4, stride=1, padding=2),
             nn.ReLU(),
-            nn.Conv2d(num_filters, num_filters * 2, kernel_size=4, padding=2, stride=2),  # (num_filters*2, 2, 2)
-            nn.BatchNorm2d(num_filters * 2),
+            nn.Conv2d(128, 128, kernel_size=4, stride=1, padding=2),
             nn.ReLU(),
-            nn.Conv2d(num_filters * 2, num_filters * 2, kernel_size=4, padding=2, stride=2),  # (num_filters*2, 1,1)
-            nn.BatchNorm2d(num_filters * 2),
+            nn.Conv2d(128, 128, kernel_size=4, stride=1, padding=2),
             nn.ReLU(),
         )
-        self.residual_blocks = nn.Sequential(
-            *[ResidualBlock(num_filters * 2) for _ in range(num_res_blocks)]
-        )
-        self.policy_head = nn.Sequential(
-            nn.Conv2d(num_filters * 2, 2, kernel_size=1),  # Output: (2, 1, 1)
-            nn.BatchNorm2d(2),
+        self.fc_layers = nn.Sequential(
+            nn.Linear(128 * 8 * 9, 1024),  # Adjusted dimensions
             nn.ReLU(),
-            nn.Flatten(),  # Flatten to (batch_size, 2)
-            nn.Linear(8, action_dim),  # Updated in_features from 2 to 8
-        )
-        self.value_head = nn.Sequential(
-            nn.Conv2d(num_filters * 2, 1, kernel_size=1),  # Output: (1, 1, 1)
-            nn.BatchNorm2d(1),
-            nn.ReLU(),
-            nn.Flatten(),  # Flatten to (batch_size, 4)
-            nn.Linear(4, 256),  # Updated in_features from 1 to 4
-            nn.ReLU(),
-            nn.Linear(256, 1),
-            nn.Tanh(),
+            nn.Linear(1024, action_dim)
         )
 
     def forward(self, x):
         x = self.conv_layers(x)
-        x = self.residual_blocks(x)
-        policy = self.policy_head(x)
-        value = self.value_head(x)
-        return F.log_softmax(policy, dim=1), value
+        x = x.view(x.size(0), -1)
+        x = self.fc_layers(x)
+        return x
