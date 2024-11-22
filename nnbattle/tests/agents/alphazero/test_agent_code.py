@@ -2,8 +2,9 @@ import logging
 import unittest
 from unittest.mock import MagicMock, patch
 import torch
+import numpy as np
 
-from nnbattle.agents.alphazero.utils.model_utils import load_agent_model, save_agent_model
+from nnbattle.agents.alphazero.utils import model_utils
 from nnbattle.agents.alphazero.agent_code import initialize_agent
 from nnbattle.agents.alphazero.train.trainer import train_alphazero
 from nnbattle.game.connect_four_game import ConnectFourGame
@@ -31,56 +32,70 @@ class TestAgentCode(unittest.TestCase):
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model', side_effect=FileNotFoundError("Model path does not exist."))
     def test_load_agent_model_failure(self, mock_load_agent_model):
         with self.assertRaises(FileNotFoundError):
-            load_agent_model(self.agent)
+            model_utils.load_agent_model(self.agent)
         mock_load_agent_model.assert_called_once_with(self.agent)
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
     @patch('nnbattle.agents.alphazero.agent_code.torch.load')
     def test_load_agent_model_success(self, mock_torch_load, mock_load_agent_model):
         mock_load_agent_model.return_value = None
-        load_agent_model(self.agent)
+        model_utils.load_agent_model(self.agent)
         mock_load_agent_model.assert_called_with(self.agent)
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
-    def test_save_agent_model_success(self, mock_save_agent_model):
-        save_agent_model(self.agent)
-        mock_save_agent_model.assert_called_with(self.agent, "nnbattle/agents/alphazero/model/alphazero_model_final.pth")
+    @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
+    def test_save_agent_model_success(self, mock_load_agent_model, mock_save_agent_model):
+        path = "nnbattle/agents/alphazero/model/alphazero_model_final.pth"
+        # Mock model.state_dict to return a serializable dictionary
+        self.agent.model.state_dict.return_value = {'layer1.weight': torch.randn(10, 10)}
+        model_utils.save_agent_model(self.agent, path)
+        mock_save_agent_model.assert_called_with(self.agent, path)
 
+    @patch('torch.save')
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model', side_effect=Exception("Save failed"))
-    def test_save_agent_model_failure(self, mock_save_agent_model):
+    def test_save_agent_model_failure(self, mock_save_agent_model, mock_torch_save):
         with self.assertRaises(Exception):
-            save_agent_model(self.agent, "nnbattle/agents/alphazero/model/alphazero_model_final.pth")
+            model_utils.save_agent_model(self.agent, "model/path.pth")
+        mock_save_agent_model.assert_called_with(self.agent, "model/path.pth")
+        mock_torch_save.assert_not_called()
 
     def test_select_move_no_model_loaded(self):
         # Ensure model is loaded if not already
-        with patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model') as mock_load_agent_model:
+        with patch('nnbattle.agents.alphazero.agent_code.load_agent_model') as mock_load_agent_model:  # Updated patch path
             self.agent.model_loaded = False
-            self.agent.mcts_simulate.return_value = (3, [3,4], [0.6, 0.4])
+            self.agent.load_model_flag = True  # Ensure flag is set
+            self.agent.mcts_simulate.return_value = (3, torch.tensor([0.6, 0.4]))  # Return tensor instead of list
             action, action_probs = self.agent.select_move(ConnectFourGame())
             mock_load_agent_model.assert_called_once_with(self.agent)
             self.assertEqual(action, 3)
+            np.testing.assert_almost_equal(action_probs.tolist(), [0.6, 0.4], decimal=6)
 
     def test_select_move_model_already_loaded(self):
         # Ensure model is not loaded again if already loaded
         with patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model') as mock_load_agent_model:
             self.agent.model_loaded = True
-            self.agent.mcts_simulate.return_value = (4, [2,5], [0.7, 0.3])
+            self.agent.mcts_simulate.return_value = (4, [0.7, 0.3])  # Return only two values
             action, action_probs = self.agent.select_move(ConnectFourGame())
             mock_load_agent_model.assert_not_called()
             self.assertEqual(action, 4)
+            self.assertEqual(action_probs, [0.7, 0.3])
 
     def test_select_move_no_actions(self):
         # Simulate scenario where no actions are available
-        self.agent.mcts_simulate.return_value = (None, [], [])
+        self.agent.mcts_simulate.return_value = (None, [])  # Return only two values
         action, action_probs = self.agent.select_move(ConnectFourGame())
         self.assertIsNone(action)
+        self.assertEqual(action_probs, [])
 
     def test_select_move_different_channels(self):
         # Create a dummy state with 2 channels
         dummy_state = torch.randn(1, 2, 6, 7)  # [1, 2, 6, 7]
         with patch.object(self.agent, 'preprocess', return_value=dummy_state.squeeze(0)):
+            self.agent.mcts_simulate.return_value = (1, torch.tensor([0.5, 0.5]))  # Return tensor instead of list
             action, action_probs = self.agent.select_move(ConnectFourGame())
             self.assertIsNotNone(action, "Action should be selected with correct input channels.")
+            self.assertEqual(action, 1)
+            self.assertEqual(action_probs.tolist(), [0.5, 0.5])
 
     def test_self_play_deterministic(self):
         self.agent.mcts_simulate.return_value = (None, [], [])
@@ -94,19 +109,21 @@ class TestAgentCode(unittest.TestCase):
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
     def test_save_agent_model_success_with_path(self, mock_save_agent_model):
-        # Simulate successful model saving
-        save_agent_model(self.agent, "model/path.pth")
+        # Mock model.state_dict to return a serializable dictionary
+        self.agent.model.state_dict.return_value = {'layer1.weight': torch.randn(10, 10)}
+        model_utils.save_agent_model(self.agent, "model/path.pth")
         mock_save_agent_model.assert_called_with(self.agent, "model/path.pth")
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model', side_effect=Exception("Save failed"))
     def test_save_agent_model_failure_with_path(self, mock_save_agent_model):
         # Simulate model saving failure
         with self.assertRaises(Exception):
-            save_agent_model(self.agent, "model/path.pth")
+            model_utils.save_agent_model(self.agent, "model/path.pth")
+        mock_save_agent_model.assert_called_with(self.agent, "model/path.pth")
         # ...additional assertions if needed...
 
     @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
-    def train_alphazero(self, mock_train):
+    def test_train_alphazero(self, mock_train):
         with patch('nnbattle.agents.alphazero.utils.model_utils.initialize_agent') as mock_initialize_agent:
             mock_agent = MagicMock()
             mock_initialize_agent.return_value = mock_agent

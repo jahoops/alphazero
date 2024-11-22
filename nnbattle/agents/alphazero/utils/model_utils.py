@@ -37,6 +37,7 @@ def save_agent_model(agent: 'AlphaZeroAgent', path: str = MODEL_PATH):
     :param agent: Instance of AlphaZeroAgent.
     :param path: Destination path for the model weights.
     """
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     torch.save(agent.model.state_dict(), path)
     logging.getLogger(__name__).info(f"Model saved to {path}.")
 

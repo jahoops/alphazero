@@ -75,11 +75,11 @@ class AlphaZeroAgent(Agent):
         load_agent_model(self)
 
     def save_model_method(self):
-        save_agent_model(self)
+        save_agent_model(self, self.model_path)  # Pass the model_path explicitly
 
     def select_move(self, game: ConnectFourGame):
         if self.load_model_flag and not self.model_loaded:
-            self.load_model_method()
+            load_agent_model(self)  # Call load_agent_model directly
 
         start_time = time.time()
         selected_action, action_probs = self.act(game)
@@ -88,12 +88,12 @@ class AlphaZeroAgent(Agent):
 
         if selected_action is None:
             logger.warning("No possible actions available.")
-            return None
+            return None, []
 
         return selected_action, action_probs
 
     def act(self, game: ConnectFourGame):
-        selected_action, actions, action_probs = self.mcts_simulate(game)
+        selected_action, action_probs = self.mcts_simulate(game)
         if selected_action is None:
             logger.warning("No valid action selected by MCTS.")
             return None, []
@@ -154,7 +154,7 @@ class AlphaZeroAgent(Agent):
         for child in root.children.values():
             action_probs[child.action] = child.visits / total_visits
 
-        return selected_action, torch.FloatTensor(action_probs).to(self.device)
+        return selected_action, torch.tensor(action_probs).to(self.device)
 
     def self_play(self):
         game_data = []
