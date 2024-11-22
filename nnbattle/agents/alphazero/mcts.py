@@ -2,27 +2,29 @@
 
 import logging
 import math
+import numpy as np
+from typing import Optional
 from copy import deepcopy
 
 from nnbattle.game.connect_four_game import ConnectFourGame 
-
 from .utils import deepcopy_env  # Assuming you have a deepcopy utility
+from .utils.preprocessing import preprocess_board
 
 logger = logging.getLogger(__name__)
 
 class MCTSNode:
-    def __init__(self, parent=None, action=None, env=None):
+    def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], env: ConnectFourGame):
         self.parent = parent
         self.action = action
-        self.env = deepcopy_env(env) if env else None
+        self.env = env
         self.children = {}
         self.visits = 0
         self.value = 0.0
 
-    def is_leaf(self):
+    def is_leaf(self) -> bool:
         return len(self.children) == 0
 
-    def best_child(self, c_puct=1.4):
+    def best_child(self, c_puct: float) -> Optional['MCTSNode']:
         best_score = -float('inf')
         best_child = None
         for child in self.children.values():
@@ -32,12 +34,12 @@ class MCTSNode:
                 best_child = child
         return best_child
 
-    def expand(self, action_probs, legal_moves):
+    def expand(self, policy: np.ndarray, legal_moves: list):
         for action in legal_moves:
             if action not in self.children:
                 self.children[action] = MCTSNode(parent=self, action=action, env=self.env)
 
-    def backpropagate(self, reward):
+    def backpropagate(self, reward: float):
         self.visits += 1
         self.value += reward
         if self.parent:

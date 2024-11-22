@@ -5,8 +5,10 @@ import copy
 import logging
 import os
 import torch
-# Remove the direct import of AlphaZeroAgent to prevent circular import
-# from .agent_code import AlphaZeroAgent  # Removed to fix circular dependency
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .agent_code import AlphaZeroAgent  # Prevent circular import at runtime
 
 def preprocess_board(board, player):
     """
@@ -50,7 +52,7 @@ def load_agent_model(agent: "AlphaZeroAgent"):
         logging.getLogger(__name__).error(f"Model path {MODEL_PATH} does not exist.")
         raise FileNotFoundError(f"Model path {MODEL_PATH} does not exist.")
 
-def save_agent_model(agent: "AlphaZeroAgent", path: str):
+def save_agent_model(agent: AlphaZeroAgent, path: str = MODEL_PATH):
     """
     Saves the agent's model to the specified path.
 
@@ -68,7 +70,7 @@ def initialize_agent(
     num_simulations=800,
     c_puct=1.4,
     load_model=True
-):
+) -> "AlphaZeroAgent":
     """
     Initializes and returns an instance of AlphaZeroAgent.
 

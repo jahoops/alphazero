@@ -1,17 +1,19 @@
 # /__init__.py
 
-from .agent_code import AlphaZeroAgent
-from .utils import initialize_agent, load_agent_model, save_agent_model  # Updated imports
-from .lightning_module import Connect4LightningModule
-from .data_module import ConnectFourDataModule
+from .agent import AlphaZeroAgent
+from .utils.model_io import initialize_agent, load_agent_model, save_agent_model
+from .mcts import MCTSNode
+from .train.trainer import train_alphazero
+from .network import Connect4Net
 
 __all__ = [
     'AlphaZeroAgent',
     'initialize_agent',
     'load_agent_model',
     'save_agent_model',
-    'Connect4LightningModule',
-    'ConnectFourDataModule',
+    'MCTSNode',
+    'train_alphazero',
+    'Connect4Net',
 ]
 
 
