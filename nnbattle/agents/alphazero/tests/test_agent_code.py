@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent  # Updated absolute import
 from nnbattle.agents.alphazero.network import Connect4Net      # Updated absolute import
-from nnbattle.agents.alphazero.mcts import MCTSNode            # Updated absolute import
+from nnbattle.agents.alphazero.mcts import MCTSNode            # Ensure MCTSNode is correctly imported
 from nnbattle.game.connect_four_game import ConnectFourGame 
 
 # Configure logging if present

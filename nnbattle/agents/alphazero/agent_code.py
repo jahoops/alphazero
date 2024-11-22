@@ -12,8 +12,8 @@ from nnbattle.game.connect_four_game import ConnectFourGame  # Update the import
 
 from .network import Connect4Net
 from nnbattle.agents.base_agent import Agent
-from nnbattle.agents.base_agent import Agent
 
+# Configure logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
