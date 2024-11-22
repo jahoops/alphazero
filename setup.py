@@ -10,4 +10,7 @@ setup(
         'torch',
         'numpy'
     ],
+    extras_require={
+        'test': ['pytest'],
+    },
 )
