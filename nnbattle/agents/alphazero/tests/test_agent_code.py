@@ -1,15 +1,22 @@
 # /tests/test_agent_code.py
 
+# Configure logging
+import logging
 import unittest
 from unittest.mock import MagicMock, patch
 
-from alphazero.agent_code import AlphaZeroAgent
+from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent  # Updated absolute import
+from nnbattle.agents.alphazero.network import Connect4Net      # Updated absolute import
+from nnbattle.agents.alphazero.mcts import MCTSNode            # Updated absolute import
 from nnbattle.game.connect_four_game import ConnectFourGame 
 
+# Configure logging if present
+logging.basicConfig(level=logging.INFO)  # Changed from DEBUG or other levels to INFO
+logger = logging.getLogger(__name__)
 
 class TestAlphaZeroAgent(unittest.TestCase):
-    @patch('.agent_code.Connect4Net')
-    @patch('.agent_code.MCTSNode')
+    @patch('nnbattle.agents.alphazero.network.Connect4Net')
+    @patch('nnbattle.agents.alphazero.mcts.MCTSNode')
     def setUp(self, mock_mcts_node, mock_connect4net):
         self.agent = AlphaZeroAgent(
             state_dim=2,  # Updated from previous value
@@ -22,7 +29,7 @@ class TestAlphaZeroAgent(unittest.TestCase):
         self.agent.model.eval = MagicMock()
         mock_mcts_node.return_value = MagicMock()
 
-    @patch('.agent_code.torch.load')
+    @patch('nnbattle.agents.alphazero.agent_code.torch.load')
     def test_load_model_success(self, mock_torch_load):
         # Simulate successful model loading
         mock_torch_load.return_value = {}
@@ -30,7 +37,7 @@ class TestAlphaZeroAgent(unittest.TestCase):
         self.assertTrue(self.agent.model_loaded)
         self.agent.model.load_state_dict.assert_called()
 
-    @patch('.agent_code.torch.load')
+    @patch('nnbattle.agents.alphazero.agent_code.torch.load')
     def test_load_model_failure(self, mock_torch_load):
         # Simulate model loading failure
         mock_torch_load.side_effect = Exception("Load failed")

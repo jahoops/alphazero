@@ -13,6 +13,7 @@ from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import Connect4LightningModule
 from nnbattle.game import ConnectFourGame
 from nnbattle.agents.base_agent import Agent
+from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent, initialize_agent  # Ensure AlphaZeroAgent is imported
 
 # Configure logging at the start of the file
 logging.basicConfig(
@@ -38,15 +39,16 @@ def self_play(agent, num_games):
         logger.info(f"Starting game {game_num + 1}/{num_games}")
         game_start_time = time.time()
         while not game.is_terminal():
-            move = agent.select_move(game)
-            game.make_move(move)
+            # Unpack selected_action and action_probs
+            selected_action, action_probs = agent.select_move(game)
+            game.make_move(selected_action)  # Pass only the action, not the tuple
             agent.current_player = game.current_player  # Update current player
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
         result = game.get_result()
         # Ensure that state is preprocessed correctly
         preprocessed_state = agent.preprocess(game.get_state())  # Shape: [2,6,7]
-        mcts_prob = [0] * agent.action_dim  # Placeholder for MCTS probabilities
+        mcts_prob = torch.zeros(agent.action_dim, dtype=torch.float32)  # Initialize as Tensor
         memory.append((preprocessed_state, mcts_prob, result))
         logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
     agent.memory.extend(memory)  # Assuming agent.memory is a list
@@ -60,7 +62,7 @@ def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_mode
     state_dim = 2          # Updated to match number of channels
     action_dim = 7         # Seven possible actions
     num_simulations = 800  # Number of MCTS simulations
-    agent = AlphaZeroAgent(state_dim=state_dim, action_dim=action_dim, use_gpu=use_gpu, load_model=load_model, num_simulations=num_simulations)
+    agent = AlphaZeroAgent.initialize_agent()  # Use the imported initialize_agent
     
     # Log GPU usage during training
     if torch.cuda.is_available() and use_gpu:
@@ -108,4 +110,5 @@ def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_mode
     logger.info(f"Training completed in {timedelta(seconds=elapsed_time)}")
 
 if __name__ == "__main__":
-    train_alphazero(time_limit=0.1, num_self_play_games=2, load_model=False)  # Example: train for 6 minutes without loading existing model
+    agent = AlphaZeroAgent.initialize_agent()
+    train_alphazero(time_limit=0.1, num_self_play_games=2, load_model=False)

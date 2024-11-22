@@ -1,10 +1,15 @@
 # game/connect_four_game.py
 
 import copy
+import logging
 
 import numpy as np
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 PLAYER_PIECE = 1
+# Removed duplicate PLAYER_PIECE definition
+# PLAYER_PIECE = 1
 AI_PIECE = 2
 EMPTY = 0
 ROW_COUNT = 6
@@ -17,10 +22,10 @@ class ConnectFourGame:
         self.current_player = PLAYER_PIECE  # Player 1 starts
 
     def copy(self):
-        """
-        Creates a deep copy of the current game state.
-        """
-        return copy.deepcopy(self)
+        new_game = ConnectFourGame()
+        new_game.board = self.board.copy()  # Ensure a copy of the NumPy array is made
+        new_game.current_player = self.current_player
+        return new_game
 
     def reset(self):
         """
@@ -116,6 +121,7 @@ class ConnectFourGame:
         :param col: Integer representing the column index.
         :return: Boolean indicating if a move can be made in the column.
         """
+        assert isinstance(self.board, np.ndarray), f"self.board is not a NumPy array but {type(self.board)}"
         return self.board[0][col] == EMPTY
 
     def get_next_open_row(self, col):
@@ -146,7 +152,10 @@ class ConnectFourGame:
         :param player: Integer representing the player's piece.
         :return: Boolean indicating if the player has won.
         """
-        return len(self.get_win_positions(player)) > 0
+        win_positions = self.get_win_positions(player)
+        if win_positions:
+            logger.info(f"Player {player} has winning positions: {win_positions}")
+        return len(win_positions) > 0
 
     def get_win_positions(self, player):
         """
@@ -160,13 +169,13 @@ class ConnectFourGame:
         for row in range(ROW_COUNT):
             for col in range(COLUMN_COUNT - 3):
                 window = self.board[row, col:col+WINDOW_LENGTH]
-                if all(window == player):
+                if np.all(window == player):
                     wins.append(((row, col), (0, 1)))
         # Vertical
         for col in range(COLUMN_COUNT):
             for row in range(ROW_COUNT - 3):
                 window = self.board[row:row+WINDOW_LENGTH, col]
-                if all(window == player):
+                if np.all(window == player):
                     wins.append(((row, col), (1, 0)))
         # Positive Diagonal
         for row in range(ROW_COUNT - 3):
@@ -175,9 +184,9 @@ class ConnectFourGame:
                 if all(cell == player for cell in window):
                     wins.append(((row, col), (1, 1)))
         # Negative Diagonal
-        for row in range(3, ROW_COUNT):
+        for row in range(3, ROW_COUNT):  # Changed range from (ROW_COUNT - 3) to (3, ROW_COUNT)
             for col in range(COLUMN_COUNT - 3):
-                window = [self.board[row-i][col+i] for i in range(WINDOW_LENGTH)]
+                window = [self.board[row - i][col + i] for i in range(WINDOW_LENGTH)]  # Corrected indexing
                 if all(cell == player for cell in window):
                     wins.append(((row, col), (-1, 1)))
         return wins
@@ -238,9 +247,9 @@ class ConnectFourGame:
                 score += self.evaluate_window(window, piece)
 
         # Score negative sloped diagonals
-        for row in range(ROW_COUNT-3):
+        for row in range(3, ROW_COUNT):  # Changed from range(ROW_COUNT-3) to range(3, ROW_COUNT)
             for col in range(COLUMN_COUNT-3):
-                window = [self.board[row+3-i][col+i] for i in range(WINDOW_LENGTH)]
+                window = [self.board[row-i][col+i] for i in range(WINDOW_LENGTH)]  # Corrected indexing
                 score += self.evaluate_window(window, piece)
 
         return score

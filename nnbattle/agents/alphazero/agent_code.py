@@ -10,8 +10,8 @@ import torch
 
 from nnbattle.game.connect_four_game import ConnectFourGame  # Update the import path as needed
 
-from .mcts import MCTSNode
 from .network import Connect4Net
+from nnbattle.agents.base_agent import Agent
 from nnbattle.agents.base_agent import Agent
 
 # Configure logging
@@ -19,6 +19,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname
 logger = logging.getLogger(__name__)
 
 class AlphaZeroAgent(Agent):
+    # Add logger as a class attribute
+    logger = logging.getLogger(__name__)
+
     def __init__(
         self,
         action_dim,
@@ -42,6 +45,9 @@ class AlphaZeroAgent(Agent):
         self.memory = []  # Initialize empty memory list
         self.model = Connect4Net(state_dim, action_dim).to(self.device)
         
+        # Initialize the logger instance
+        self.logger = self.__class__.logger
+
         logger.info(f"Using device: {self.device}")
         if self.device.type == "cuda":
             logger.info(f"GPU: {torch.cuda.get_device_name()}")
@@ -73,10 +79,11 @@ class AlphaZeroAgent(Agent):
         :param board: Current game board as a NumPy array.
         :return: Preprocessed board as a Torch tensor with shape [2, 6, 7].
         """
+        board = board.copy()  # Add this line to prevent modifying the original board
         opponent_player = 2 if self.current_player == 1 else 1
         current_board = (board == self.current_player).astype(float)
         opponent_board = (board == opponent_player).astype(float)
-        tensor_board = torch.FloatTensor([current_board, opponent_board]).to(self.device)  # Shape: [2,6,7]
+        tensor_board = torch.FloatTensor([current_board, opponent_board]).to(self.device)  # Ensure Tensor type
         return tensor_board
 
     def load_model(self):
@@ -113,7 +120,7 @@ class AlphaZeroAgent(Agent):
 
         start_time = time.time()
         # Perform MCTS to get action probabilities
-        selected_action, actions, probs = self.act(game.board, game, self.num_simulations)
+        selected_action, actions, action_probs = self.act(game.board, game, self.num_simulations)
         end_time = time.time()
         logger.info(f"Time taken for select_move: {end_time - start_time:.4f} seconds")
 
@@ -121,7 +128,7 @@ class AlphaZeroAgent(Agent):
             logger.warning("No possible actions available.")
             return None
 
-        return selected_action
+        return selected_action, action_probs  # Return both selected_action and action_probs
 
     def act(self, state, env, num_simulations=800):
         """
@@ -166,33 +173,38 @@ class AlphaZeroAgent(Agent):
         for simulation in range(num_simulations):
             node = root
             env_copy = env.copy()
+            game_copy = ConnectFourGame()
+            game_copy.board = deepcopy(env_copy.board)
+            game_copy.current_player = env_copy.current_player
 
             # === Selection ===
-            while not node.is_leaf() and not env_copy.is_terminal():
+            while not node.is_leaf() and not game_copy.is_terminal():
                 node = node.best_child(c_puct=self.c_puct)
                 if node is None:
                     break
-                env_copy.make_move(node.action)
-                self.current_player = -self.current_player  # Switch player
+                game_copy.make_move(node.action)
+                # Switch player
+                game_copy.current_player = AI_PIECE if game_copy.current_player == PLAYER_PIECE else PLAYER_PIECE
 
             if node is None:
                 continue
 
             # === Evaluation ===
-            if env_copy.is_terminal():
+            if game_copy.is_terminal():
                 # Terminal node reached; get reward and backpropagate
-                reward = env_copy.get_reward()
+                reward = game_copy.get_reward()
                 node.backpropagate(reward)
                 continue
 
             # === Expansion ===
-            legal_moves = env_copy.get_valid_locations()
+            legal_moves = game_copy.get_valid_locations()
             if not legal_moves:
                 # No moves possible
                 node.backpropagate(0)
                 continue
 
-            state_tensor = self.preprocess(env_copy.board).unsqueeze(0)  # Shape: [1, 2, 6, 7]
+            state_tensor = self.preprocess(game_copy.board).unsqueeze(0)
+            # Ensure that game_copy.board remains a NumPy array after preprocessing
             with torch.no_grad():
                 log_policy, value = self.model(state_tensor)
                 policy = torch.exp(log_policy).cpu().numpy().flatten()
@@ -227,7 +239,10 @@ class AlphaZeroAgent(Agent):
         for child in root.children.values():
             action_probs[child.action] = child.visits / total_visits
 
-        return selected_action, list(root.children.keys()), action_probs.tolist()
+        # Convert action_probs to a FloatTensor before returning
+        action_probs = torch.FloatTensor(action_probs).to(self.device)
+
+        return selected_action, list(root.children.keys()), action_probs
 
     def self_play(self):
         """
@@ -240,16 +255,14 @@ class AlphaZeroAgent(Agent):
 
         while not done:
             self.current_player = player
-            selected_action = self.select_move(self.env)
+            selected_action, action_probs = self.select_move(self.env)
             if selected_action is None:
                 logger.error("Agent failed to select a valid action during self-play.")
                 break
 
-            # Placeholder for action probabilities; in practice, use MCTS probabilities
-            action_probs = [0.0] * self.action_dim
-            action_probs[selected_action] = 1.0  # Assuming deterministic selection for self-play
+            # action_probs is already a FloatTensor from select_move
 
-            game_data.append((state.copy(), action_probs.copy(), player))
+            game_data.append((state.copy(), action_probs, player))
             state, reward, done, _ = self.env.step(selected_action)
             player = -player  # Switch players
 
@@ -265,3 +278,41 @@ class AlphaZeroAgent(Agent):
             self.memory.append((state_data, mcts_prob, value))
 
     # Removed train_step since training is handled by LightningModule
+
+    def load_agent_model(self):
+        """
+        Loads the agent's model from the specified path.
+
+        Raises:
+            FileNotFoundError: If the model path does not exist.
+            Exception: If there is an error loading the model.
+        """
+        if not os.path.exists(self.model_path):
+            logger.error(f"Model path {self.model_path} does not exist.")
+            raise FileNotFoundError(f"Model path {self.model_path} does not exist.")
+        try:
+            self.model.load_state_dict(torch.load(self.model_path, map_location=self.device))
+            self.model.eval()
+            self.model_loaded = True
+            logger.info(f"Agent model loaded successfully from {self.model_path}")
+        except Exception as e:
+            logger.error(f"Error loading model: {e}")
+            raise e
+
+    def initialize_agent():
+        """
+        Initializes and returns an AlphaZeroAgent instance.
+
+        Returns:
+            AlphaZeroAgent: An instance of the AlphaZeroAgent.
+        """
+        agent = AlphaZeroAgent(
+            state_dim=2,
+            action_dim=7,
+            use_gpu=True,  # Set to True if using GPU
+            model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",
+            num_simulations=800,
+            c_puct=1.4,
+            load_model=True  # Set to False if you don't want to load an existing model
+        )
+        return agent

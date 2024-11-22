@@ -16,6 +16,7 @@ class TestMinimaxAgent(unittest.TestCase):
 
     def test_win_detection(self):
         # Simulate a simple win scenario
+        PLAYER_PIECE = 1  # Define PLAYER_PIECE
         for i in range(4):
             row = self.game.get_next_open_row(0)
             self.game.drop_piece(row, 0, PLAYER_PIECE)

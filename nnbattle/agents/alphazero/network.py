@@ -45,6 +45,8 @@ class Connect4Net(nn.Module):
         x = self.conv_layers(x)
         x = x.view(x.size(0), -1)
         x = self.fc_layers(x)
-        log_policy = F.log_softmax(self.policy_head(x), dim=1)
+        log_policy = F.log_softmax(self.policy_head(x), dim=1)  # Ensure log_softmax is applied
         value = torch.tanh(self.value_head(x))
         return log_policy, value
+
+# Ensure no duplicated classes or functions that are now in agent_code.py

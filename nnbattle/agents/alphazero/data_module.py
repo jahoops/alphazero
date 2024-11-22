@@ -7,7 +7,7 @@ import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)  # Changed from DEBUG to INFO
 
 
 class ConnectFourDataset(Dataset):
@@ -19,7 +19,12 @@ class ConnectFourDataset(Dataset):
 
     def __getitem__(self, idx):
         tensor_state, mcts_prob, value = self.memory[idx]
-        return tensor_state, torch.FloatTensor(mcts_prob), torch.FloatTensor([value])
+        
+        # Ensure mcts_prob is a FloatTensor
+        if isinstance(mcts_prob, list):
+            mcts_prob = torch.FloatTensor(mcts_prob)
+        
+        return tensor_state, mcts_prob, torch.FloatTensor([value])
 
 
 class ConnectFourDataModule(pl.LightningDataModule):

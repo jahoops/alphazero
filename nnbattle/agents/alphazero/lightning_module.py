@@ -20,7 +20,7 @@ class Connect4LightningModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         states, mcts_probs, values = batch
         log_policy, predicted_values = self.model(states)  # Unpack model outputs
-        policy_loss = nn.CTCLoss()(log_policy, mcts_probs)  # Adjust loss function as needed
+        policy_loss = nn.KLDivLoss(reduction='batchmean')(log_policy, mcts_probs)  # Use KLDivLoss
         value_loss = self.loss_function(predicted_values, values)
         loss = policy_loss + value_loss  # Combine losses
         self.log('train_loss', loss)
