@@ -8,12 +8,15 @@ import torch
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
+from nnbattle.game import ConnectFourGame
+from nnbattle.agents.alphazero.agent_code import initialize_agent  # Ensure correct import
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import Connect4LightningModule
-from nnbattle.game import ConnectFourGame
-from nnbattle.agents.base_agent import Agent
-
-from nnbattle.agents.alphazero.utils import deepcopy_env, initialize_agent, load_agent_model, save_agent_model  # Updated imports
+from nnbattle.agents.alphazero.utils.model_utils import (
+    MODEL_PATH,
+    load_agent_model,
+    save_agent_model
+)
 
 # Configure logging at the start of the file
 logging.basicConfig(
@@ -59,15 +62,25 @@ def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_mode
     start_time = time.time()
     
     # Initialize Agent using initialize_agent from utils.py
-    agent = initialize_agent(
+    agent = initialize_agent(  # Ensure this call is present
         action_dim=7,
         state_dim=2,
         use_gpu=use_gpu,
-        # model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",  # Removed to use centralized MODEL_PATH
         num_simulations=800,
         c_puct=1.4,
         load_model=load_model
     )
+    
+    # Ensure agent.model_path is set
+    agent.model_path = MODEL_PATH  # Added line
+    
+    if load_model:
+        try:
+            load_agent_model(agent)
+            logger.info("Model loaded successfully")
+        except FileNotFoundError as e:
+            logger.error(f"Model path {MODEL_PATH} does not exist.")
+            raise e
     
     # Log GPU usage during training
     if torch.cuda.is_available() and use_gpu:

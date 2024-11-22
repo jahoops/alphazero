@@ -8,11 +8,10 @@ import numpy as np
 import torch
 
 from nnbattle.game.connect_four_game import ConnectFourGame
-
 from .network import Connect4Net
-from nnbattle.agents.base_agent import Agent
-from .utils import deepcopy_env, load_agent_model, save_agent_model, MODEL_PATH  # Added MODEL_PATH import
-from .mcts import MCTSNode  # Added import for MCTSNode
+from .utils.model_utils import load_agent_model, save_agent_model, MODEL_PATH
+from .mcts import MCTSNode
+from nnbattle.agents.base_agent import Agent  # Ensure this import is correct
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
@@ -191,5 +190,27 @@ class AlphaZeroAgent(Agent):
             use_gpu=self.device.type == 'cuda',
             load_model=self.model_loaded
         )
+
+def initialize_agent(
+    action_dim=7,
+    state_dim=2,
+    use_gpu=False,
+    num_simulations=800,
+    c_puct=1.4,
+    load_model=True
+) -> AlphaZeroAgent:
+    """
+    Initializes and returns an instance of AlphaZeroAgent.
+
+    :return: AlphaZeroAgent instance
+    """
+    return AlphaZeroAgent(
+        action_dim=action_dim,
+        state_dim=state_dim,
+        use_gpu=use_gpu,
+        num_simulations=num_simulations,
+        c_puct=c_puct,
+        load_model=load_model
+    )
 
 __all__ = ['AlphaZeroAgent']

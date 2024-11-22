@@ -1,18 +1,18 @@
-# /tests/test_agent_code.py
-
 import logging
 import unittest
 from unittest.mock import MagicMock, patch
+import torch
 
-from nnbattle.agents.alphazero.utils import initialize_agent, load_agent_model, save_agent_model
-from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent
+from nnbattle.agents.alphazero.utils.model_utils import load_agent_model, save_agent_model
+from nnbattle.agents.alphazero.agent_code import initialize_agent
+from nnbattle.agents.alphazero.train.trainer import train_alphazero
 from nnbattle.game.connect_four_game import ConnectFourGame
 
 # Configure logging if present
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class TestAlphaZeroAgent(unittest.TestCase):
+class TestAgentCode(unittest.TestCase):
     def setUp(self):
         # Initialize agent without patching Connect4Net and MCTSNode
         self.agent = initialize_agent(
@@ -21,39 +21,39 @@ class TestAlphaZeroAgent(unittest.TestCase):
             use_gpu=True,
             num_simulations=800,
             c_puct=1.4,
-            load_model=False
+            load_model=False  # Corrected argument name
         )
         # Mock the necessary methods instead of entire classes
         self.agent.model = MagicMock()
         self.agent.model.eval = MagicMock()
         self.agent.mcts_simulate = MagicMock()
 
-    @patch('nnbattle.agents.alphazero.utils.load_agent_model')
+    @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model', side_effect=FileNotFoundError("Model path does not exist."))
+    def test_load_agent_model_failure(self, mock_load_agent_model):
+        with self.assertRaises(FileNotFoundError):
+            load_agent_model(self.agent)
+        mock_load_agent_model.assert_called_once_with(self.agent)
+
+    @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
     @patch('nnbattle.agents.alphazero.agent_code.torch.load')
-    def test_load_model_success(self, mock_torch_load, mock_load_agent_model):
+    def test_load_agent_model_success(self, mock_torch_load, mock_load_agent_model):
         mock_load_agent_model.return_value = None
         load_agent_model(self.agent)
         mock_load_agent_model.assert_called_with(self.agent)
 
-    @patch('nnbattle.agents.alphazero.utils.load_agent_model', side_effect=Exception("Load failed"))
-    @patch('nnbattle.agents.alphazero.agent_code.torch.load')
-    def test_load_model_failure(self, mock_torch_load, mock_load_agent_model):
-        with self.assertRaises(Exception):
-            load_agent_model(self.agent)
-
-    @patch('nnbattle.agents.alphazero.utils.save_agent_model')
-    def test_save_model_success(self, mock_save_agent_model):
+    @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
+    def test_save_agent_model_success(self, mock_save_agent_model):
         save_agent_model(self.agent)
         mock_save_agent_model.assert_called_with(self.agent, "nnbattle/agents/alphazero/model/alphazero_model_final.pth")
 
-    @patch('nnbattle.agents.alphazero.utils.save_agent_model', side_effect=Exception("Save failed"))
-    def test_save_model_failure(self, mock_save_agent_model):
+    @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model', side_effect=Exception("Save failed"))
+    def test_save_agent_model_failure(self, mock_save_agent_model):
         with self.assertRaises(Exception):
             save_agent_model(self.agent, "nnbattle/agents/alphazero/model/alphazero_model_final.pth")
 
     def test_select_move_no_model_loaded(self):
         # Ensure model is loaded if not already
-        with patch('nnbattle.agents.alphazero.utils.load_agent_model') as mock_load_agent_model:
+        with patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model') as mock_load_agent_model:
             self.agent.model_loaded = False
             self.agent.mcts_simulate.return_value = (3, [3,4], [0.6, 0.4])
             action, action_probs = self.agent.select_move(ConnectFourGame())
@@ -62,7 +62,7 @@ class TestAlphaZeroAgent(unittest.TestCase):
 
     def test_select_move_model_already_loaded(self):
         # Ensure model is not loaded again if already loaded
-        with patch('nnbattle.agents.alphazero.utils.load_agent_model') as mock_load_agent_model:
+        with patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model') as mock_load_agent_model:
             self.agent.model_loaded = True
             self.agent.mcts_simulate.return_value = (4, [2,5], [0.7, 0.3])
             action, action_probs = self.agent.select_move(ConnectFourGame())
@@ -92,22 +92,22 @@ class TestAlphaZeroAgent(unittest.TestCase):
                 self.assertEqual(mcts_prob[3], 1.0)
                 self.assertEqual(value, -1)  # Assuming player 1 lost
 
-    @patch('nnbattle.agents.alphazero.utils.save_agent_model')
-    def test_save_model_success_with_path(self, mock_save_agent_model):
+    @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
+    def test_save_agent_model_success_with_path(self, mock_save_agent_model):
         # Simulate successful model saving
         save_agent_model(self.agent, "model/path.pth")
         mock_save_agent_model.assert_called_with(self.agent, "model/path.pth")
 
-    @patch('nnbattle.agents.alphazero.utils.save_agent_model', side_effect=Exception("Save failed"))
-    def test_save_model_failure_with_path(self, mock_save_agent_model):
+    @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model', side_effect=Exception("Save failed"))
+    def test_save_agent_model_failure_with_path(self, mock_save_agent_model):
         # Simulate model saving failure
         with self.assertRaises(Exception):
             save_agent_model(self.agent, "model/path.pth")
         # ...additional assertions if needed...
 
-    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
-    def test_train_alphazero(self, mock_train):
-        with patch('nnbattle.agents.alphazero.utils.initialize_agent') as mock_initialize_agent:
+    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    def train_alphazero(self, mock_train):
+        with patch('nnbattle.agents.alphazero.utils.model_utils.initialize_agent') as mock_initialize_agent:
             mock_agent = MagicMock()
             mock_initialize_agent.return_value = mock_agent
             train_alphazero(

@@ -7,8 +7,7 @@ from typing import Optional
 from copy import deepcopy
 
 from nnbattle.game.connect_four_game import ConnectFourGame 
-from .utils import deepcopy_env  # Assuming you have a deepcopy utility
-from .utils.preprocessing import preprocess_board
+from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
 
 logger = logging.getLogger(__name__)
 
