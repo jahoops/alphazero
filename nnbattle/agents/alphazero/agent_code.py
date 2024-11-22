@@ -4,6 +4,8 @@ import logging
 from collections import deque
 import os
 import time
+from unittest.mock import MagicMock  # Add this import
+from nnbattle.agents.alphazero.mcts import MCTSNode  # Add this import
 
 import numpy as np
 import torch
@@ -12,10 +14,10 @@ from nnbattle.game.connect_four_game import ConnectFourGame  # Update the import
 
 from .network import Connect4Net
 from nnbattle.agents.base_agent import Agent
+from .utils import deepcopy_env, load_agent_model, save_agent_model  # Updated import
 
 # Configure logging
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %( message)s')
 logger = logging.getLogger(__name__)
 
 class AlphaZeroAgent(Agent):
@@ -27,7 +29,6 @@ class AlphaZeroAgent(Agent):
         action_dim,
         state_dim=2,  # Updated default value
         use_gpu=False,
-        model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",
         num_simulations=800,
         c_puct=1.4,
         load_model=True  # Add this parameter
@@ -36,14 +37,15 @@ class AlphaZeroAgent(Agent):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.device = torch.device("cuda" if use_gpu and torch.cuda.is_available() else "cpu")
-        self.model_path = model_path
         self.model_loaded = False
         self.load_model_flag = load_model  # Store the flag
         self.num_simulations = num_simulations  # Initialize num_simulations
         self.c_puct = c_puct  # Initialize c_puct
         self.current_player = 1  # Initialize current_player
         self.memory = []  # Initialize empty memory list
-        self.model = Connect4Net(state_dim, action_dim).to(self.device)
+        self.model = Connect4Net(state_dim, action_dim)
+        if not isinstance(self.model, MagicMock):
+            self.model = self.model.to(self.device)
         
         # Initialize the logger instance
         self.logger = self.__class__.logger
@@ -54,7 +56,7 @@ class AlphaZeroAgent(Agent):
             logger.info(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
         
         if load_model:
-            self.load_model()
+            load_agent_model(self)  # Use utility function
 
     def log_gpu_stats(self):
         """Log detailed GPU statistics."""
@@ -87,26 +89,13 @@ class AlphaZeroAgent(Agent):
         return tensor_board
 
     def load_model(self):
-        """Load the model with weights_only=True for security."""
-        if os.path.exists(self.model_path):
-            self.model.load_state_dict(
-                torch.load(
-                    self.model_path,
-                    map_location=self.device,
-                    weights_only=True  # Add this parameter
-                )
-            )
-            logger.info(f"Model loaded successfully from {self.model_path}")
-            self.model_loaded = True
+        """Load the agent's model."""
+        logger.warning("load_model method is deprecated. Use load_agent_model from utils.py instead.")
+        load_agent_model(self)
 
-    def save_model(self, path):
-        """
-        Saves model weights to the specified path.
-
-        :param path: Destination path for the model weights.
-        """
-        torch.save(self.model.state_dict(), path)
-        logger.info(f"Model saved to {path}.")
+    def save_model(self):
+        """Save the agent's model."""
+        save_agent_model(self)  # Removed path parameter
 
     def select_move(self, game: ConnectFourGame):
         """
@@ -184,7 +173,7 @@ class AlphaZeroAgent(Agent):
                     break
                 game_copy.make_move(node.action)
                 # Switch player
-                game_copy.current_player = AI_PIECE if game_copy.current_player == PLAYER_PIECE else PLAYER_PIECE
+                game_copy.current_player = 2 if game_copy.current_player == 1 else 1
 
             if node is None:
                 continue
@@ -279,40 +268,9 @@ class AlphaZeroAgent(Agent):
 
     # Removed train_step since training is handled by LightningModule
 
-    def load_agent_model(self):
-        """
-        Loads the agent's model from the specified path.
+    def perform_training(self):
+        """Perform training steps for the agent."""
+        from .train.train_alpha_zero import train_alphazero  # Moved import here to prevent circular dependency
+        train_alphazero(time_limit=3600, num_self_play_games=1000, use_gpu=self.device.type == 'cuda', load_model=self.model_loaded)
 
-        Raises:
-            FileNotFoundError: If the model path does not exist.
-            Exception: If there is an error loading the model.
-        """
-        if not os.path.exists(self.model_path):
-            logger.error(f"Model path {self.model_path} does not exist.")
-            raise FileNotFoundError(f"Model path {self.model_path} does not exist.")
-        try:
-            self.model.load_state_dict(torch.load(self.model_path, map_location=self.device))
-            self.model.eval()
-            self.model_loaded = True
-            logger.info(f"Agent model loaded successfully from {self.model_path}")
-        except Exception as e:
-            logger.error(f"Error loading model: {e}")
-            raise e
-
-    def initialize_agent():
-        """
-        Initializes and returns an AlphaZeroAgent instance.
-
-        Returns:
-            AlphaZeroAgent: An instance of the AlphaZeroAgent.
-        """
-        agent = AlphaZeroAgent(
-            state_dim=2,
-            action_dim=7,
-            use_gpu=True,  # Set to True if using GPU
-            model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",
-            num_simulations=800,
-            c_puct=1.4,
-            load_model=True  # Set to False if you don't want to load an existing model
-        )
-        return agent
+__all__ = ['AlphaZeroAgent']

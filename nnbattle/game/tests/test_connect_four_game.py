@@ -59,8 +59,8 @@ class TestConnectFourGame(unittest.TestCase):
             # This is necessary because make_move() switches the player after each move
             self.game.current_player = PLAYER_PIECE
         # Log the board state for debugging
-        logger.debug("Board state after setting up a vertical win for PLAYER_PIECE:")
-        logger.debug(f"\n{self.board_to_string(self.game.board)}")
+        logger.info("Board state after setting up a vertical win for PLAYER_PIECE:")
+        logger.info(f"\n{self.board_to_string(self.game.board)}")
         self.assertTrue(self.game.is_terminal(), "Game should be terminal after a win.")
         self.assertEqual(self.game.get_winner(), PLAYER_PIECE, "PLAYER_PIECE should be the winner.")
 
@@ -84,15 +84,15 @@ class TestConnectFourGame(unittest.TestCase):
         self.game.board = draw_board
 
         # Log the board state for debugging
-        # logger.debug("Board state for draw scenario:")  # Consider removing or commenting out
-        # logger.debug(f"\n{self.board_to_string(self.game.board)}")  # Consider removing or commenting out
+        logger.info("Board state for draw scenario:")
+        logger.info(f"\n{self.board_to_string(self.game.board)}")
 
         # Assert that the game is terminal
         self.assertTrue(self.game.is_terminal(), "Game should be terminal after a draw.")
 
         # Assert that there is no winner
         winner = self.game.get_winner()
-        # self.assertEqual(winner, EMPTY, "There should be no winner in a draw.")  # ...existing code...
+        self.assertEqual(winner, EMPTY, "There should be no winner in a draw.")
 
         # Additional assertions to ensure no player has a winning condition
         self.assertFalse(self.game.check_win(AI_PIECE), "AI_PIECE should not have a winning condition in a draw.")

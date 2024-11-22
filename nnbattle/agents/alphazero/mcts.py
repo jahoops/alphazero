@@ -44,3 +44,6 @@ class MCTSNode:
             self.parent.backpropagate(reward)
 
 __all__ = ['MCTSNode']
+
+# No changes needed if not mocking base classes
+# Ensure that in tests, only methods are mocked, not entire classes that use super()

@@ -24,7 +24,7 @@ class ResidualBlock(nn.Module):
 
 class Connect4Net(nn.Module):
     def __init__(self, state_dim, action_dim):
-        super(Connect4Net, self).__init__()
+        super(Connect4Net, self).__init__()  # Ensure correct inheritance
         self.conv_layers = nn.Sequential(
             nn.Conv2d(state_dim, 128, kernel_size=4, stride=1, padding=2),  # Use state_dim for flexibility
             nn.ReLU(),

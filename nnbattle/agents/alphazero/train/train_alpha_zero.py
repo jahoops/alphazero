@@ -8,12 +8,12 @@ import torch
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-from nnbattle.agents.alphazero import AlphaZeroAgent
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import Connect4LightningModule
 from nnbattle.game import ConnectFourGame
 from nnbattle.agents.base_agent import Agent
-from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent, initialize_agent  # Ensure AlphaZeroAgent is imported
+
+from nnbattle.agents.alphazero.utils import deepcopy_env, initialize_agent, load_agent_model, save_agent_model  # Updated imports
 
 # Configure logging at the start of the file
 logging.basicConfig(
@@ -26,8 +26,8 @@ def log_gpu_info(agent):
     """Log GPU information."""
     if torch.cuda.is_available():
         logger.info(f"Training on GPU: {torch.cuda.get_device_name()}")
-        allocated = torch.cuda.memory_allocated()/1e9
-        reserved = torch.cuda.memory_reserved()/1e9
+        allocated = torch.cuda.memory_allocated() / 1e9
+        reserved = torch.cuda.memory_reserved() / 1e9
         logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
 
 def self_play(agent, num_games):
@@ -58,11 +58,16 @@ def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_mode
     torch.set_float32_matmul_precision('medium')  # Set precision to utilize Tensor Cores
     start_time = time.time()
     
-    # Initialize Agent with GPU support and control model loading
-    state_dim = 2          # Updated to match number of channels
-    action_dim = 7         # Seven possible actions
-    num_simulations = 800  # Number of MCTS simulations
-    agent = AlphaZeroAgent.initialize_agent()  # Use the imported initialize_agent
+    # Initialize Agent using initialize_agent from utils.py
+    agent = initialize_agent(
+        action_dim=7,
+        state_dim=2,
+        use_gpu=use_gpu,
+        # model_path="nnbattle/agents/alphazero/model/alphazero_model_final.pth",  # Removed to use centralized MODEL_PATH
+        num_simulations=800,
+        c_puct=1.4,
+        load_model=load_model
+    )
     
     # Log GPU usage during training
     if torch.cuda.is_available() and use_gpu:
@@ -75,7 +80,10 @@ def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_mode
     data_module = ConnectFourDataModule(agent=agent, batch_size=32)  # Adjust batch_size as needed
     
     # Initialize Lightning Module with state_dim and action_dim
-    model = Connect4LightningModule(state_dim=state_dim, action_dim=action_dim)
+    model = Connect4LightningModule(
+        state_dim=agent.state_dim,
+        action_dim=agent.action_dim
+    )  # Use agent's attributes
     
     # Set up Model Checkpoint callback
     checkpoint_callback = ModelCheckpoint(
@@ -98,17 +106,17 @@ def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_mode
     trainer.fit(model, datamodule=data_module)
     
     # Log GPU stats after training
-    agent.log_gpu_stats()
+    if hasattr(agent, 'log_gpu_stats'):
+        agent.log_gpu_stats()
+    else:
+        logger.warning("Agent does not have a log_gpu_stats method.")
     
-    # Save the final model
-    os.makedirs(os.path.dirname(agent.model_path), exist_ok=True)
-    torch.save(model.state_dict(), agent.model_path)
-    logger.info(f"Model saved to {agent.model_path}")
+    # Save the final model using the utility function
+    save_agent_model(agent, agent.model_path)
     
     end_time = time.time()
     elapsed_time = end_time - start_time
     logger.info(f"Training completed in {timedelta(seconds=elapsed_time)}")
 
 if __name__ == "__main__":
-    agent = AlphaZeroAgent.initialize_agent()
     train_alphazero(time_limit=0.1, num_self_play_games=2, load_model=False)
