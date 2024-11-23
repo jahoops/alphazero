@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from pytorch_lightning.callbacks import ModelCheckpoint
 from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent
 from nnbattle.game import ConnectFourGame
-from nnbattle.agents.alphazero.agent_code import initialize_agent  # Ensure correct import
+from nnbattle.agents.alphazero.agent_code import initialize_agent  # Moved import here
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
 from nnbattle.agents.alphazero.utils.model_utils import (
@@ -26,6 +26,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Set float32 matmul precision for Tensor Cores
+torch.set_float32_matmul_precision('high')
+
 def log_gpu_info(agent):
     """Log GPU information."""
     if torch.cuda.is_available():
@@ -33,6 +36,8 @@ def log_gpu_info(agent):
         allocated = torch.cuda.memory_allocated() / 1e9
         reserved = torch.cuda.memory_reserved() / 1e9
         logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
+    else:
+        logger.warning("No CUDA device available")
 
 def self_play(agent, num_games):
     memory = []
@@ -75,7 +80,7 @@ def train_alphazero(
     :param use_gpu: Whether to use GPU for training.
     :param load_model: Whether to load an existing model before training.
     """
-    agent = initialize_agent(  # Changed from direct AlphaZeroAgent instantiation
+    agent = initialize_agent(
         action_dim=7,
         state_dim=2,
         use_gpu=use_gpu,
@@ -87,11 +92,11 @@ def train_alphazero(
     data_module = ConnectFourDataModule(agent, num_self_play_games)
     lightning_module = ConnectFourLightningModule(agent)
     
-    # Use PyTorch Lightning's Trainer instead of manual optimization
     trainer = pl.Trainer(
         max_time=timedelta(seconds=time_limit),
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
-        devices=1
+        devices=1,
+        log_every_n_steps=1  # Set logging interval to 1
     )
     
     start_time = time.time()
@@ -108,4 +113,6 @@ def train_alphazero(
     logger.info("Training completed.")
 
 if __name__ == "__main__":
+    # Ensure CUDA_VISIBLE_DEVICES is set
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     train_alphazero(time_limit=0.1, num_self_play_games=2, load_model=False)

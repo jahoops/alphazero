@@ -9,10 +9,12 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)  # Changed from DEBUG to INFO
 
+# Ensure __all__ is defined
+__all__ = ['ConnectFourDataset', 'ConnectFourDataModule']
 
 class ConnectFourDataset(Dataset):
     def __init__(self, data):
-        self.data = data
+        self.data = data if data else []
 
     def __len__(self):
         return len(self.data)
@@ -21,15 +23,9 @@ class ConnectFourDataset(Dataset):
         state, mcts_prob, reward = self.data[idx]
         # Ensure state has the correct shape [2, 6, 7]
         if isinstance(state, np.ndarray):
-            # Handle if state comes in wrong shape
-            if state.shape[0] != 2:
-                if len(state.shape) == 2:  # If it's [6, 7]
-                    state = np.stack([state == 1, state == 2])
-                elif state.shape[0] > 2:  # If it has too many channels
-                    state = state[:2]
-            
-            # Ensure state has shape [2, 6, 7]
-            assert state.shape == (2, 6, 7), f"Invalid state shape: {state.shape}"
+            if state.shape != (2, 6, 7):
+                logger.error(f"Invalid state shape: {state.shape}. Expected (2, 6, 7).")
+                raise ValueError(f"Invalid state shape: {state.shape}. Expected (2, 6, 7).")
         
         return (
             torch.tensor(state, dtype=torch.float32),
@@ -42,7 +38,7 @@ class ConnectFourDataModule(pl.LightningDataModule):
     def __init__(self, agent, num_games):
         super().__init__()
         self.agent = agent
-        self.num_games = num_games
+        self.num_games = max(1, num_games)  # Ensure at least one game
         self.dataset = ConnectFourDataset([])
 
     def generate_self_play_games(self):

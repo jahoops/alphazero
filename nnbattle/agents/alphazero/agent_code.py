@@ -222,14 +222,13 @@ class AlphaZeroAgent(Agent):
 
     def perform_training(self):
         """Perform training using train_alphazero."""
-        # Explicitly import from trainer module
         from nnbattle.agents.alphazero.train.trainer import train_alphazero
-        
+
         train_alphazero(
             time_limit=3600,
             num_self_play_games=1000,
-            use_gpu=self.device.type == 'cuda',
-            load_model=self.model_loaded
+            use_gpu=self.device.type == 'cuda',  # Ensure correct GPU usage
+            load_model=self.load_model_flag
         )
 
 def initialize_agent(
