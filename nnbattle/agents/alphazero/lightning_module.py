@@ -24,7 +24,11 @@ class ConnectFourLightningModule(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.parameters(), lr=1e-3)
+        # Add safety check for model parameters
+        params = list(self.agent.model.parameters())
+        if not params:
+            raise ValueError("Model has no parameters to optimize")
+        optimizer = torch.optim.Adam(params, lr=1e-3)
         return optimizer
 
     def loss_function(self, outputs, targets_policy, targets_value):

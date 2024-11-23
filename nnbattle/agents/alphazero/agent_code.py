@@ -73,11 +73,19 @@ class AlphaZeroAgent(Agent):
 
     def preprocess(self, board):
         board = board.copy()
-        opponent_player = 2 if self.current_player == 1 else 1
-        current_board = (board == self.current_player).astype(float)
-        opponent_board = (board == opponent_player).astype(float)
-        tensor_board = torch.FloatTensor([current_board, opponent_board]).to(self.device)
-        return tensor_board
+        # Ensure board is in correct shape for processing
+        if len(board.shape) == 3 and board.shape[0] > 2:
+            board = board[:2]  # Take only first two channels if too many
+        elif len(board.shape) == 2:
+            # Create two channel board if single channel
+            current_board = (board == self.current_player).astype(float)
+            opponent_player = 2 if self.current_player == 1 else 1
+            opponent_board = (board == opponent_player).astype(float)
+            board = np.stack([current_board, opponent_board])
+        
+        # Ensure final shape is [2, 6, 7]
+        assert board.shape == (2, 6, 7), f"Invalid board shape after preprocessing: {board.shape}"
+        return torch.FloatTensor(board).to(self.device)
 
     def load_model_method(self):
         logger.warning("load_model method is deprecated. Use load_agent_model from utils.py instead.")
@@ -185,7 +193,12 @@ class AlphaZeroAgent(Agent):
                 logger.error("Agent failed to select a valid action during self-play.")
                 break
 
-            game_data.append((game.get_state().copy(), action_probs.numpy(), player))
+            # Move action_probs to CPU before converting to numpy
+            game_data.append((
+                game.get_state().copy(),
+                action_probs.cpu().numpy() if isinstance(action_probs, torch.Tensor) else action_probs,
+                player
+            ))
             game.make_move(selected_action)
             player = -player  # Switch player
             move_count += 1

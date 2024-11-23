@@ -75,10 +75,12 @@ def train_alphazero(
     :param use_gpu: Whether to use GPU for training.
     :param load_model: Whether to load an existing model before training.
     """
-    agent = AlphaZeroAgent(
+    agent = initialize_agent(  # Changed from direct AlphaZeroAgent instantiation
         action_dim=7,
         state_dim=2,
         use_gpu=use_gpu,
+        num_simulations=800,
+        c_puct=1.4,
         load_model=load_model
     )
     
