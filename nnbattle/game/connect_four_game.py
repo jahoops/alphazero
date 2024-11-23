@@ -7,10 +7,8 @@ import numpy as np
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-PLAYER_PIECE = 1
-# Removed duplicate PLAYER_PIECE definition
-# PLAYER_PIECE = 1
-AI_PIECE = 2
+RED_PIECE = 1
+YEL_PIECE = 2
 EMPTY = 0
 ROW_COUNT = 6
 COLUMN_COUNT = 7
@@ -18,190 +16,109 @@ WINDOW_LENGTH = 4
 
 class ConnectFourGame:
     def __init__(self):
-        self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)  # 6 rows x 7 columns
-        self.current_player = PLAYER_PIECE  # Player 1 starts
+        self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
+        self.last_piece = None  # Track last piece played
+        self.enforce_turns = True  # Add flag to control turn enforcement
 
-    def copy(self):
+    def new_game(self):
+        """Creates and returns a new game instance."""
         new_game = ConnectFourGame()
-        new_game.board = self.board.copy()  # Ensure a copy of the NumPy array is made
-        new_game.current_player = self.current_player
+        new_game.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
+        new_game.last_piece = None
         return new_game
 
     def reset(self):
-        """
-        Resets the game to the initial state.
-        """
+        """Resets the game to initial state."""
         self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
-        self.current_player = PLAYER_PIECE
+        self.last_piece = None
         return self.board.copy()
 
-    def make_move(self, action):
-        if self.is_valid_location(action):
-            row = self.get_next_open_row(action)
-            self.drop_piece(row, action, self.current_player)
-            self.current_player = AI_PIECE if self.current_player == PLAYER_PIECE else PLAYER_PIECE
-        else:
-            logger.error(f"Invalid move attempted: Column {action} is full.")
+    def make_move(self, column, piece):
+        """Make a move for the given piece in the specified column.
+        Returns True if move was valid and made, False otherwise."""
+        if not (piece in [RED_PIECE, YEL_PIECE]):
+            logger.error(f"Invalid piece: {piece}. Must be {RED_PIECE} or {YEL_PIECE}")
+            return False
+            
+        # Check turn order only if enforcement is enabled
+        if self.enforce_turns and self.last_piece is not None and piece == self.last_piece:
+            logger.error(f"Invalid turn: Piece {piece} cannot move twice in a row")
+            return False
 
-    def step(self, action):
-        """
-        Applies the action to the board and returns the game status.
-        """
-        self.make_move(action)
-        terminal = self.is_terminal()
-        reward = self.get_reward()
-        return self.board, reward, terminal
+        if self.is_valid_move(column):
+            row = self.get_next_open_row(column)
+            self.board[row][column] = piece
+            self.last_piece = piece
+            return True
+            
+        logger.error(f"Invalid move: Column {column} is full")
+        return False
 
-    def is_terminal(self):
-        return self.check_win(PLAYER_PIECE) or self.check_win(AI_PIECE) or self.is_board_full()
+    def is_valid_move(self, column):
+        """Check if a move is valid."""
+        return (0 <= column < COLUMN_COUNT and 
+                self.board[ROW_COUNT-1][column] == EMPTY)
 
-    def get_reward(self):
-        if self.check_win(PLAYER_PIECE):
-            return 1  # Player wins
-        elif self.check_win(AI_PIECE):
-            return -1  # AI wins
-        else:
-            return 0  # Draw or ongoing
-
-    def get_board_state(self):
-        return self.board.copy()
-
-    def is_terminal_node(self):
-        return self.is_terminal()
-
-    def get_valid_locations(self):
-        valid_locations = []
-        for col in range(COLUMN_COUNT):
-            if self.is_valid_location(col):
-                valid_locations.append(col)
-        return valid_locations
-
-    def is_valid_location(self, col):
-        return self.board[ROW_COUNT-1][col] == EMPTY
-
-    def get_next_open_row(self, col):
-        for r in range(ROW_COUNT):
-            if self.board[r][col] == EMPTY:
-                return r
-        return None  # Should not happen if checked with is_valid_location
-
-    def drop_piece(self, row, col, piece):
-        self.board[row][col] = piece
+    def get_next_open_row(self, column):
+        """Get the next available row in the given column."""
+        for row in range(ROW_COUNT):
+            if self.board[row][column] == EMPTY:
+                return row
+        return None
 
     def check_win(self, piece):
-        # Check horizontal locations
-        for c in range(COLUMN_COUNT-3):
-            for r in range(ROW_COUNT):
-                if all(self.board[r][c+i] == piece for i in range(WINDOW_LENGTH)):
+        """Check if the given piece has won."""
+        # Check horizontal
+        for r in range(ROW_COUNT):
+            for c in range(COLUMN_COUNT-3):
+                if all(self.board[r][c+i] == piece for i in range(4)):
                     return True
 
-        # Check vertical locations
-        for c in range(COLUMN_COUNT):
-            for r in range(ROW_COUNT-3):
-                if all(self.board[r+i][c] == piece for i in range(WINDOW_LENGTH)):
+        # Check vertical
+        for r in range(ROW_COUNT-3):
+            for c in range(COLUMN_COUNT):
+                if all(self.board[r+i][c] == piece for i in range(4)):
                     return True
 
-        # Check positively sloped diagonals
-        for c in range(COLUMN_COUNT-3):
-            for r in range(ROW_COUNT-3):
-                if all(self.board[r+i][c+i] == piece for i in range(WINDOW_LENGTH)):
+        # Check positive diagonal
+        for r in range(ROW_COUNT-3):
+            for c in range(COLUMN_COUNT-3):
+                if all(self.board[r+i][c+i] == piece for i in range(4)):
                     return True
 
-        # Check negatively sloped diagonals
-        for c in range(COLUMN_COUNT-3):
-            for r in range(3, ROW_COUNT):
-                if all(self.board[r-i][c+i] == piece for i in range(WINDOW_LENGTH)):
+        # Check negative diagonal
+        for r in range(3, ROW_COUNT):
+            for c in range(COLUMN_COUNT-3):
+                if all(self.board[r-i][c+i] == piece for i in range(4)):
                     return True
 
         return False
 
-    def get_win_positions(self, piece):
-        win_positions = []
-        # Similar checks as check_win but store winning positions
-        for c in range(COLUMN_COUNT-3):
-            for r in range(ROW_COUNT):
-                if all(self.board[r][c+i] == piece for i in range(WINDOW_LENGTH)):
-                    win_positions.append([(r, c+i) for i in range(WINDOW_LENGTH)])
-
-        for c in range(COLUMN_COUNT):
-            for r in range(ROW_COUNT-3):
-                if all(self.board[r+i][c] == piece for i in range(WINDOW_LENGTH)):
-                    win_positions.append([(r+i, c) for i in range(WINDOW_LENGTH)])
-
-        for c in range(COLUMN_COUNT-3):
-            for r in range(ROW_COUNT-3):
-                if all(self.board[r+i][c+i] == piece for i in range(WINDOW_LENGTH)):
-                    win_positions.append([(r+i, c+i) for i in range(WINDOW_LENGTH)])
-
-        for c in range(COLUMN_COUNT-3):
-            for r in range(3, ROW_COUNT):
-                if all(self.board[r-i][c+i] == piece for i in range(WINDOW_LENGTH)):
-                    win_positions.append([(r-i, c+i) for i in range(WINDOW_LENGTH)])
-
-        return win_positions
-
     def is_board_full(self):
-        return all(self.board[ROW_COUNT-1][c] != EMPTY for c in range(COLUMN_COUNT))
+        """Check if the board is full."""
+        return not any(self.board[ROW_COUNT-1][c] == EMPTY for c in range(COLUMN_COUNT))
 
-    def get_winner(self):
-        if self.check_win(PLAYER_PIECE):
-            return PLAYER_PIECE
-        elif self.check_win(AI_PIECE):
-            return AI_PIECE
-        else:
-            return 0  # No winner
+    def get_game_state(self):
+        """Return the current game state."""
+        if self.check_win(RED_PIECE):
+            return "RED_WINS"
+        elif self.check_win(YEL_PIECE):
+            return "YEL_WINS"
+        elif self.is_board_full():
+            return "DRAW"
+        return "ONGOING"
 
-    def score_position(self, piece):
-        score = 0
-        # Score horizontal
-        for r in range(ROW_COUNT):
-            row_array = list(self.board[r])
-            for c in range(COLUMN_COUNT-3):
-                window = row_array[c:c+WINDOW_LENGTH]
-                score += self.evaluate_window(window, piece)
-        # Score vertical
-        for c in range(COLUMN_COUNT):
-            col_array = list(self.board[:,c])
-            for r in range(ROW_COUNT-3):
-                window = col_array[r:r+WINDOW_LENGTH]
-                score += self.evaluate_window(window, piece)
-        # Score positive sloped diagonals
-        for r in range(ROW_COUNT-3):
-            for c in range(COLUMN_COUNT-3):
-                window = [self.board[r+i][c+i] for i in range(WINDOW_LENGTH)]
-                score += self.evaluate_window(window, piece)
-        # Score negative sloped diagonals
-        for r in range(3, ROW_COUNT):
-            for c in range(COLUMN_COUNT-3):
-                window = [self.board[r-i][c+i] for i in range(WINDOW_LENGTH)]
-                score += self.evaluate_window(window, piece)
-        return score
+    def get_valid_moves(self):
+        """Return list of valid column moves."""
+        return [col for col in range(COLUMN_COUNT) if self.is_valid_move(col)]
 
-    def evaluate_window(self, window, piece):
-        score = 0
-        opp_piece = PLAYER_PIECE if piece == AI_PIECE else AI_PIECE
-
-        if window.count(piece) == 4:
-            score += 100
-        elif window.count(piece) == 3 and window.count(EMPTY) == 1:
-            score += 5
-        elif window.count(piece) == 2 and window.count(EMPTY) == 2:
-            score += 2
-
-        if window.count(opp_piece) == 3 and window.count(EMPTY) == 1:
-            score -= 4
-
-        return score
-
-    def get_result(self):
-        return self.get_winner()
-
-    def get_state(self):
+    def get_board(self):
+        """Return copy of current board state."""
         return self.board.copy()
 
     def board_to_string(self):
-        mapping = {PLAYER_PIECE: 'X', AI_PIECE: 'O', EMPTY: '.'}
-        rows = []
-        for row in self.board:
-            rows.append(' '.join(mapping[cell] for cell in row))
-        return '\n'.join(rows)
+        """Return string representation of board."""
+        mapping = {RED_PIECE: 'X', YEL_PIECE: 'O', EMPTY: '.'}
+        return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board)
+
+# Remove all other methods related to agents, rewards, and scoring

@@ -96,7 +96,6 @@ def train_alphazero(
         # Removed max_time parameter
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
         log_every_n_steps=1,  # Set logging interval to 1
-        log_every_n_steps=1,  # Set logging interval to 1
         fast_dev_run=False  # Ensure fast_dev_run is False for actual training
     )
     
@@ -110,11 +109,16 @@ def train_alphazero(
         
         logger.info("Saving the model...")
         save_agent_model(agent)
-        logger.info(f"Completed training iteration {iteration}/{max_iterations}.")
+
         logger.info(f"Completed training iteration {iteration}/{max_iterations}.")
     
     logger.info("Training completed.")
 
 if __name__ == "__main__":
     # Ensure CUDA_VISIBLE_DEVICES is set
-    train_alphazero(max_iterations=10, num_self_play_games=2, use_gpu=True, load_model=False)    train_alphazero(        max_iterations=10,  # Replaced time_limit with max_iterations        num_self_play_games=2,        use_gpu=False,        load_model=False    )
+    train_alphazero(
+        max_iterations=10,  # Replaced time_limit with max_iterations
+        num_self_play_games=2,
+        use_gpu=True,
+        load_model=False
+    )
