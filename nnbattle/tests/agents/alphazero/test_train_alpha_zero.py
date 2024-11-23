@@ -13,13 +13,13 @@ from nnbattle.agents.alphazero.utils.model_utils import (
     MODEL_PATH
 )
 from nnbattle.agents.alphazero.train.trainer import train_alphazero
-from nnbattle.agents.alphazero.agent_code import initialize_agent
 from nnbattle.agents.alphazero.network import Connect4Net  # Add this import
 
 class TestTrainAlphaZero(unittest.TestCase):
     def setUp(self):
         self.use_gpu = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.use_gpu else "cpu")
+        self.game = ConnectFourGame()  # Initialize the game attribute
         
         # Create mock model with correct state dict structure
         self.mock_model = MagicMock()
@@ -462,7 +462,7 @@ class TestTrainAlphaZero(unittest.TestCase):
             ". . . . . . .\n"
             ". . . . . . ."
         )
-        string_representation = self.agent.board_to_string(board)
+        string_representation = self.game.board_to_string(board)  # Use the game attribute
         self.assertEqual(string_representation, expected)
 
     def test_test_make_move_invalid(self):

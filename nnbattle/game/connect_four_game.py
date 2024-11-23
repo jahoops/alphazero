@@ -198,3 +198,10 @@ class ConnectFourGame:
 
     def get_state(self):
         return self.board.copy()
+
+    def board_to_string(self):
+        mapping = {PLAYER_PIECE: 'X', AI_PIECE: 'O', EMPTY: '.'}
+        rows = []
+        for row in self.board:
+            rows.append(' '.join(mapping[cell] for cell in row))
+        return '\n'.join(rows)

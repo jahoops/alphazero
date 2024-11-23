@@ -11,7 +11,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from nnbattle.game import ConnectFourGame
 from nnbattle.agents.alphazero.agent_code import initialize_agent  # Ensure correct import
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
-from nnbattle.agents.alphazero.lightning_module import Connect4LightningModule
+from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
 from nnbattle.agents.alphazero.utils.model_utils import (
     MODEL_PATH,
     load_agent_model,
@@ -56,6 +56,9 @@ def self_play(agent, num_games):
         logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
     agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
+
+# Ensure train_alphazero is defined here and not imported from elsewhere
+# Do not add any import statements for train_alphazero here
 
 def train_alphazero(
     time_limit: int,

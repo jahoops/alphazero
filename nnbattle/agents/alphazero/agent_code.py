@@ -232,4 +232,4 @@ def initialize_agent(
         load_model=load_model
     )
 
-__all__ = ['AlphaZeroAgent']
+__all__ = ['AlphaZeroAgent', 'initialize_agent']
