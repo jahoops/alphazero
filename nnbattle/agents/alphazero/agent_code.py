@@ -151,7 +151,7 @@ class AlphaZeroAgent(Agent):
 
             filtered_probs = np.zeros(self.action_dim)
             filtered_probs[legal_moves] = policy[legal_moves]
-            if filtered_probs.sum() > 0:
+            if (filtered_probs.sum() > 0):
                 filtered_probs /= filtered_probs.sum()
             else:
                 filtered_probs[legal_moves] = 1.0 / len(legal_moves)
@@ -172,12 +172,13 @@ class AlphaZeroAgent(Agent):
 
         return selected_action, action_probs
 
-    def self_play(self):
+    def self_play(self, max_moves=100):
         game_data = []
         game = ConnectFourGame()
         player = 1
+        move_count = 0
 
-        while not game.is_terminal():
+        while not game.is_terminal() and move_count < max_moves:
             self.current_player = player
             selected_action, action_probs = self.select_move(game)
             if selected_action is None:
@@ -187,6 +188,14 @@ class AlphaZeroAgent(Agent):
             game_data.append((game.get_state().copy(), action_probs.numpy(), player))
             game.make_move(selected_action)
             player = -player  # Switch player
+            move_count += 1
+
+            # Add logging to track the game state
+            logger.info(f"Move {move_count}: {selected_action}, Current player: {player}")
+            logger.info(f"Board state:\n{game.board_to_string()}")
+
+        if move_count >= max_moves:
+            logger.warning("Reached maximum number of moves without a terminal state.")
 
         winner = game.get_winner()
         logger.info(f"Game ended. Winner: {winner}")

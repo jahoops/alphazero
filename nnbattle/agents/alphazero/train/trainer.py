@@ -6,8 +6,9 @@ from datetime import timedelta
 import logging
 import torch
 import pytorch_lightning as pl
+from torch.utils.data import DataLoader
 from pytorch_lightning.callbacks import ModelCheckpoint
-
+from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent
 from nnbattle.game import ConnectFourGame
 from nnbattle.agents.alphazero.agent_code import initialize_agent  # Ensure correct import
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
@@ -84,24 +85,20 @@ def train_alphazero(
     data_module = ConnectFourDataModule(agent, num_self_play_games)
     lightning_module = ConnectFourLightningModule(agent)
     
-    trainer = torch.optim.Adam(lightning_module.parameters(), lr=1e-3)
+    # Use PyTorch Lightning's Trainer instead of manual optimization
+    trainer = pl.Trainer(
+        max_time=timedelta(seconds=time_limit),
+        accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
+        devices=1
+    )
     
     start_time = time.time()
     while time.time() - start_time < time_limit:
         logger.info("Starting self-play games...")
         data_module.generate_self_play_games()
         
-        logger.info("Loading training data...")
-        train_loader = DataLoader(data_module.dataset, batch_size=64, shuffle=True)
-        
         logger.info("Starting training iteration...")
-        for batch in train_loader:
-            states, mcts_probs, rewards = batch
-            outputs = lightning_module(states)
-            loss = lightning_module.loss_function(outputs, mcts_probs, rewards)
-            loss.backward()
-            trainer.step()
-            trainer.zero_grad()
+        trainer.fit(lightning_module, data_module)
         
         logger.info("Saving the model...")
         save_agent_model(agent)
