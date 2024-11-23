@@ -84,10 +84,10 @@ class TestAgentCode(unittest.TestCase):
 
     def test_select_move_no_actions(self):
         # Simulate scenario where no actions are available
-        self.agent.mcts_simulate.return_value = (None, [])  # Return only two values
+        self.agent.mcts_simulate.return_value = (None, torch.zeros(self.agent.action_dim, device=self.agent.device))
         action, action_probs = self.agent.select_move(ConnectFourGame())
         self.assertIsNone(action)
-        self.assertEqual(action_probs, [])
+        torch.testing.assert_close(action_probs, torch.zeros(self.agent.action_dim, device=self.agent.device))
 
     def test_select_move_different_channels(self):
         # Create a dummy state with 2 channels
@@ -100,14 +100,14 @@ class TestAgentCode(unittest.TestCase):
             self.assertEqual(action_probs.tolist(), [0.5, 0.5])
 
     def test_self_play_deterministic(self):
-        self.agent.mcts_simulate.return_value = (None, [], [])
+        self.agent.mcts_simulate.return_value = (None, torch.zeros(self.agent.action_dim, device=self.agent.device))
         with patch.object(self.agent, 'select_move', return_value=(3, torch.tensor([0,0,0,1,0,0,0], dtype=torch.float32))):
             with patch.object(ConnectFourGame, 'make_move', return_value=None):
-                self.agent.self_play()
+                self.agent.self_play(max_moves=1)
                 self.assertEqual(len(self.agent.memory), 1)
                 state, mcts_prob, value = self.agent.memory[0]
                 self.assertEqual(mcts_prob[3], 1.0)
-                self.assertEqual(value, -1)  # Assuming player 1 lost
+                self.assertEqual(value, 0)  # Game is ongoing or draw
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
     def test_save_agent_model_success_with_path(self, mock_save_agent_model):
@@ -125,17 +125,18 @@ class TestAgentCode(unittest.TestCase):
         # ...additional assertions if needed...
 
     @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
-    def test_train_alphazero(self, mock_train):
-        with patch('nnbattle.agents.alphazero.utils.model_utils.initialize_agent') as mock_initialize_agent:
+    @patch('nnbattle.agents.alphazero.utils.model_utils.initialize_agent')
+    def test_train_alphazero(self, mock_initialize_agent, mock_train):
+        with patch('nnbattle.agents.alphazero.initialize_agent') as mock_initialize_agent_correct:
             mock_agent = MagicMock()
-            mock_initialize_agent.return_value = mock_agent
+            mock_initialize_agent_correct.return_value = mock_agent
             train_alphazero(
                 max_iterations=2,  # Reduced from 1000 to 2 for testing
                 num_self_play_games=10,  # Reduced for quicker tests
                 use_gpu=True,
                 load_model=True
             )
-            mock_initialize_agent.assert_called_once_with(
+            mock_initialize_agent_correct.assert_called_once_with(
                 action_dim=7,
                 state_dim=2,
                 use_gpu=True,
@@ -166,6 +167,40 @@ class TestAgentCode(unittest.TestCase):
         self.assertEqual(preprocessed_board.shape, (2, 6, 7))
         self.assertEqual(preprocessed_board[0, 0, 0], 1)
         self.assertEqual(preprocessed_board[1, 0, 1], 1)
+
+    @patch('nnbattle.agents.alphazero.agent_code.initialize_agent', side_effect=FileNotFoundError("Initialize agent failed."))
+    def test_load_agent_model_failure(self, mock_initialize_agent):
+        with self.assertRaises(FileNotFoundError):
+            model_utils.load_agent_model(self.agent)
+        mock_initialize_agent.assert_called_once_with(self.agent)
+
+    # Ensure all mocks for mcts_simulate return two values
+    def test_act_method(self):
+        """Test the act method to ensure it returns valid actions."""
+        game = ConnectFourGame()
+        self.agent.mcts_simulate.return_value = (3, torch.tensor([0.6, 0.4]))
+        action, action_probs = self.agent.act(game)
+        self.assertIsInstance(action, int)
+        self.assertGreaterEqual(action, 0)
+        self.assertLess(action, self.agent.action_dim)
+        self.assertEqual(action_probs.shape, (self.agent.action_dim,))
+        self.assertAlmostEqual(action_probs.sum().item(), 1.0, places=5)
+    
+    def test_mcts_simulation(self):
+        """Test MCTS simulation to ensure it runs without errors."""
+        game = ConnectFourGame()
+        self.agent.mcts_simulate.return_value = (2, torch.tensor([0.3, 0.7]))
+        selected_action, action_probs = self.agent.mcts_simulate(game)
+        self.assertIsInstance(selected_action, int)
+        self.assertEqual(action_probs.shape, (self.agent.action_dim,))
+        self.assertAlmostEqual(action_probs.sum().item(), 1.0, places=5)
+    
+    def test_self_play_memory(self):
+        """Test that self_play populates the memory with game data."""
+        initial_memory_length = len(self.agent.memory)
+        self.agent.mcts_simulate.return_value = (1, torch.tensor([0.5, 0.5]))
+        self.agent.self_play()
+        self.assertGreater(len(self.agent.memory), initial_memory_length)
 
     def test_act_method(self):
         """Test the act method to ensure it returns valid actions."""

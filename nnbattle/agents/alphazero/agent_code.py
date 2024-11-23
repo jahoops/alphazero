@@ -120,7 +120,7 @@ class AlphaZeroAgent(Agent):
         selected_action, action_probs = self.mcts_simulate(game)
         if selected_action is None:
             logger.warning("No valid action selected by MCTS.")
-            return None, []
+            return None, torch.zeros(self.action_dim, device=self.device)
 
         return selected_action, action_probs
 
@@ -132,34 +132,40 @@ class AlphaZeroAgent(Agent):
             node = root
             game_copy = deepcopy_env(game)
 
-            while not node.is_leaf() and not game_copy.is_terminal():
+            while not node.is_leaf() and game_copy.get_game_state() == "ONGOING":
                 node = node.best_child(c_puct=self.c_puct)
                 if node is None:
                     break
-                game_copy.make_move(node.action)
+                game_copy.make_move(node.action, game_copy.current_player)
                 game_copy.current_player = 2 if game_copy.current_player == 1 else 1
 
             if node is None:
                 continue
 
-            if game_copy.is_terminal():
-                reward = game_copy.get_reward()
+            state = game_copy.get_game_state()
+            if state in ["RED_WINS", "YEL_WINS", "DRAW"]:
+                if state == "RED_WINS":
+                    reward = 1 if game_copy.last_piece == RED_PIECE else -1
+                elif state == "YEL_WINS":
+                    reward = 1 if game_copy.last_piece == YEL_PIECE else -1
+                else:
+                    reward = 0
                 node.backpropagate(reward)
                 continue
 
-            legal_moves = game_copy.get_valid_locations()
+            legal_moves = game_copy.get_valid_moves()
             if not legal_moves:
                 node.backpropagate(0)
                 continue
 
-            state_tensor = self.preprocess(game_copy.board).unsqueeze(0)
+            state_tensor = self.preprocess(game_copy.get_board()).unsqueeze(0)
             with torch.no_grad():
                 log_policy, value = self.model(state_tensor)
                 policy = torch.exp(log_policy).cpu().numpy().flatten()
 
             filtered_probs = np.zeros(self.action_dim)
             filtered_probs[legal_moves] = policy[legal_moves]
-            if (filtered_probs.sum() > 0):
+            if filtered_probs.sum() > 0:
                 filtered_probs /= filtered_probs.sum()
             else:
                 filtered_probs[legal_moves] = 1.0 / len(legal_moves)
@@ -178,6 +184,7 @@ class AlphaZeroAgent(Agent):
         for child in root.children.values():
             action_probs[child.action] = child.visits / total_visits
 
+        # Ensure all code paths return two values
         return selected_action, action_probs
 
     def self_play(self, max_moves=100):
@@ -186,40 +193,40 @@ class AlphaZeroAgent(Agent):
         player = 1
         move_count = 0
 
-        while not game.is_terminal() and move_count < max_moves:
+        while game.get_game_state() == "ONGOING" and move_count < max_moves:
             self.current_player = player
             selected_action, action_probs = self.select_move(game)
             if selected_action is None:
                 logger.error("Agent failed to select a valid action during self-play.")
                 break
 
-            # **Preprocess the state before storing it**
-            preprocessed_state = self.preprocess(game.get_state())
+            preprocessed_state = self.preprocess(game.get_board())
 
             game_data.append((
-                preprocessed_state.cpu().numpy(),  # Store the preprocessed state
-                action_probs.cpu().numpy() if isinstance(action_probs, torch.Tensor) else action_probs,
+                preprocessed_state.cpu().numpy(),
+                action_probs.cpu().numpy(),
                 player
             ))
-            game.make_move(selected_action)
-            player = -player  # Switch player
+            game.make_move(selected_action, player)
+            player = 2 if player == 1 else 1
             move_count += 1
 
-            # Add logging to track the game state
             logger.info(f"Move {move_count}: {selected_action}, Current player: {player}")
             logger.info(f"Board state:\n{game.board_to_string()}")
 
         if move_count >= max_moves:
             logger.warning("Reached maximum number of moves without a terminal state.")
 
-        winner = game.get_winner()
-        logger.info(f"Game ended. Winner: {winner}")
+        state, _, player_in_game = game_data[-1]
+        state_last = game.get_game_state()
+        if state_last == "RED_WINS":
+            value = 1 if player_in_game == RED_PIECE else -1
+        elif state_last == "YEL_WINS":
+            value = 1 if player_in_game == YEL_PIECE else -1
+        else:
+            value = 0
 
         for state_data, mcts_prob, player_in_game in game_data:
-            if winner == 0:
-                value = 0
-            else:
-                value = 1 if winner == player_in_game else -1
             self.memory.append((state_data, mcts_prob, value))
 
     def perform_training(self):
@@ -233,6 +240,17 @@ class AlphaZeroAgent(Agent):
             max_iterations=1000,  # Replaced time_limit=3600 with max_iterations=1000
             num_self_play_games=1000,
             use_gpu=self.device.type == 'cuda',  # Ensure correct GPU usage
+            load_model=self.load_model_flag
+        )
+
+    def initialize_agent_correctly(self):
+        # Ensure the patch path is correct
+        return initialize_agent(
+            action_dim=self.action_dim,
+            state_dim=self.state_dim,
+            use_gpu=self.device.type == 'cuda',
+            num_simulations=self.num_simulations,
+            c_puct=self.c_puct,
             load_model=self.load_model_flag
         )
 
