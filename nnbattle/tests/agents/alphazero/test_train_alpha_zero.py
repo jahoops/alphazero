@@ -714,4 +714,44 @@ class TestTrainingPipeline(unittest.TestCase):
         )
         mock_initialize_agent.assert_called_once()
 
+    def test_training_with_mock_data(self):
+        """Test the training loop using mock data to ensure it performs as expected."""
+        agent = initialize_agent(load_model=False)
+        agent.memory = [
+            (
+                np.random.rand(2, 6, 7),
+                np.random.rand(agent.action_dim),
+                np.random.choice([-1, 0, 1])
+            )
+            for _ in range(10)
+        ]
+        data_module = ConnectFourDataModule(agent, num_games=0)  # No self-play games
+        lightning_module = ConnectFourLightningModule(agent)
+        trainer = pl.Trainer(fast_dev_run=True)
+        trainer.fit(lightning_module, data_module)
+        self.assertTrue(True, "Training completed without errors.")
+
+    def test_training_step_computation(self):
+        """Test that the training step computes the correct loss."""
+        agent = initialize_agent(load_model=False)
+        lightning_module = ConnectFourLightningModule(agent)
+        batch = (
+            torch.randn(4, 2, 6, 7),
+            torch.softmax(torch.randn(4, agent.action_dim), dim=1),
+            torch.randn(4)
+        )
+        loss = lightning_module.training_step(batch, batch_idx=0)
+        self.assertIsInstance(loss, torch.Tensor)
+        self.assertEqual(loss.ndim, 0, "Loss should be a scalar tensor.")
+
+    def test_full_training_cycle(self):
+        """Test the full training cycle including self-play and training."""
+        agent = initialize_agent(load_model=False)
+        data_module = ConnectFourDataModule(agent, num_games=1)
+        data_module.generate_self_play_games()
+        lightning_module = ConnectFourLightningModule(agent)
+        trainer = pl.Trainer(max_epochs=1, log_every_n_steps=1)
+        trainer.fit(lightning_module, data_module)
+        self.assertTrue(True, "Full training cycle completed without errors.")
+
 # ...rest of the existing tests...

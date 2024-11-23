@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 
 from nnbattle.agents.alphazero.data_module import ConnectFourDataset, ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
+from nnbattle.agents.alphazero.train.trainer import train_alphazero
 
 class TestDatasetOperations(unittest.TestCase):
     def setUp(self):
@@ -96,6 +97,25 @@ class TestOptimizer(unittest.TestCase):
         self.agent.model.parameters.return_value = []
         with self.assertRaises(ValueError):
             self.lightning_module.configure_optimizers()
+
+class TestTrainingComponents(unittest.TestCase):
+    @patch('nnbattle.agents.alphazero.train.trainer.save_agent_model')
+    @patch('nnbattle.agents.alphazero.train.trainer.pl.Trainer')
+    @patch('nnbattle.agents.alphazero.train.trainer.ConnectFourLightningModule')
+    @patch('nnbattle.agents.alphazero.train.trainer.ConnectFourDataModule')
+    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
+    def test_train_alphazero_flow(
+        self, mock_initialize_agent, mock_data_module, mock_lightning_module, mock_trainer, mock_save_model
+    ):
+        """Test the overall training flow in train_alphazero."""
+        mock_agent = MagicMock()
+        mock_initialize_agent.return_value = mock_agent
+        train_alphazero(time_limit=1, num_self_play_games=1, use_gpu=False, load_model=False)
+        mock_initialize_agent.assert_called_once()
+        mock_data_module.assert_called_once_with(mock_agent, 1)
+        mock_lightning_module.assert_called_once_with(mock_agent)
+        mock_trainer.return_value.fit.assert_called_once()
+        mock_save_model.assert_called()
 
 if __name__ == '__main__':
     unittest.main()

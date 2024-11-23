@@ -150,5 +150,46 @@ class TestAgentCode(unittest.TestCase):
                 load_model=True
             )
 
+    def test_preprocess_empty_board(self):
+        """Test preprocessing on an empty board."""
+        board = np.zeros((6, 7))
+        preprocessed_board = self.agent.preprocess(board)
+        self.assertEqual(preprocessed_board.shape, (2, 6, 7))
+        self.assertTrue(torch.all(preprocessed_board == 0))
+
+    def test_preprocess_non_empty_board(self):
+        """Test preprocessing on a board with moves."""
+        board = np.zeros((6, 7))
+        board[0, 0] = 1  # Player 1
+        board[0, 1] = 2  # Player 2
+        preprocessed_board = self.agent.preprocess(board)
+        self.assertEqual(preprocessed_board.shape, (2, 6, 7))
+        self.assertEqual(preprocessed_board[0, 0, 0], 1)
+        self.assertEqual(preprocessed_board[1, 0, 1], 1)
+
+    def test_act_method(self):
+        """Test the act method to ensure it returns valid actions."""
+        game = ConnectFourGame()
+        action, action_probs = self.agent.act(game)
+        self.assertIsInstance(action, int)
+        self.assertGreaterEqual(action, 0)
+        self.assertLess(action, self.agent.action_dim)
+        self.assertEqual(action_probs.shape, (self.agent.action_dim,))
+        self.assertAlmostEqual(action_probs.sum().item(), 1.0, places=5)
+
+    def test_mcts_simulation(self):
+        """Test MCTS simulation to ensure it runs without errors."""
+        game = ConnectFourGame()
+        selected_action, action_probs = self.agent.mcts_simulate(game)
+        self.assertIsInstance(selected_action, int)
+        self.assertEqual(action_probs.shape, (self.agent.action_dim,))
+        self.assertAlmostEqual(action_probs.sum().item(), 1.0, places=5)
+
+    def test_self_play_memory(self):
+        """Test that self_play populates the memory with game data."""
+        initial_memory_length = len(self.agent.memory)
+        self.agent.self_play()
+        self.assertGreater(len(self.agent.memory), initial_memory_length)
+
 if __name__ == '__main__':
     unittest.main()
