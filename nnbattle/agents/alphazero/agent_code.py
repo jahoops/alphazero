@@ -193,9 +193,11 @@ class AlphaZeroAgent(Agent):
                 logger.error("Agent failed to select a valid action during self-play.")
                 break
 
-            # Move action_probs to CPU before converting to numpy
+            # **Preprocess the state before storing it**
+            preprocessed_state = self.preprocess(game.get_state())
+
             game_data.append((
-                game.get_state().copy(),
+                preprocessed_state.cpu().numpy(),  # Store the preprocessed state
                 action_probs.cpu().numpy() if isinstance(action_probs, torch.Tensor) else action_probs,
                 player
             ))
@@ -221,11 +223,14 @@ class AlphaZeroAgent(Agent):
             self.memory.append((state_data, mcts_prob, value))
 
     def perform_training(self):
-        """Perform training using train_alphazero."""
+        """Perform training using train_alphazero.
+
+        :param max_iterations: Maximum number of training iterations.
+        """
         from nnbattle.agents.alphazero.train.trainer import train_alphazero
 
         train_alphazero(
-            time_limit=3600,
+            max_iterations=1000,  # Replaced time_limit=3600 with max_iterations=1000
             num_self_play_games=1000,
             use_gpu=self.device.type == 'cuda',  # Ensure correct GPU usage
             load_model=self.load_model_flag

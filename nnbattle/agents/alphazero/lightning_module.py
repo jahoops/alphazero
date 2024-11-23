@@ -29,10 +29,10 @@ class ConnectFourLightningModule(pl.LightningModule):
         policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits, dim=1), dim=1))
         loss = value_loss + policy_loss
         
-        # Log the individual losses for debugging
-        self.log('value_loss', value_loss)
-        self.log('policy_loss', policy_loss)
-        self.log('train_loss', loss)
+        # Log the individual losses with on_step and on_epoch flags
+        self.log('value_loss', value_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('policy_loss', policy_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         
         return loss
 

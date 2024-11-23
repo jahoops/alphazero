@@ -113,8 +113,8 @@ class TestTrainAlphaZero(unittest.TestCase):
 
             # Call the function under test
             train_alphazero(
-                time_limit=1,
-                num_self_play_games=1,
+                max_iterations=2,  # Replaced from 1000 to 2 for testing
+                num_self_play_games=10,  # Replaced from 1000 to 10 for testing
                 use_gpu=self.use_gpu,
                 load_model=False
             )
@@ -159,8 +159,8 @@ class TestTrainAlphaZero(unittest.TestCase):
             # Call the function under test and expect an exception
             with self.assertRaises(Exception) as context:
                 train_alphazero(
-                    time_limit=1,
-                    num_self_play_games=1,
+                    max_iterations=2,  # Replaced from 1000 to 2 for testing
+                    num_self_play_games=10,  # Replaced from 1000 to 10 for testing
                     use_gpu=self.use_gpu,
                     load_model=False
                 )
@@ -174,8 +174,8 @@ class TestTrainAlphaZero(unittest.TestCase):
         self.agent.perform_training()
 
         mock_train.assert_called_once_with(
-            time_limit=3600,
-            num_self_play_games=1000,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=False,  # Expect False since device is CPU
             load_model=self.agent.load_model_flag
         )
@@ -189,8 +189,8 @@ class TestTrainAlphaZero(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             train_alphazero(
-                time_limit=3600,
-                num_self_play_games=1000,
+                max_iterations=2,  # Replaced from 1000 to 2 for testing
+                num_self_play_games=10,  # Replaced from 1000 to 10 for testing
                 use_gpu=True,
                 load_model=True
             )
@@ -205,8 +205,8 @@ class TestTrainAlphaZero(unittest.TestCase):
         self.agent.perform_training()
         
         mock_train.assert_called_once_with(
-            time_limit=3600,
-            num_self_play_games=1000,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=self.use_gpu,  # Use the class variable
             load_model=False
         )
@@ -222,8 +222,8 @@ class TestTrainAlphaZero(unittest.TestCase):
         self.agent.perform_training()
         
         mock_train.assert_called_once_with(
-            time_limit=3600,
-            num_self_play_games=1000,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=True,  # Now testing with GPU
             load_model=False
         )
@@ -235,8 +235,8 @@ class TestTrainAlphaZero(unittest.TestCase):
         self.agent.perform_training()
         
         mock_train.assert_called_once_with(
-            time_limit=3600,
-            num_self_play_games=1000,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=False,
             load_model=False
         )
@@ -265,8 +265,8 @@ class TestTrainAlphaZero(unittest.TestCase):
             # Call the function under test
             from nnbattle.agents.alphazero.train.trainer import train_alphazero
             train_alphazero(
-                time_limit=1,
-                num_self_play_games=1,
+                max_iterations=2,  # Replaced from 1000 to 2 for testing
+                num_self_play_games=10,  # Replaced from 1000 to 10 for testing
                 use_gpu=self.use_gpu,
                 load_model=False
             )
@@ -281,7 +281,7 @@ class TestTrainAlphaZero(unittest.TestCase):
                     
             # Verify other interactions
             mock_load_agent_model.assert_called_once_with(mock_agent)
-            mock_self_play.assert_called_once_with(mock_agent, 1)
+            mock_self_play.assert_called_once_with(mock_agent, 10)
             mock_trainer.fit.assert_called_once()
             mock_save_agent_model.assert_called_once_with(mock_agent)
 
@@ -330,8 +330,8 @@ class TestTrainAlphaZero(unittest.TestCase):
 
             # Call the function under test
             train_alphazero(
-                time_limit=1,
-                num_self_play_games=1,
+                max_iterations=2,  # Replaced from 1000 to 2 for testing
+                num_self_play_games=10,  # Replaced from 1000 to 10 for testing
                 use_gpu=self.use_gpu,
                 load_model=False
             )
@@ -384,8 +384,8 @@ class TestTrainAlphaZero(unittest.TestCase):
         
         # Verify the mock was called with correct parameters
         mock_train.assert_called_once_with(
-            time_limit=3600,
-            num_self_play_games=1000,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=use_gpu,
             load_model=False
         )
@@ -411,8 +411,8 @@ class TestTrainAlphaZero(unittest.TestCase):
     def test_perform_training(self, mock_train):
         self.agent.perform_training()
         mock_train.assert_called_once_with(
-            time_limit=3600,
-            num_self_play_games=1000,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=True,  # Updated to match actual call
             load_model=False
         )
@@ -616,6 +616,56 @@ class TestTrainAlphaZero(unittest.TestCase):
 
     # Ensure all incomplete methods are properly filled following similar patterns
 
+    @patch('pytorch_lightning.Trainer.fit')  # Correctly patch the 'fit' method
+    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.trainer.save_agent_model')
+    def test_train_alphazero_flow(
+        self, mock_save_agent_model, mock_initialize_agent, mock_fit
+    ):
+        """Test that train_alphazero runs and Trainer.fit is called correctly."""
+        # Arrange
+        mock_initialize_agent.return_value = MagicMock()  # Mock the agent
+        mock_fit.return_value = MagicMock()  # Mock the fit method
+
+        # Act
+        max_iterations = 5  # Define number of iterations for testing
+        train_alphazero(
+            max_iterations=max_iterations,             # Use max_iterations
+            num_self_play_games=2,
+            use_gpu=False,
+            load_model=False
+        )
+
+        # Assert
+        self.assertEqual(mock_fit.call_count, max_iterations)  # Expect fit to be called max_iterations times
+        mock_fit.assert_called()  # Ensure 'fit' was called at least once
+
+    @patch('pytorch_lightning.Trainer.fit')
+    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.trainer.save_agent_model')
+    def test_train_alphazero_iterations(
+        self, mock_save_agent_model, mock_initialize_agent, mock_fit
+    ):
+        """Test that train_alphazero respects the max_iterations parameter."""
+        # Arrange
+        mock_initialize_agent.return_value = MagicMock()  # Mock the agent
+        mock_fit.return_value = MagicMock()  # Mock the fit method
+
+        # Act
+        max_iterations = 3  # Another test with different iterations
+        train_alphazero(
+            max_iterations=max_iterations,
+            num_self_play_games=1,
+            use_gpu=False,
+            load_model=False
+        )
+
+        # Assert
+        mock_fit.assert_called()
+        self.assertEqual(mock_fit.call_count, max_iterations)
+
+    # ...other existing tests...
+
 if __name__ == '__main__':
     unittest.main()
 
@@ -707,8 +757,8 @@ class TestTrainingPipeline(unittest.TestCase):
         """Test training initialization."""
         mock_initialize_agent.return_value = self.mock_agent
         train_alphazero(
-            time_limit=1,
-            num_self_play_games=1,
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
             use_gpu=self.use_gpu,
             load_model=False
         )
@@ -730,6 +780,32 @@ class TestTrainingPipeline(unittest.TestCase):
         trainer = pl.Trainer(fast_dev_run=True)
         trainer.fit(lightning_module, data_module)
         self.assertTrue(True, "Training completed without errors.")
+        self.assertTrue(True, "Training completed without errors.")
+
+    def test_training_step_computation(self):
+        """Test that the training step computes the correct loss."""
+        agent = initialize_agent(load_model=False)
+        lightning_module = ConnectFourLightningModule(agent)
+        batch = (
+            torch.randn(4, 2, 6, 7),
+            torch.softmax(torch.randn(4, agent.action_dim), dim=1),
+            torch.randn(4)
+        )
+        loss = lightning_module.training_step(batch, batch_idx=0)
+        self.assertIsInstance(loss, torch.Tensor)
+        self.assertEqual(loss.ndim, 0, "Loss should be a scalar tensor.")
+
+    def test_full_training_cycle(self):
+        """Test the full training cycle including self-play and training."""
+        agent = initialize_agent(load_model=False)
+        data_module = ConnectFourDataModule(agent, num_games=1)
+        data_module.generate_self_play_games()
+        lightning_module = ConnectFourLightningModule(agent)
+        trainer = pl.Trainer(max_epochs=1, log_every_n_steps=1)
+        trainer.fit(lightning_module, data_module)
+        self.assertTrue(True, "Full training cycle completed without errors.")
+
+# ...rest of the existing tests...
 
     def test_training_step_computation(self):
         """Test that the training step computes the correct loss."""

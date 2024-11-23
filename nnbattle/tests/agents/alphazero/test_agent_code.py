@@ -130,8 +130,8 @@ class TestAgentCode(unittest.TestCase):
             mock_agent = MagicMock()
             mock_initialize_agent.return_value = mock_agent
             train_alphazero(
-                time_limit=3600,
-                num_self_play_games=1000,
+                max_iterations=2,  # Reduced from 1000 to 2 for testing
+                num_self_play_games=10,  # Reduced for quicker tests
                 use_gpu=True,
                 load_model=True
             )
@@ -144,8 +144,8 @@ class TestAgentCode(unittest.TestCase):
                 load_model=True
             )
             mock_train.assert_called_once_with(
-                time_limit=3600,
-                num_self_play_games=1000,
+                max_iterations=2,  # Ensure the reduced iterations are used
+                num_self_play_games=10,
                 use_gpu=True,
                 load_model=True
             )

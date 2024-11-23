@@ -1,3 +1,4 @@
+
 # nnbattle/agents/alphazero/train/train_alpha_zero.py
 
 import os
@@ -67,7 +68,7 @@ def self_play(agent, num_games):
 # Do not add any import statements for train_alphazero here
 
 def train_alphazero(
-    max_iterations: int,  # Renamed from time_limit to max_iterations
+    max_iterations: int,
     num_self_play_games: int,
     use_gpu: bool,
     load_model: bool
@@ -93,28 +94,33 @@ def train_alphazero(
     lightning_module = ConnectFourLightningModule(agent)
     
     trainer = pl.Trainer(
-        # Removed max_time parameter
+        max_epochs=max_iterations,
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
-        log_every_n_steps=1,  # Set logging interval to 1
+        devices=1,
         log_every_n_steps=1,  # Set logging interval to 1
         fast_dev_run=False  # Ensure fast_dev_run is False for actual training
     )
     
-    for iteration in range(1, max_iterations + 1):
-        logger.info(f"Starting training iteration {iteration}/{max_iterations}...")
-        logger.info("Starting self-play games...")
+    for iteration in range(max_iterations):
+        logger.info(f"Starting self-play games for iteration {iteration + 1}...")
         data_module.generate_self_play_games()
         
-        logger.info("Starting training iteration...")
+        logger.info(f"Starting training iteration {iteration + 1}...")
         trainer.fit(lightning_module, data_module)
+        
+        logger.info(f"Completed training iteration {iteration + 1}.")
         
         logger.info("Saving the model...")
         save_agent_model(agent)
-        logger.info(f"Completed training iteration {iteration}/{max_iterations}.")
-        logger.info(f"Completed training iteration {iteration}/{max_iterations}.")
-    
+        
     logger.info("Training completed.")
 
 if __name__ == "__main__":
     # Ensure CUDA_VISIBLE_DEVICES is set
-    train_alphazero(max_iterations=10, num_self_play_games=2, use_gpu=True, load_model=False)    train_alphazero(        max_iterations=10,  # Replaced time_limit with max_iterations        num_self_play_games=2,        use_gpu=False,        load_model=False    )
+    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    train_alphazero(
+        max_iterations=10,  # Replaced time_limit with max_iterations
+        num_self_play_games=2,
+        use_gpu=False,
+        load_model=False
+    )

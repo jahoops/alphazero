@@ -110,12 +110,74 @@ class TestTrainingComponents(unittest.TestCase):
         """Test the overall training flow in train_alphazero."""
         mock_agent = MagicMock()
         mock_initialize_agent.return_value = mock_agent
-        train_alphazero(time_limit=1, num_self_play_games=1, use_gpu=False, load_model=False)
+        train_alphazero(
+            max_iterations=1,  # Replaced time_limit=1 with max_iterations=1
+            num_self_play_games=1,
+            use_gpu=False,
+            load_model=False
+        )
         mock_initialize_agent.assert_called_once()
         mock_data_module.assert_called_once_with(mock_agent, 1)
         mock_lightning_module.assert_called_once_with(mock_agent)
         mock_trainer.return_value.fit.assert_called_once()
         mock_save_model.assert_called()
+
+    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    def test_training_success(
+        self, mock_train, mock_initialize_agent, mock_load_agent_model,
+        mock_save_agent_model, mock_self_play, mock_data_module_class,
+        mock_lightning_module_class
+    ):
+        # ...existing setup code...
+        
+        train_alphazero(
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
+            use_gpu=True,
+            load_model=True
+        )
+        
+        mock_train.assert_called_once_with(
+            max_iterations=2,  # Ensure the reduced iterations are used
+            num_self_play_games=10,  # Ensure the reduced games are used
+            use_gpu=True,
+            load_model=True
+        )
+        # ...existing assertions...
+
+    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero', side_effect=Exception("Training failed"))
+    def test_training_failure(
+        self, mock_train, mock_initialize_agent, mock_load_agent_model,
+        mock_save_agent_model, mock_self_play, mock_data_module_class,
+        mock_lightning_module_class
+    ):
+        # ...existing setup code...
+        
+        with self.assertRaises(Exception):
+            train_alphazero(
+                max_iterations=2,  # Replaced from 1000 to 2 for testing
+                num_self_play_games=10,  # Replaced from 1000 to 10 for testing
+                use_gpu=True,
+                load_model=True
+            )
+        
+        mock_train.assert_called_once_with(
+            max_iterations=2,  # Ensure the reduced iterations are used
+            num_self_play_games=10,  # Ensure the reduced games are used
+            use_gpu=True,
+            load_model=True
+        )
+        # ...existing assertions...
+
+    def test_other_training_method(self):
+        # ...existing code...
+        train_alphazero(
+            max_iterations=2,  # Replaced from 1000 to 2 for testing
+            num_self_play_games=10,  # Replaced from 1000 to 10 for testing
+            use_gpu=False,
+            load_model=False
+        )
+        # ...existing assertions...
 
 if __name__ == '__main__':
     unittest.main()
