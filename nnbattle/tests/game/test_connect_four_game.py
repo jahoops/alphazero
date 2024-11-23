@@ -30,25 +30,114 @@ class TestConnectFourGame(unittest.TestCase):
         return '\n'.join(rows)
 
     def test_initial_state(self):
-        self.assertTrue((self.game.board == EMPTY).all(), "Initial board should be all zeros.")
-        self.assertEqual(self.game.current_player, PLAYER_PIECE, "Player should start first.")
+        expected_board = np.zeros((6,7), dtype=np.int8)
+        self.assertTrue(np.array_equal(self.game.board, expected_board))
+        self.assertEqual(self.game.current_player, PLAYER_PIECE)
 
     def test_make_move_valid(self):
-        move = 3
-        success = self.game.make_move(move)
-        self.assertTrue(success, "Move should be successful.")
-        self.assertEqual(self.game.board[5][move], PLAYER_PIECE, "Piece should be placed at the bottom of the column.")
-        self.assertEqual(self.game.current_player, AI_PIECE, "Current player should switch to AI.")
+        self.game.make_move(0)
+        self.assertEqual(self.game.board[0][0], PLAYER_PIECE)
+        self.assertEqual(self.game.current_player, AI_PIECE)
 
     def test_make_move_invalid(self):
-        move = 0
-        # Fill the first column
         for _ in range(6):
-            self.assertTrue(self.game.make_move(move), "Moves should be successful until the column is full.")
-        # Attempt to make a move in the full column
-        success = self.game.make_move(move)
-        self.assertFalse(success, "Move should fail when column is full.")
-        self.assertEqual(self.game.current_player, PLAYER_PIECE, "Current player should not switch after invalid move.")
+            self.game.make_move(0)
+        with self.assertLogs(level='ERROR') as log:
+            self.game.make_move(0)
+            self.assertIn("Invalid move attempted: Column 0 is full.", log.output[0])
+
+    def test_is_valid_location(self):
+        self.assertTrue(self.game.is_valid_location(0))
+        for _ in range(6):
+            self.game.make_move(0)
+        self.assertFalse(self.game.is_valid_location(0))
+
+    def test_get_next_open_row(self):
+        self.assertEqual(self.game.get_next_open_row(0), 0)
+        self.game.make_move(0)
+        self.assertEqual(self.game.get_next_open_row(0), 1)
+
+    def test_drop_piece(self):
+        self.game.drop_piece(0, 0, PLAYER_PIECE)
+        self.assertEqual(self.game.board[0][0], PLAYER_PIECE)
+
+    def test_check_win_horizontal(self):
+        for c in range(4):
+            self.game.make_move(c)
+            self.game.make_move(c)
+        self.assertTrue(self.game.check_win(PLAYER_PIECE))
+
+    def test_check_win_vertical(self):
+        for _ in range(4):
+            self.game.make_move(0)
+            self.game.make_move(1)
+        self.assertTrue(self.game.check_win(PLAYER_PIECE))
+
+    def test_check_win_positive_diagonal(self):
+        moves = [0,1,1,2,2,3,2,3,3,4,3]
+        for move in moves:
+            self.game.make_move(move)
+        self.assertTrue(self.game.check_win(PLAYER_PIECE))
+
+    def test_check_win_negative_diagonal(self):
+        moves = [3,2,2,1,1,0,1,0,0,0]
+        for move in moves:
+            self.game.make_move(move)
+        self.assertTrue(self.game.check_win(PLAYER_PIECE))
+
+    def test_is_board_full(self):
+        for c in range(7):
+            for _ in range(6):
+                self.game.make_move(c)
+        self.assertTrue(self.game.is_board_full())
+        self.assertFalse(self.game.is_terminal())  # Ensure no winner results in terminal
+
+    def test_get_winner_player(self):
+        for c in range(4):
+            self.game.make_move(c)
+            self.game.make_move(c)
+        self.assertEqual(self.game.get_winner(), PLAYER_PIECE)
+
+    def test_get_winner_ai(self):
+        for _ in range(3):
+            self.game.make_move(0)
+            self.game.make_move(1)
+        self.game.make_move(0)
+        self.assertEqual(self.game.get_winner(), PLAYER_PIECE)
+
+    def test_get_winner_none(self):
+        # Fill the board without any player winning
+        for c in range(7):
+            for _ in range(6):
+                self.game.make_move(c)
+        self.assertEqual(self.game.get_winner(), 0)
+
+    def test_get_reward_player_win(self):
+        for c in range(4):
+            self.game.make_move(c)
+            self.game.make_move(c)
+        self.assertEqual(self.game.get_reward(), 1)
+
+    def test_get_reward_ai_win(self):
+        for _ in range(4):
+            self.game.make_move(0)
+            self.game.make_move(1)
+        self.assertEqual(self.game.get_reward(), -1)
+
+    def test_get_reward_draw(self):
+        # Fill the board without any winner
+        for c in range(7):
+            for _ in range(6):
+                self.game.make_move(c)
+        self.assertEqual(self.game.get_reward(), 0)
+
+    def test_preprocess_board(self):
+        self.game.make_move(0)  # Player
+        preprocessed = self.game.get_state()
+        expected = np.zeros((2,6,7))
+        expected[0,0,0] = 1  # Current player
+        expected[1] = 0  # Opponent
+        self.assertTrue(np.array_equal(preprocessed, expected))
 
     def test_is_terminal_win(self):
         """Simulate a vertical win for PLAYER_PIECE correctly by making four consecutive moves in the same column."""

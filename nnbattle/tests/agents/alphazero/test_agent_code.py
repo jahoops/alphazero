@@ -64,7 +64,8 @@ class TestAgentCode(unittest.TestCase):
         with patch('nnbattle.agents.alphazero.agent_code.load_agent_model') as mock_load_agent_model:  # Updated patch path
             self.agent.model_loaded = False
             self.agent.load_model_flag = True  # Ensure flag is set
-            self.agent.mcts_simulate.return_value = (3, torch.tensor([0.6, 0.4]))  # Return tensor instead of list
+            # Return only two values consistently
+            self.agent.mcts_simulate.return_value = (3, torch.tensor([0.6, 0.4]))
             action, action_probs = self.agent.select_move(ConnectFourGame())
             mock_load_agent_model.assert_called_once_with(self.agent)
             self.assertEqual(action, 3)
@@ -74,11 +75,12 @@ class TestAgentCode(unittest.TestCase):
         # Ensure model is not loaded again if already loaded
         with patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model') as mock_load_agent_model:
             self.agent.model_loaded = True
-            self.agent.mcts_simulate.return_value = (4, [0.7, 0.3])  # Return only two values
+            # Return only two values consistently
+            self.agent.mcts_simulate.return_value = (4, torch.tensor([0.7, 0.3]))
             action, action_probs = self.agent.select_move(ConnectFourGame())
             mock_load_agent_model.assert_not_called()
             self.assertEqual(action, 4)
-            self.assertEqual(action_probs, [0.7, 0.3])
+            np.testing.assert_almost_equal(action_probs.tolist(), [0.7, 0.3], decimal=6)
 
     def test_select_move_no_actions(self):
         # Simulate scenario where no actions are available

@@ -57,79 +57,53 @@ def self_play(agent, num_games):
     agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
 
-def train_alphazero(time_limit, num_self_play_games=100, use_gpu=True, load_model=True):
-    torch.set_float32_matmul_precision('medium')  # Set precision to utilize Tensor Cores
-    start_time = time.time()
-    
-    # Initialize Agent using initialize_agent from utils.py
-    agent = initialize_agent(  # Ensure this call is present
+def train_alphazero(
+    time_limit: int,
+    num_self_play_games: int,
+    use_gpu: bool,
+    load_model: bool
+):
+    """
+    Trains the AlphaZero agent using self-play and reinforcement learning.
+
+    :param time_limit: Maximum time (in seconds) for training.
+    :param num_self_play_games: Number of self-play games per training iteration.
+    :param use_gpu: Whether to use GPU for training.
+    :param load_model: Whether to load an existing model before training.
+    """
+    agent = AlphaZeroAgent(
         action_dim=7,
         state_dim=2,
         use_gpu=use_gpu,
-        num_simulations=800,
-        c_puct=1.4,
         load_model=load_model
     )
     
-    # Ensure agent.model_path is set
-    agent.model_path = MODEL_PATH  # Added line
+    data_module = ConnectFourDataModule(agent, num_self_play_games)
+    lightning_module = ConnectFourLightningModule(agent)
     
-    if load_model:
-        try:
-            load_agent_model(agent)
-            logger.info("Model loaded successfully")
-        except FileNotFoundError as e:
-            logger.error(f"Model path {MODEL_PATH} does not exist.")
-            raise e
+    trainer = torch.optim.Adam(lightning_module.parameters(), lr=1e-3)
     
-    # Log GPU usage during training
-    if torch.cuda.is_available() and use_gpu:
-        log_gpu_info(agent)
-    
-    # Perform Self-Play to populate agent's memory
-    self_play(agent, num_self_play_games)
-    
-    # Initialize Data Module with the agent
-    data_module = ConnectFourDataModule(agent=agent, batch_size=32)  # Adjust batch_size as needed
-    
-    # Initialize Lightning Module with state_dim and action_dim
-    model = Connect4LightningModule(
-        state_dim=agent.state_dim,
-        action_dim=agent.action_dim
-    )  # Use agent's attributes
-    
-    # Set up Model Checkpoint callback
-    checkpoint_callback = ModelCheckpoint(
-        monitor='val_loss',
-        dirpath='alphazero/checkpoints/',
-        filename='alphazero-{epoch:02d}-{val_loss:.2f}',
-        save_top_k=3,
-        mode='min',
-    )
-    
-    # Initialize Trainer
-    trainer = pl.Trainer(
-        max_time=timedelta(hours=time_limit),
-        callbacks=[checkpoint_callback],
-        accelerator='gpu' if torch.cuda.is_available() and use_gpu else 'cpu',
-        devices=1 if torch.cuda.is_available() and use_gpu else None,
-    )
-    
-    # Start Training
-    trainer.fit(model, datamodule=data_module)
-    
-    # Log GPU stats after training
-    if hasattr(agent, 'log_gpu_stats'):
-        agent.log_gpu_stats()
-    else:
-        logger.warning("Agent does not have a log_gpu_stats method.")
-    
-    # Save the final model using the utility function
-    save_agent_model(agent, agent.model_path)
-    
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    logger.info(f"Training completed in {timedelta(seconds=elapsed_time)}")
+    start_time = time.time()
+    while time.time() - start_time < time_limit:
+        logger.info("Starting self-play games...")
+        data_module.generate_self_play_games()
+        
+        logger.info("Loading training data...")
+        train_loader = DataLoader(data_module.dataset, batch_size=64, shuffle=True)
+        
+        logger.info("Starting training iteration...")
+        for batch in train_loader:
+            states, mcts_probs, rewards = batch
+            outputs = lightning_module(states)
+            loss = lightning_module.loss_function(outputs, mcts_probs, rewards)
+            loss.backward()
+            trainer.step()
+            trainer.zero_grad()
+        
+        logger.info("Saving the model...")
+        save_agent_model(agent)
+        
+    logger.info("Training completed.")
 
 if __name__ == "__main__":
     train_alphazero(time_limit=0.1, num_self_play_games=2, load_model=False)

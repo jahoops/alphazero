@@ -11,35 +11,33 @@ logger.setLevel(logging.INFO)  # Changed from DEBUG to INFO
 
 
 class ConnectFourDataset(Dataset):
-    def __init__(self, memory):
-        self.memory = memory
+    def __init__(self, data):
+        self.data = data
 
     def __len__(self):
-        return len(self.memory)
+        return len(self.data)
 
     def __getitem__(self, idx):
-        tensor_state, mcts_prob, value = self.memory[idx]
-        
-        # Ensure mcts_prob is a FloatTensor
-        if isinstance(mcts_prob, list):
-            mcts_prob = torch.FloatTensor(mcts_prob)
-        
-        return tensor_state, mcts_prob, torch.FloatTensor([value])
+        state, mcts_prob, reward = self.data[idx]
+        return torch.tensor(state, dtype=torch.float32), torch.tensor(mcts_prob, dtype=torch.float32), torch.tensor(reward, dtype=torch.float32)
 
 
 class ConnectFourDataModule(pl.LightningDataModule):
-    def __init__(self, agent, batch_size=32):
+    def __init__(self, agent, num_games):
         super().__init__()
         self.agent = agent
-        self.batch_size = batch_size
+        self.num_games = num_games
+        self.dataset = ConnectFourDataset([])
+
+    def generate_self_play_games(self):
+        for _ in range(self.num_games):
+            self.agent.self_play()
+        self.dataset.data.extend(self.agent.memory)
+        self.agent.memory.clear()
+        logger.info(f"Generated {self.num_games} self-play games.")
 
     def setup(self, stage=None):
-        self.train_dataset = ConnectFourDataset(self.agent.memory)
+        pass
 
     def train_dataloader(self):
-        return DataLoader(
-            self.train_dataset, 
-            batch_size=self.batch_size, 
-            shuffle=True, 
-            num_workers=0  # Changed from 4 to 0 to prevent CUDA initialization errors
-        )
+        return DataLoader(self.dataset, batch_size=64, shuffle=True)

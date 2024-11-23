@@ -3,8 +3,10 @@
 import logging
 import math
 import numpy as np
-from typing import Optional
+from typing import Optional, List
 from copy import deepcopy
+
+import torch
 
 from nnbattle.game.connect_four_game import ConnectFourGame 
 from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
@@ -19,30 +21,38 @@ class MCTSNode:
         self.children = {}
         self.visits = 0
         self.value = 0.0
+        self.prior = 0.0
 
     def is_leaf(self) -> bool:
         return len(self.children) == 0
 
     def best_child(self, c_puct: float) -> Optional['MCTSNode']:
         best_score = -float('inf')
-        best_child = None
+        best_node = None
         for child in self.children.values():
-            score = (child.value / (child.visits + 1)) + c_puct * math.sqrt(math.log(self.visits + 1) / (child.visits + 1))
+            u = c_puct * child.prior * math.sqrt(self.visits) / (1 + child.visits)
+            q = child.value / (1 + child.visits)
+            score = q + u
             if score > best_score:
                 best_score = score
-                best_child = child
-        return best_child
+                best_node = child
+        return best_node
 
-    def expand(self, policy: np.ndarray, legal_moves: list):
-        for action in legal_moves:
+    def expand(self, action_probs: torch.Tensor, legal_actions: List[int]):
+        for action in legal_actions:
             if action not in self.children:
-                self.children[action] = MCTSNode(parent=self, action=action, env=self.env)
+                new_env = self.env.copy()
+                new_env.make_move(action)
+                new_env.current_player = 2 if new_env.current_player == 1 else 1
+                child_node = MCTSNode(parent=self, action=action, env=new_env)
+                child_node.prior = action_probs[action].item()
+                self.children[action] = child_node
 
     def backpropagate(self, reward: float):
         self.visits += 1
         self.value += reward
         if self.parent:
-            self.parent.backpropagate(reward)
+            self.parent.backpropagate(-reward)
 
 __all__ = ['MCTSNode']
 

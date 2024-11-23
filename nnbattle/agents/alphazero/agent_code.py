@@ -6,6 +6,7 @@ import os
 import time
 import numpy as np
 import torch
+import copy
 
 from nnbattle.game.connect_four_game import ConnectFourGame
 from .network import Connect4Net
@@ -16,6 +17,10 @@ from nnbattle.agents.base_agent import Agent  # Ensure this import is correct
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
 logger = logging.getLogger(__name__)
+
+def deepcopy_env(env):
+    """Deep copy the environment."""
+    return copy.deepcopy(env)
 
 class AlphaZeroAgent(Agent):
     logger = logging.getLogger(__name__)
@@ -48,7 +53,11 @@ class AlphaZeroAgent(Agent):
             logger.info(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
 
         if load_model:
-            load_agent_model(self)
+            try:
+                load_agent_model(self)
+            except FileNotFoundError:
+                logger.warning("No model file found, starting with fresh model.")
+                self.model_loaded = False
 
     def log_gpu_stats(self):
         if torch.cuda.is_available():
@@ -78,8 +87,14 @@ class AlphaZeroAgent(Agent):
         save_agent_model(self, self.model_path)  # Pass the model_path explicitly
 
     def select_move(self, game: ConnectFourGame):
+        """Select a move and return action probabilities."""
         if self.load_model_flag and not self.model_loaded:
-            load_agent_model(self)  # Call load_agent_model directly
+            try:
+                load_agent_model(self)
+                self.model_loaded = True
+            except FileNotFoundError:
+                logger.warning("No model file found, using untrained model.")
+                self.model_loaded = False
 
         start_time = time.time()
         selected_action, action_probs = self.act(game)
@@ -88,7 +103,8 @@ class AlphaZeroAgent(Agent):
 
         if selected_action is None:
             logger.warning("No possible actions available.")
-            return None, []
+            # Always return a tensor for action_probs
+            return None, torch.zeros(self.action_dim, device=self.device)
 
         return selected_action, action_probs
 
@@ -146,15 +162,15 @@ class AlphaZeroAgent(Agent):
         action_visits = [(child.action, child.visits) for child in root.children.values()]
         if not action_visits:
             logger.error("No actions available after MCTS simulations.")
-            return None, []
+            return None, torch.zeros(self.action_dim, device=self.device)
 
         selected_action = max(action_visits, key=lambda x: x[1])[0]
         total_visits = sum(child.visits for child in root.children.values())
-        action_probs = np.zeros(self.action_dim)
+        action_probs = torch.zeros(self.action_dim, device=self.device)
         for child in root.children.values():
             action_probs[child.action] = child.visits / total_visits
 
-        return selected_action, torch.tensor(action_probs).to(self.device)
+        return selected_action, action_probs
 
     def self_play(self):
         game_data = []
@@ -168,9 +184,9 @@ class AlphaZeroAgent(Agent):
                 logger.error("Agent failed to select a valid action during self-play.")
                 break
 
-            game_data.append((game.get_state().copy(), action_probs, player))
+            game_data.append((game.get_state().copy(), action_probs.numpy(), player))
             game.make_move(selected_action)
-            player = -player
+            player = -player  # Switch player
 
         winner = game.get_winner()
         logger.info(f"Game ended. Winner: {winner}")
@@ -179,11 +195,14 @@ class AlphaZeroAgent(Agent):
             if winner == 0:
                 value = 0
             else:
-                value = 1 if winner == player_in_game else -1  # Corrected 'was' to '=='
+                value = 1 if winner == player_in_game else -1
             self.memory.append((state_data, mcts_prob, value))
 
     def perform_training(self):
-        from .train.train_alpha_zero import train_alphazero  # Local import to prevent circular dependency
+        """Perform training using train_alphazero."""
+        # Explicitly import from trainer module
+        from nnbattle.agents.alphazero.train.trainer import train_alphazero
+        
         train_alphazero(
             time_limit=3600,
             num_self_play_games=1000,
