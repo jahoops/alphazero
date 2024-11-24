@@ -58,7 +58,7 @@ class MinimaxAgent(Agent):
             value = -math.inf
             best_column = random.choice(valid_locations)
             for col in valid_locations:
-                temp_game = new_game()
+                temp_game = game.new_game()
                 move_successful = temp_game.make_move(col)
                 if not move_successful:
                     continue  # Skip invalid moves
@@ -74,7 +74,7 @@ class MinimaxAgent(Agent):
             value = math.inf
             best_column = random.choice(valid_locations)
             for col in valid_locations:
-                temp_game = new_game()
+                temp_game = game.new_game()
                 move_successful = temp_game.make_move(col)
                 if not move_successful:
                     continue  # Skip invalid moves
