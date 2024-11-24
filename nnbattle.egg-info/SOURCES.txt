@@ -1,6 +1,7 @@
 pyproject.toml
 setup.py
 nnbattle/__init__.py
+nnbattle/constants.py
 nnbattle.egg-info/PKG-INFO
 nnbattle.egg-info/SOURCES.txt
 nnbattle.egg-info/dependency_links.txt

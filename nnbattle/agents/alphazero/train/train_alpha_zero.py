@@ -25,6 +25,8 @@ from nnbattle.agents.alphazero.utils.model_utils import (
     save_agent_model
 )
 
+# Configure logging
+logger = logging.getLogger(__name__)
 # Set float32 matmul precision for Tensor Cores
 torch.set_float32_matmul_precision('high')
 
@@ -49,6 +51,7 @@ def self_play(agent, num_games):
         while not game.is_terminal():
             # Unpack selected_action and action_probs
             selected_action, action_probs = agent.select_move(game)
+            logger.info(f"Move {selected_action}/{agent.team}")
             game.make_move(selected_action, agent.team)  # Pass only the action, not the tuple
             agent.team = 3 - agent.team  # switch team
         game_end_time = time.time()
@@ -117,8 +120,8 @@ if __name__ == "__main__":
     # Ensure CUDA_VISIBLE_DEVICES is set
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     train_alphazero(
-        max_iterations=10,  # Replaced time_limit with max_iterations
-        num_self_play_games=2,
-        use_gpu=False,
-        load_model=False
+        max_iterations=10,
+        num_self_play_games=100,
+        use_gpu=True,
+        load_model=True
     )

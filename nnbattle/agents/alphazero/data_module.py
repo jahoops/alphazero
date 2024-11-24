@@ -42,6 +42,7 @@ class ConnectFourDataModule(pl.LightningDataModule):
         self.dataset = ConnectFourDataset([])
 
     def generate_self_play_games(self):
+        logger.info(f"Self play {self}")
         for _ in range(self.num_games):
             self.agent.self_play()
         self.dataset.data.extend(self.agent.memory)

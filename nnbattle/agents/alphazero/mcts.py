@@ -9,6 +9,7 @@ import copy
 import torch
 
 from nnbattle.game.connect_four_game import ConnectFourGame 
+from nnbattle.constants import RED_TEAM, YEL_TEAM  # Ensure constants are imported
 from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
 
 logger = logging.getLogger(__name__)
@@ -21,7 +22,11 @@ class MCTSNode:
     def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], env: ConnectFourGame):
         self.parent = parent
         self.action = action
-        self.team = env.last_piece
+        # Determine the team that will make the next move
+        if env.last_piece is None:
+            self.team = RED_TEAM  # Starting team
+        else:
+            self.team = 3 - env.last_piece  # Switch team
         self.env = env
         self.children = {}
         self.visits = 0
@@ -47,7 +52,7 @@ class MCTSNode:
         for action in legal_actions:
             if action not in self.children:
                 new_env = deepcopy_env(self.env)
-                new_env.make_move(action,self.team)
+                new_env.make_move(action, self.team)  # self.team is now valid
                 child_node = MCTSNode(parent=self, action=action, env=new_env)
                 child_node.prior = action_probs[action].item()
                 self.children[action] = child_node
