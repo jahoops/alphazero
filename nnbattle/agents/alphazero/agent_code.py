@@ -1,11 +1,20 @@
 # /agent_code.py
 
 import logging
-from collections import deque
+
+# Configure logging at the very start
+logging.basicConfig(
+    level=logging.INFO,  # Or DEBUG for more details
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Proceed with your imports
 import os
 import time
-import numpy as np
+from datetime import timedelta
 import torch
+import pytorch_lightning as pl
+import numpy as np
 import copy
 
 from nnbattle.game.connect_four_game import ConnectFourGame
@@ -59,6 +68,9 @@ class AlphaZeroAgent(Agent):
                 logger.warning("No model file found, starting with fresh model.")
                 self.model_loaded = False
 
+        logger.info("Initialized AlphaZeroAgent.")
+        logger.info("AlphaZeroAgent initialized.")
+
     def log_gpu_stats(self):
         if torch.cuda.is_available():
             allocated = torch.cuda.memory_allocated() / 1e9
@@ -95,7 +107,7 @@ class AlphaZeroAgent(Agent):
         save_agent_model(self, self.model_path)  # Pass the model_path explicitly
 
     def select_move(self, game: ConnectFourGame):
-        """Select a move and return action probabilities."""
+        logger.info("Selecting a move...")
         if self.load_model_flag and not self.model_loaded:
             try:
                 load_agent_model(self)
@@ -110,8 +122,7 @@ class AlphaZeroAgent(Agent):
         logger.info(f"Time taken for select_move: {end_time - start_time:.4f} seconds")
 
         if selected_action is None:
-            logger.warning("No possible actions available.")
-            # Always return a tensor for action_probs
+            logger.warning("No valid action selected by MCTS.")
             return None, torch.zeros(self.action_dim, device=self.device)
 
         return selected_action, action_probs
@@ -125,6 +136,7 @@ class AlphaZeroAgent(Agent):
         return selected_action, action_probs
 
     def mcts_simulate(self, game: ConnectFourGame):
+        logger.info("Starting MCTS simulation...")
         root = MCTSNode(parent=None, action=None, env=deepcopy_env(game))
         root.visits = 1
 
@@ -172,6 +184,7 @@ class AlphaZeroAgent(Agent):
 
             node.expand(filtered_probs, legal_moves)
             node.backpropagate(value.item())
+            logger.debug(f"Simulating from node: {node}")
 
         action_visits = [(child.action, child.visits) for child in root.children.values()]
         if not action_visits:
@@ -184,7 +197,6 @@ class AlphaZeroAgent(Agent):
         for child in root.children.values():
             action_probs[child.action] = child.visits / total_visits
 
-        # Ensure all code paths return two values
         return selected_action, action_probs
 
     def self_play(self, max_moves=100):

@@ -1,10 +1,15 @@
+import logging
 
-# nnbattle/agents/alphazero/train/train_alpha_zero.py
+# Configure logging at the very start
+logging.basicConfig(
+    level=logging.DEBUG,  # Set to DEBUG for more detailed logs
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 
+# Now import other modules
 import os
 import time
 from datetime import timedelta
-import logging
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
@@ -19,13 +24,6 @@ from nnbattle.agents.alphazero.utils.model_utils import (
     load_agent_model,
     save_agent_model
 )
-
-# Configure logging at the start of the file
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 # Set float32 matmul precision for Tensor Cores
 torch.set_float32_matmul_precision('high')
