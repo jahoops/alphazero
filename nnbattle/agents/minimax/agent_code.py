@@ -5,6 +5,7 @@ import random
 import logging
 import copy
 from nnbattle.agents.base_agent import Agent
+from nnbattle.constants import EMPTY, ROW_COUNT, COLUMN_COUNT
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -61,14 +62,14 @@ class MinimaxAgent(Agent):
             else:  # Game is over, no more valid moves
                 return (0, None)
         elif depth == 0:  # Depth is zero
-            return (game.score_position(3 - self.team), None)
+            return (self.score_position(game), None)
         else:
             if maximizingPlayer:
                 value = -math.inf
                 best_column = random.choice(valid_moves)
                 for col in valid_moves:
                     temp_game = copy.deepcopy(game)
-                    move_successful = temp_game.make_move(col)
+                    move_successful = temp_game.make_move(col, self.team)
                     if not move_successful:
                         continue  # Skip invalid moves
                     new_score, _ = self.minimax(temp_game, depth-1, alpha, beta, False)
@@ -84,7 +85,7 @@ class MinimaxAgent(Agent):
                 best_column = random.choice(valid_moves)
                 for col in valid_moves:
                     temp_game = game.new_game()
-                    move_successful = temp_game.make_move(col)
+                    move_successful = temp_game.make_move(col, 3 - self.team)
                     if not move_successful:
                         continue  # Skip invalid moves
                     new_score, _ = self.minimax(temp_game, depth-1, alpha, beta, True)
@@ -95,3 +96,68 @@ class MinimaxAgent(Agent):
                     if alpha >= beta:
                         break
                 return value, best_column
+
+    def score_position(self, game: ConnectFourGame):
+        """
+        Evaluates the board and returns a score from the agent's perspective.
+        
+        :param game: The current game state.
+        :return: Integer score representing the desirability of the board.
+        """
+        score = 0
+        board = game.get_board()
+        
+        ## Score center column
+        center_array = [int(i) for i in list(board[:, COLUMN_COUNT//2])]
+        center_count = center_array.count(self.team)
+        score += center_count * 3  # Weight center positions higher
+        
+        ## Score Horizontal
+        for r in range(ROW_COUNT):
+            row_array = [int(i) for i in list(board[r,:])]
+            for c in range(COLUMN_COUNT-3):
+                window = row_array[c:c+4]
+                score += self.evaluate_window(window)
+        
+        ## Score Vertical
+        for c in range(COLUMN_COUNT):
+            col_array = [int(i) for i in list(board[:,c])]
+            for r in range(ROW_COUNT-3):
+                window = col_array[r:r+4]
+                score += self.evaluate_window(window)
+        
+        ## Score positive sloped diagonals
+        for r in range(ROW_COUNT-3):
+            for c in range(COLUMN_COUNT-3):
+                window = [board[r+i][c+i] for i in range(4)]
+                score += self.evaluate_window(window)
+        
+        ## Score negative sloped diagonals
+        for r in range(3, ROW_COUNT):
+            for c in range(COLUMN_COUNT-3):
+                window = [board[r-i][c+i] for i in range(4)]
+                score += self.evaluate_window(window)
+        
+        return score
+    
+    def evaluate_window(self, window):
+        """
+        Evaluates a 4-cell window and assigns a score based on the contents.
+        
+        :param window: List of 4 cells from the board.
+        :return: Integer score for the window.
+        """
+        score = 0
+        opp_team = 3 - self.team
+        
+        if window.count(self.team) == 4:
+            score += 100
+        elif window.count(self.team) == 3 and window.count(EMPTY) == 1:
+            score += 5
+        elif window.count(self.team) == 2 and window.count(EMPTY) == 2:
+            score += 2
+        
+        if window.count(opp_team) == 3 and window.count(EMPTY) == 1:
+            score -= 4
+        
+        return score

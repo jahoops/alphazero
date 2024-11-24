@@ -13,7 +13,7 @@ from nnbattle.constants import RED_TEAM, YEL_TEAM
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def run_tournament(agents, num_games=100):
+def run_tournament(agents, num_games=10):
     results = {agent.__class__.__name__: 0 for agent in agents}
     results['draws'] = 0
     game = ConnectFourGame()

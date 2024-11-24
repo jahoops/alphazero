@@ -28,7 +28,6 @@ class ConnectFourGame:
         new_game.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
         new_game.last_team = None
         return new_game
-
     def reset(self):
         """Resets the game to initial state."""
         self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
@@ -119,6 +118,10 @@ class ConnectFourGame:
         return self.board.copy()
 
     def board_to_string(self):
-        """Return string representation of board."""
-        mapping = {RED_TEAM: 'X', YEL_TEAM: 'O', EMPTY: '.'}
+        """Return string representation of board with colored circles."""
+        mapping = {
+            RED_TEAM: '\033[91m\u25CF\033[0m',  # Red circle
+            YEL_TEAM: '\033[93m\u25CF\033[0m',  # Yellow circle
+            EMPTY: '\u25CB'                      # White circle
+        }
         return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board)
