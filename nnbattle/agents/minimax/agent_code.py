@@ -5,6 +5,7 @@ import random
 
 from nnbattle.agents.base_agent import Agent
 from nnbattle.game.connect_four_game import ConnectFourGame 
+from constants import RED_TEAM, YEL_TEAM
 
 class MinimaxAgent(Agent):
     def __init__(self, depth=4, team=1):
@@ -15,7 +16,7 @@ class MinimaxAgent(Agent):
         :param team: The team number (1 or 2) that the agent is playing for.
         """
         self.depth = depth
-        self.team = 1
+        self.team = YEL_TEAM if team == 1 else RED_TEAM
 
     def select_move(self, game: ConnectFourGame):
         """
@@ -24,9 +25,6 @@ class MinimaxAgent(Agent):
         :param game: The current state of the game.
         :return: The column number (0-6) where the agent decides to drop its piece.
         """
-        valid_locations = game.get_valid_locations()
-        if not valid_locations:
-            return None
         score, column = self.minimax(game, self.depth, -math.inf, math.inf, True)
         return column
 
@@ -42,17 +40,16 @@ class MinimaxAgent(Agent):
         :return: Tuple of (score, column)
         """
         valid_locations = game.get_valid_locations()
-        is_terminal = game.is_terminal()
-        if depth == 0 or is_terminal:
-            if is_terminal:
-                if game.check_win(AI_PIECE):
-                    return (math.inf, None)
-                elif game.check_win(PLAYER_PIECE):
-                    return (-math.inf, None)
-                else:  # Game is over, no more valid moves
-                    return (0, None)
-            else:  # Depth is zero
-                return (game.score_position(AI_PIECE), None)
+        result = game.get_game_state()
+        if depth == 0 or result != "ONGOING":
+            if result == self.team:
+                return (math.inf, None)
+            elif result == 3 - self.team:
+                return (-math.inf, None)
+            else:  # Game is over, no more valid moves
+                return (0, None)
+        else:  # Depth is zero
+            return (game.score_position(3 - self.team), None)
 
         if maximizingPlayer:
             value = -math.inf
@@ -85,4 +82,4 @@ class MinimaxAgent(Agent):
                 beta = min(beta, value)
                 if alpha >= beta:
                     break
-            return value, best_column
+            return value, best_column  

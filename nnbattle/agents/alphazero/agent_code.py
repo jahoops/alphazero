@@ -182,7 +182,7 @@ class AlphaZeroAgent(Agent):
 
         :param max_iterations: Maximum number of training iterations.
         """
-        from nnbattle.agents.alphazero.train.trainer import train_alphazero
+        # Removed unnecessary import
 
         train_alphazero(
             max_iterations=1000,  # Replaced time_limit=3600 with max_iterations=1000

@@ -8,7 +8,7 @@ import copy
 
 import torch
 
-from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError
+from nnbattle.game import ConnectFourGame, InvalidMoveError  # Updated import path
 from nnbattle.constants import RED_TEAM, YEL_TEAM  # Ensure constants are imported
 from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
 

@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from pytorch_lightning.callbacks import ModelCheckpoint
 from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent
-from nnbattle.game import ConnectFourGame
+from nnbattle.game import ConnectFourGame, InvalidMoveError, InvalidTurnError  # Ensure these are correctly imported
 from nnbattle.agents.alphazero.agent_code import initialize_agent  # Moved import here
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
