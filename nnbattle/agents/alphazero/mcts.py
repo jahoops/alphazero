@@ -23,10 +23,10 @@ class MCTSNode:
         self.parent = parent
         self.action = action
         # Determine the team that will make the next move
-        if env.last_piece is None:
+        if env.last_team is None:
             self.team = RED_TEAM  # Starting team
         else:
-            self.team = 3 - env.last_piece  # Switch team
+            self.team = 3 - env.last_team  # Switch team
         self.env = env
         self.children = {}
         self.visits = 0
@@ -79,10 +79,10 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
             if node is None:
                 logger.debug("No child nodes available during selection.")
                 break
-            if(env.last_piece is None):
+            if(env.last_team is None):
                 env.make_move(node.action, RED_TEAM)
             else:
-                env.make_move(node.action, 3 - env.last_piece)
+                env.make_move(node.action, 3 - env.last_team)
             logger.debug(f"Moved to child node: Team {node.team}, Action {node.action}")
 
         # **Expansion**

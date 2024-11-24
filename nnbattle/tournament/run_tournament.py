@@ -20,25 +20,39 @@ def run_tournament(agents, num_games=100):
 
     for i in range(num_games):
         game.reset()
-        # Set starting team based on game index
-        start_team = RED_TEAM if (i % 2) == 0 else YEL_TEAM  # Assign RED_TEAM or YEL_TEAM
+        current_team = RED_TEAM if i % 2 == 0 else YEL_TEAM  # Alternate starting team
+        
         while game.get_game_state() == "ONGOING":
-            agent = next((a for a in agents if a.team == start_team), None)
+            agent = next((a for a in agents if a.team == current_team), None)
             if agent is None:
-                logger.error(f"No agent found for team {start_team}.")
+                logger.error(f"No agent found for team {current_team}")
                 break
-            selected_action = agent.select_move(game)
-            game.make_move(selected_action, agent.team)
-            result = game.get_game_state()
-            if result != "ONGOING":
-                if result in [RED_TEAM, YEL_TEAM]:
-                    winner_agent = next((a for a in agents if a.team == result), None)
-                    if winner_agent:
-                        results[winner_agent.__class__.__name__] += 1
-                elif result == "Draw":
-                    results['draws'] += 1
-        # Add board representation after each game
-        logger.info(f"Final board for game {i + 1}:\n{game.board_to_string()}")
+                
+            # Handle different return types from select_move
+            move_result = agent.select_move(game)
+            selected_action = move_result[0] if isinstance(move_result, tuple) else move_result
+            
+            try:
+                game.make_move(selected_action, agent.team)
+                logger.info(f"Team {agent.team} placed piece in column {selected_action}")
+                logger.info(f"Board state:\n{game.board_to_string()}")
+            except (InvalidMoveError, InvalidTurnError) as e:
+                logger.error(f"Invalid move by {agent.__class__.__name__}: {e}")
+                break
+
+            current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
+
+        # Log game result
+        result = game.get_game_state()
+        logger.info(f"Game {i+1} ended with result: {result}")
+        logger.info(f"Final board:\n{game.board_to_string()}")
+        
+        if result in [RED_TEAM, YEL_TEAM]:
+            winner = next((a for a in agents if a.team == result), None)
+            if winner:
+                results[winner.__class__.__name__] += 1
+        else:
+            results['draws'] += 1
 
     # Save results
     results_dir = os.path.join('tournament', 'results')

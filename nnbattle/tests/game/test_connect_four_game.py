@@ -26,7 +26,7 @@ class TestConnectFourGame(unittest.TestCase):
             lambda: self.assertTrue(np.array_equal(self.game.board, np.zeros((6,7), dtype=np.int8)))
         )
         self.assertWithBoardState(
-            lambda: self.assertIsNone(self.game.last_piece)
+            lambda: self.assertIsNone(self.game.last_team)
         )
 
     def test_make_move_valid(self):
@@ -38,7 +38,7 @@ class TestConnectFourGame(unittest.TestCase):
             lambda: self.assertEqual(self.game.board[0][0], RED_TEAM)
         )
         self.assertWithBoardState(
-            lambda: self.assertEqual(self.game.last_piece, RED_TEAM)
+            lambda: self.assertEqual(self.game.last_team, RED_TEAM)
         )
 
         # Next move must be the other piece
@@ -49,7 +49,7 @@ class TestConnectFourGame(unittest.TestCase):
             lambda: self.assertEqual(self.game.board[0][1], YEL_TEAM)
         )
         self.assertWithBoardState(
-            lambda: self.assertEqual(self.game.last_piece, YEL_TEAM)
+            lambda: self.assertEqual(self.game.last_team, YEL_TEAM)
         )
 
     def test_make_move_invalid_turn(self):
@@ -204,7 +204,7 @@ class TestConnectFourGame(unittest.TestCase):
             lambda: self.assertTrue(np.array_equal(new_game.board, np.zeros((6,7), dtype=np.int8)))
         )
         self.assertWithBoardState(
-            lambda: self.assertIsNone(new_game.last_piece)
+            lambda: self.assertIsNone(new_game.last_team)
         )
 
     def test_make_move_turn_enforcement(self):

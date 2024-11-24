@@ -111,7 +111,7 @@ class AlphaZeroAgent(Agent):
         logger.info(f"Agent {self.team} selecting a move.")
 
         # Ensure it's the agent's turn
-        if game.last_piece == self.team:
+        if game.last_team == self.team:
             raise InvalidTurnError(f"It's not Agent {self.team}'s turn.")
 
         # Get the current valid moves

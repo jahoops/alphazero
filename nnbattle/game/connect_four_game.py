@@ -19,41 +19,41 @@ class InvalidTurnError(Exception):
 class ConnectFourGame:
     def __init__(self):
         self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
-        self.last_piece = None
+        self.last_team = None
         self.enforce_turns = True  # Always enforce turns
 
     def new_game(self):
         """Creates and returns a new game instance."""
         new_game = ConnectFourGame()
         new_game.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
-        new_game.last_piece = None
+        new_game.last_team = None
         return new_game
 
     def reset(self):
         """Resets the game to initial state."""
         self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
-        self.last_piece = None
+        self.last_team = None
         return self.board.copy()
 
-    def make_move(self, column, piece):
-        """Make a move for the given piece in the specified column."""
-        if piece not in [RED_TEAM, YEL_TEAM]:
-            logger.error(f"Invalid piece: {piece}. Must be {RED_TEAM} or {YEL_TEAM}.")
-            raise InvalidMoveError(f"Invalid piece: {piece}. Must be {RED_TEAM} or {YEL_TEAM}.")
+    def make_move(self, column, team):
+        """Make a move for the given team in the specified column."""
+        if team not in [RED_TEAM, YEL_TEAM]:
+            logger.error(f"Invalid team: {team}. Must be {RED_TEAM} or {YEL_TEAM}.")
+            raise InvalidMoveError(f"Invalid team: {team}. Must be {RED_TEAM} or {YEL_TEAM}.")
 
         if self.enforce_turns:
-            if self.last_piece is not None and piece == self.last_piece:
-                logger.error(f"Invalid turn: Piece {piece} cannot move twice in a row.")
-                raise InvalidTurnError(f"Invalid turn: Piece {piece} cannot move twice in a row.")
+            if self.last_team is not None and team == self.last_team:
+                logger.error(f"Invalid turn: team {team} cannot move twice in a row.")
+                raise InvalidTurnError(f"Invalid turn: team {team} cannot move twice in a row.")
 
         if not self.is_valid_move(column):
             logger.error(f"Invalid move: Column {column} is full or out of bounds.")
             raise InvalidMoveError(f"Invalid move: Column {column} is full or out of bounds.")
 
         row = self.get_next_open_row(column)
-        self.board[row][column] = piece
-        self.last_piece = piece
-        logger.debug(f"Piece {piece} placed in column {column}, row {row}.")
+        self.board[row][column] = team
+        self.last_team = team
+        logger.debug(f"team {team} placed in column {column}, row {row}.")
         return True
 
     def is_valid_move(self, column):
@@ -68,30 +68,30 @@ class ConnectFourGame:
                 return row
         return None
 
-    def check_win(self, piece):
-        """Check if the given piece has won."""
+    def check_win(self, team):
+        """Check if the given team has won."""
         # Check horizontal
         for r in range(ROW_COUNT):
             for c in range(COLUMN_COUNT-3):
-                if all(self.board[r][c+i] == piece for i in range(4)):
+                if all(self.board[r][c+i] == team for i in range(4)):
                     return True
 
         # Check vertical
         for r in range(ROW_COUNT-3):
             for c in range(COLUMN_COUNT):
-                if all(self.board[r+i][c] == piece for i in range(4)):
+                if all(self.board[r+i][c] == team for i in range(4)):
                     return True
 
         # Check positive diagonal
         for r in range(ROW_COUNT-3):
             for c in range(COLUMN_COUNT-3):
-                if all(self.board[r+i][c+i] == piece for i in range(4)):
+                if all(self.board[r+i][c+i] == team for i in range(4)):
                     return True
 
         # Check negative diagonal
         for r in range(3, ROW_COUNT):
             for c in range(COLUMN_COUNT-3):
-                if all(self.board[r-i][c+i] == piece for i in range(4)):
+                if all(self.board[r-i][c+i] == team for i in range(4)):
                     return True
 
         return False
