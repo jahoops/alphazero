@@ -44,14 +44,14 @@ def self_play(agent, num_games):
     game = ConnectFourGame()
     for game_num in range(num_games):
         game.reset()
-        agent.current_player = 1  # Initialize current player at the start of the game
+        agent.team = 1  # Initialize current player at the start of the game
         logger.info(f"Starting game {game_num + 1}/{num_games}")
         game_start_time = time.time()
         while not game.is_terminal():
             # Unpack selected_action and action_probs
             selected_action, action_probs = agent.select_move(game)
-            game.make_move(selected_action)  # Pass only the action, not the tuple
-            agent.current_player = game.current_player  # Update current player
+            game.make_move(selected_action, agent.team)  # Pass only the action, not the tuple
+            agent.team = 3 - agent.team  # Update current player
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
         result = game.get_result()

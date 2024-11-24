@@ -6,17 +6,16 @@ import random
 from nnbattle.agents.base_agent import Agent
 from nnbattle.game.connect_four_game import ConnectFourGame 
 
-PLAYER_PIECE = 1
-AI_PIECE = 2
-
 class MinimaxAgent(Agent):
-    def __init__(self, depth=4):
+    def __init__(self, depth=4, team=1):
         """
-        Initializes the MinimaxAgent with a specified search depth.
+        Initializes the MinimaxAgent with a specified search depth and team number.
         
         :param depth: The depth to which the Minimax algorithm will search.
+        :param team: The team number (1 or 2) that the agent is playing for.
         """
         self.depth = depth
+        self.team = 1
 
     def select_move(self, game: ConnectFourGame):
         """
@@ -59,7 +58,7 @@ class MinimaxAgent(Agent):
             value = -math.inf
             best_column = random.choice(valid_locations)
             for col in valid_locations:
-                temp_game = game.copy()
+                temp_game = new_game()
                 move_successful = temp_game.make_move(col)
                 if not move_successful:
                     continue  # Skip invalid moves
@@ -75,7 +74,7 @@ class MinimaxAgent(Agent):
             value = math.inf
             best_column = random.choice(valid_locations)
             for col in valid_locations:
-                temp_game = game.copy()
+                temp_game = new_game()
                 move_successful = temp_game.make_move(col)
                 if not move_successful:
                     continue  # Skip invalid moves

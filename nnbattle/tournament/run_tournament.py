@@ -16,21 +16,20 @@ def run_tournament(agents, num_games=100):
 
     for i in range(num_games):
         game.reset()
-        current_player = i % 2  # Alternate starting player
+        start_team = (i % 2) + 1  # Alternate starting player
         while not game.is_terminal_node():
-            agent = agents[current_player]
-            move = agent.select_move(game.get_board_state())
-            if move is not None and game.is_valid_location(move):
-                row = game.get_next_open_row(move)
-                game.drop_piece(row, move, game.PLAYER_PIECE if current_player == 0 else game.AI_PIECE)
-                if game.winning_move(game.PLAYER_PIECE if current_player == 0 else game.AI_PIECE):
+            agent = agents[start_team]
+            move = agent.select_move(game.get_board_state(), agent.team)
+            result = get_game_state()
+            if result != "Ongoing":
+                if agent.team == result:
                     results[agent.__class__.__name__] += 1
                     break
-                current_player = 1 - current_player
-            else:
-                # Invalid move or no move available
-                results['draws'] += 1
-                break
+                elif result == "Draw":
+                    results['draws'] += 1
+                    break
+                else:
+                    results[agents[3 - agent.team].__class__.__name__] += 1
         else:
             results['draws'] += 1
 

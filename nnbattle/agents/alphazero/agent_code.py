@@ -42,7 +42,7 @@ class AlphaZeroAgent(Agent):
         self.load_model_flag = load_model
         self.num_simulations = num_simulations
         self.c_puct = c_puct
-        self.current_player = 1
+        self.team = 1
         self.memory = []
         self.model = Connect4Net(state_dim, action_dim).to(self.device)
         self.model_path = MODEL_PATH  # Added model_path attribute
@@ -78,8 +78,8 @@ class AlphaZeroAgent(Agent):
             board = board[:2]  # Take only first two channels if too many
         elif len(board.shape) == 2:
             # Create two channel board if single channel
-            current_board = (board == self.current_player).astype(float)
-            opponent_player = 2 if self.current_player == 1 else 1
+            current_board = (board == self.team).astype(float)
+            opponent_player = 2 if self.team == 1 else 1
             opponent_board = (board == opponent_player).astype(float)
             board = np.stack([current_board, opponent_board])
         
@@ -136,8 +136,8 @@ class AlphaZeroAgent(Agent):
                 node = node.best_child(c_puct=self.c_puct)
                 if node is None:
                     break
-                game_copy.make_move(node.action, game_copy.current_player)
-                game_copy.current_player = 2 if game_copy.current_player == 1 else 1
+                game_copy.make_move(node.action, self.team)
+                self.team = 2 if self.team == 1 else 1
 
             if node is None:
                 continue
@@ -194,7 +194,7 @@ class AlphaZeroAgent(Agent):
         move_count = 0
 
         while game.get_game_state() == "ONGOING" and move_count < max_moves:
-            self.current_player = player
+            self.team = player
             selected_action, action_probs = self.select_move(game)
             if selected_action is None:
                 logger.error("Agent failed to select a valid action during self-play.")

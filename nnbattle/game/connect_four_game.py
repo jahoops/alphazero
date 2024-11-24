@@ -2,17 +2,11 @@
 
 import copy
 import logging
-
 import numpy as np
+from nnbattle.constants import RED_TEAM, YEL_TEAM, EMPTY, ROW_COUNT, COLUMN_COUNT, WINDOW_LENGTH
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
-
-RED_PIECE = 1
-YEL_PIECE = 2
-EMPTY = 0
-ROW_COUNT = 6
-COLUMN_COUNT = 7
-WINDOW_LENGTH = 4
 
 class ConnectFourGame:
     def __init__(self):
@@ -36,8 +30,8 @@ class ConnectFourGame:
     def make_move(self, column, piece):
         """Make a move for the given piece in the specified column.
         Returns True if move was valid and made, False otherwise."""
-        if not (piece in [RED_PIECE, YEL_PIECE]):
-            logger.error(f"Invalid piece: {piece}. Must be {RED_PIECE} or {YEL_PIECE}")
+        if not (piece in [RED_TEAM, YEL_TEAM]):
+            logger.error(f"Invalid piece: {piece}. Must be {RED_TEAM} or {YEL_TEAM}")
             return False
             
         # Check turn order only if enforcement is enabled
@@ -100,12 +94,12 @@ class ConnectFourGame:
 
     def get_game_state(self):
         """Return the current game state."""
-        if self.check_win(RED_PIECE):
-            return "RED_WINS"
-        elif self.check_win(YEL_PIECE):
-            return "YEL_WINS"
+        if self.check_win(RED_TEAM):
+            return RED_TEAM
+        elif self.check_win(YEL_TEAM):
+            return YEL_TEAM
         elif self.is_board_full():
-            return "DRAW"
+            return "Draw"
         return "ONGOING"
 
     def get_valid_moves(self):
@@ -118,7 +112,5 @@ class ConnectFourGame:
 
     def board_to_string(self):
         """Return string representation of board."""
-        mapping = {RED_PIECE: 'X', YEL_PIECE: 'O', EMPTY: '.'}
+        mapping = {RED_TEAM: 'X', YEL_TEAM: 'O', EMPTY: '.'}
         return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board)
-
-# Remove all other methods related to agents, rewards, and scoring

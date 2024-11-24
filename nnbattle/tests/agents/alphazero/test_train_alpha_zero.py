@@ -586,9 +586,9 @@ class TestTrainAlphaZero(unittest.TestCase):
 
     def test_test_make_move_invalid(self):
         for _ in range(6):
-            self.game.make_move(0)
+            self.game.make_move(0, RED_TEAM)
         with self.assertLogs(level='ERROR') as log:
-            self.game.make_move(0)
+            self.game.make_move(0, YEL_TEAM)
             self.assertIn("Invalid move attempted: Column 0 is full.", log.output[0])
 
     # ...fill in other test methods similarly...

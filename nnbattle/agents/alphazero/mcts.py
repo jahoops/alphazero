@@ -4,7 +4,7 @@ import logging
 import math
 import numpy as np
 from typing import Optional, List
-from copy import deepcopy
+import copy
 
 import torch
 
@@ -13,10 +13,15 @@ from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
 
 logger = logging.getLogger(__name__)
 
+def deepcopy_env(env):
+    """Deep copy the environment."""
+    return copy.deepcopy(env)
+
 class MCTSNode:
     def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], env: ConnectFourGame):
         self.parent = parent
         self.action = action
+        self.team = env.last_piece
         self.env = env
         self.children = {}
         self.visits = 0
@@ -41,9 +46,8 @@ class MCTSNode:
     def expand(self, action_probs: torch.Tensor, legal_actions: List[int]):
         for action in legal_actions:
             if action not in self.children:
-                new_env = self.env.copy()
-                new_env.make_move(action)
-                new_env.current_player = 2 if new_env.current_player == 1 else 1
+                new_env = deepcopy_env(self.env)
+                new_env.make_move(action,self.team)
                 child_node = MCTSNode(parent=self, action=action, env=new_env)
                 child_node.prior = action_probs[action].item()
                 self.children[action] = child_node
