@@ -11,6 +11,8 @@ class ConnectFourLightningModule(pl.LightningModule):
         super().__init__()
         self.agent = agent
         self.loss_fn = self.loss_function
+        self.save_hyperparameters()
+        self.automatic_optimization = True
 
     def forward(self, x):
         # Ensure x has shape [batch_size, 2, 6, 7]
@@ -19,34 +21,48 @@ class ConnectFourLightningModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         states, mcts_probs, rewards = batch
-        # Ensure states have shape [batch_size, 2, 6, 7]
-        assert states.shape[1:] == (2, 6, 7), f"State tensor has incorrect shape: {states.shape}"
+        
+        # Forward pass
         logits, values = self.forward(states)
         
-        # Ensure tensors have requires_grad=True
-        if not logits.requires_grad:
-            logits = logits.detach().requires_grad_(True)
-        if not values.requires_grad:
-            values = values.detach().requires_grad_(True)
-            
-        value_loss = F.mse_loss(values.squeeze(), rewards)
-        policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits, dim=1), dim=1))
-        loss = value_loss + policy_loss
+        # Ensure proper shapes
+        values = values.squeeze()
+        rewards = rewards.float()
         
-        # Log the individual losses with on_step and on_epoch flags
-        self.log('value_loss', value_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('policy_loss', policy_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        # Calculate losses with added small epsilon to prevent log(0)
+        value_loss = F.mse_loss(values, rewards)
+        policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
+        total_loss = value_loss + policy_loss
+
+        # Log metrics without _step suffix
+        self.log('value_loss', value_loss, on_step=True, on_epoch=True, prog_bar=True)
+        self.log('policy_loss', policy_loss, on_step=True, on_epoch=True, prog_bar=True)
+        self.log('train_loss', total_loss, on_step=True, on_epoch=True, prog_bar=True)
         
-        return loss
+        return total_loss  # Return just the loss tensor
+
+    def on_train_epoch_end(self):
+        # Get metrics that were logged during training steps
+        metrics = self.trainer.callback_metrics
+        
+        # Log epoch-level metrics if they exist
+        if 'value_loss_step' in metrics:
+            self.log('value_loss_epoch', metrics['value_loss_step'], on_epoch=True, prog_bar=True)
+        if 'policy_loss_step' in metrics:
+            self.log('policy_loss_epoch', metrics['policy_loss_step'], on_epoch=True, prog_bar=True)
+        if 'train_loss_step' in metrics:
+            self.log('train_loss_epoch', metrics['train_loss_step'], on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self):
-        # Add safety check for model parameters
-        params = list(self.agent.model.parameters())
-        if not params:
-            raise ValueError("Model has no parameters to optimize")
-        optimizer = torch.optim.Adam(params, lr=1e-3)
-        return optimizer
+        optimizer = torch.optim.Adam(self.parameters(), lr=0.001)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='min', factor=0.1, patience=10, verbose=True
+        )
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": scheduler,
+            "monitor": "train_loss"
+        }
 
     def loss_function(self, outputs, targets_policy, targets_value):
         logits, values = outputs

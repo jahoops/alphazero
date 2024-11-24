@@ -46,33 +46,37 @@ class ConnectFourDataModule(pl.LightningDataModule):
         self.agent = agent
         self.num_games = num_games
         self.dataset = ConnectFourDataset([], agent)
+        self.batch_size = 32  # Add explicit batch size
 
     def generate_self_play_games(self):
         logger.info(f"Generating {self.num_games} self-play games.")
         try:
-            self.agent.self_play()
-            logger.info("Self-play games generated successfully.")
+            # Generate games and store them
+            for _ in range(self.num_games):
+                self.agent.self_play()
+                if self.agent.memory:
+                    self.dataset.data.extend(self.agent.memory)
+                    self.agent.memory.clear()
+                    logger.info(f"Current dataset size: {len(self.dataset.data)} games")
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
             raise
-
-        # Ensure that agent.memory has been populated
-        if not self.agent.memory:
-            logger.warning("No self-play games were generated.")
-        else:
-            self.dataset.data.extend(self.agent.memory)
-            self.agent.memory.clear()
-            logger.info(f"Added {len(self.agent.memory)} games to the dataset.")
 
     def setup(self, stage=None):
         pass
 
     def train_dataloader(self):
         if len(self.dataset.data) == 0:
-            # Add at least one dummy sample if empty
+            logger.warning("Dataset is empty! Adding dummy sample for testing.")
             self.dataset.data.append((
                 np.zeros((2, 6, 7)),  # state
                 np.zeros(7),          # mcts_probs
                 0                     # reward
             ))
-        return DataLoader(self.dataset, batch_size=64, shuffle=True)
+        return DataLoader(
+            self.dataset, 
+            batch_size=self.batch_size,
+            shuffle=True,
+            num_workers=4,
+            pin_memory=True
+        )

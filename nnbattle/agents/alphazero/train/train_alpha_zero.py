@@ -78,48 +78,60 @@ def train_alphazero(
     use_gpu: bool,
     load_model: bool
 ):
-    """
-    Trains the AlphaZero agent using self-play and reinforcement learning.
-
-    :param max_iterations: Maximum number of training iterations.
-    :param num_self_play_games: Number of self-play games per training iteration.
-    :param use_gpu: Whether to use GPU for training.
-    :param load_model: Whether to load an existing model before training.
-    """
+    """Trains the AlphaZero agent using self-play and reinforcement learning."""
+    # Only load the model once at the start if requested
     agent = initialize_agent(
         action_dim=7,
         state_dim=2,
         use_gpu=use_gpu,
         num_simulations=800,
         c_puct=1.4,
-        load_model=load_model
+        load_model=load_model  # Only load once at initialization
     )
     
     data_module = ConnectFourDataModule(agent, num_self_play_games)
     lightning_module = ConnectFourLightningModule(agent)
     
+    # Add checkpoint callback to save best models
+    checkpoint_callback = pl.callbacks.ModelCheckpoint(
+        dirpath='nnbattle/agents/alphazero/model/checkpoints',
+        filename='alphazero-{epoch:02d}-{train_loss:.2f}',
+        save_top_k=3,
+        monitor='train_loss',
+        mode='min'
+    )
+    
     trainer = pl.Trainer(
         max_epochs=max_iterations,
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
         devices=1,
-        log_every_n_steps=1,  # Set logging interval to 1
-        fast_dev_run=False  # Ensure fast_dev_run is False for actual training
+        callbacks=[checkpoint_callback],
+        log_every_n_steps=1
     )
+    
+    # Disable model loading in agent's select_move during training
+    agent.load_model_flag = False
     
     for iteration in range(1, max_iterations + 1):
         logger.info(f"Starting training iteration {iteration}/{max_iterations}...")
         try:
             logger.info("Starting self-play games...")
             data_module.generate_self_play_games()
-
+            
             logger.info("Starting training iteration...")
             trainer.fit(lightning_module, data_module)
-
-            logger.info("Saving the model...")
-            save_agent_model(agent)
+            
+            # Save the model after each iteration
+            model_path = f"nnbattle/agents/alphazero/model/alphazero_model_{iteration}.pth"
+            save_agent_model(agent, model_path)
+            
+            # Also save as final model
+            save_agent_model(agent, MODEL_PATH)
+            logger.info(f"Model saved for iteration {iteration}")
+            
         except (InvalidMoveError, InvalidTurnError) as e:
             logger.error(f"An error occurred during training: {e}")
-            raise  # Stop the application
+            raise
 
     logger.info("Training completed.")
 
@@ -127,8 +139,8 @@ if __name__ == "__main__":
     # Ensure CUDA_VISIBLE_DEVICES is set
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     train_alphazero(
-        max_iterations=10,
-        num_self_play_games=100,
+        max_iterations=10000,     # Increased from 2000 to 10000
+        num_self_play_games=500,  # Increased from 100 to 500
         use_gpu=True,
         load_model=True
     )

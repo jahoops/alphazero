@@ -66,9 +66,12 @@ class ConnectFourGame:
 
     def get_next_open_row(self, column):
         """Get the next available row in the given column starting from the bottom."""
-        for row in range(ROW_COUNT-1, -1, -1):
+        # Change iteration from top-down to bottom-up
+        for row in range(ROW_COUNT):
             if self.board[row][column] == EMPTY:
+                logger.debug(f"Next open row for column {column} is {row}")
                 return row
+        logger.debug(f"No open rows for column {column}")
         return None
 
     def check_win(self, team):
