@@ -8,7 +8,7 @@ import copy
 
 import torch
 
-from nnbattle.game.connect_four_game import ConnectFourGame 
+from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError
 from nnbattle.constants import RED_TEAM, YEL_TEAM  # Ensure constants are imported
 from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
 
@@ -68,23 +68,30 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
     root = MCTSNode(parent=None, action=None, env=deepcopy_env(game))
     root.visits = 1
 
-    for _ in range(agent.num_simulations):
+    for simulation in range(agent.num_simulations):
         node = root
         env = deepcopy_env(game)
+        logger.debug(f"Simulation {simulation + 1}/{agent.num_simulations}")
 
         # **Selection**
         while not node.is_leaf():
             node = node.best_child(agent.c_puct)
             if node is None:
+                logger.debug("No child nodes available during selection.")
                 break
-            env.make_move(node.action, node.team)
+            if(env.last_piece is None):
+                env.make_move(node.action, RED_TEAM)
+            else:
+                env.make_move(node.action, 3 - env.last_piece)
+            logger.debug(f"Moved to child node: Team {node.team}, Action {node.action}")
 
         # **Expansion**
         if env.get_game_state() == "ONGOING":
-            state = agent.preprocess(env.get_board())
+            state = agent.preprocess(env.get_board())  # Use preprocess to ensure correct shape
             action_probs, value = agent.model(state.unsqueeze(0))
             action_probs = action_probs.squeeze().detach().cpu()
             value = value.item()
+            logger.debug(f"Node expanded with action_probs: {action_probs} and value: {value}")
             # Mask invalid moves
             valid_actions = env.get_valid_moves()
             action_mask = torch.zeros(agent.action_dim)
@@ -101,18 +108,21 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
         else:
             # **Terminal State**
             final_state = env.get_game_state()
-            if final_state == "WIN":
-                winner = env.last_piece
-                reward = 1.0 if winner == agent.team else -1.0
+            if final_state == RED_TEAM or final_state == YEL_TEAM:
+                reward = 1.0 if final_state == agent.team else -1.0
+                logger.debug(f"Terminal state: Team {final_state} wins with reward {reward}")
             else:
                 reward = 0.0  # Draw
+                logger.debug(f"Terminal state: Draw with reward {reward}")
 
-        # **Backpropagation**
+        # **Simulation and Backpropagation**
         node.backpropagate(reward)
+        logger.debug(f"Backpropagated reward {reward} to node.")
 
     # **Selection of the Best Action**
     action_visits = [(child.action, child.visits) for child in root.children.values()]
     if not action_visits:
+        logger.error("No valid moves found during MCTS.")
         raise InvalidMoveError("No valid moves found during MCTS.")
 
     selected_action = max(action_visits, key=lambda x: x[1])[0]
@@ -121,9 +131,10 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
         action_probs[action] = visits
     action_probs /= action_probs.sum()
 
+    logger.info(f"MCTS selected action {selected_action} with action_probs {action_probs}")
     return selected_action, action_probs
 
-__all__ = ['MCTSNode']
+__all__ = ['MCTSNode', 'mcts_simulate']
 
 # No changes needed if not mocking base classes
 # Ensure that in tests, only methods are mocked, not entire classes that use super()

@@ -13,10 +13,14 @@ class ConnectFourLightningModule(pl.LightningModule):
         self.loss_fn = self.loss_function
 
     def forward(self, x):
+        # Ensure x has shape [batch_size, 2, 6, 7]
+        assert x.shape[1:] == (2, 6, 7), f"Input tensor has incorrect shape: {x.shape}"
         return self.agent.model(x)
 
     def training_step(self, batch, batch_idx):
         states, mcts_probs, rewards = batch
+        # Ensure states have shape [batch_size, 2, 6, 7]
+        assert states.shape[1:] == (2, 6, 7), f"State tensor has incorrect shape: {states.shape}"
         logits, values = self.forward(states)
         
         # Ensure tensors have requires_grad=True

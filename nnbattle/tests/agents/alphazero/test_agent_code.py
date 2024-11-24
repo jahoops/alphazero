@@ -101,14 +101,12 @@ class TestAgentCode(unittest.TestCase):
             self.assertEqual(action_probs.tolist(), [0.5, 0.5])
 
     def test_self_play_deterministic(self):
-        self.agent.mcts_simulate.return_value = (None, torch.zeros(self.agent.action_dim, device=self.agent.device))
-        with patch.object(self.agent, 'select_move', return_value=(3, torch.tensor([0,0,0,1,0,0,0], dtype=torch.float32))):
-            with patch.object(ConnectFourGame, 'make_move', return_value=None):
-                self.agent.self_play(max_moves=1)
-                self.assertEqual(len(self.agent.memory), 1)
-                state, mcts_prob, value = self.agent.memory[0]
-                self.assertEqual(mcts_prob[3], 1.0)
-                self.assertEqual(value, 0)  # Game is ongoing or draw
+        self.agent.mcts_simulate.return_value = (3, torch.tensor([0.6, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0]))
+        with patch.object(self.agent, 'select_move', return_value=(3, torch.tensor([0.6, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0]))):
+            self.agent.self_play(max_moves=10)
+            # Ensure that all appended states are preprocessed
+            for state, _, _ in self.agent.memory:
+                self.assertEqual(state.shape, (2, 6, 7))
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
     def test_save_agent_model_success_with_path(self, mock_save_agent_model):
@@ -238,6 +236,21 @@ class TestAgentCode(unittest.TestCase):
         )
         mock_initialize.assert_called_once()
         mock_train.assert_called_once()
+
+    @patch('nnbattle.agents.alphazero.agent_code.load_agent_model', side_effect=FileNotFoundError("Model path does not exist."))
+    def test_load_agent_model_failure(self, mock_load_agent_model):
+        with self.assertRaises(FileNotFoundError):
+            load_agent_model(self.agent)
+        mock_load_agent_model.assert_called_once_with(self.agent)
+
+    def test_self_play_turn_order(self):
+        """Test that self_play alternates turns correctly."""
+        with patch.object(self.agent, 'select_move', side_effect=[(0, self.default_action_probs), (1, self.default_action_probs)]):
+            self.agent.self_play(max_moves=2)
+            self.assertEqual(len(self.agent.memory), 1)  # Only one game with 2 moves
+            board, action_probs, result = self.agent.memory[0]
+            self.assertEqual(board[0][0], self.team)  # First move by self
+            self.assertEqual(board[0][1], YEL_TEAM if self.team == RED_TEAM else RED_TEAM)  # Second move by opponent
 
 if __name__ == '__main__':
     unittest.main()

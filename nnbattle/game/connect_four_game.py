@@ -3,7 +3,7 @@
 import copy
 import logging
 import numpy as np
-from nnbattle.constants import RED_TEAM, YEL_TEAM, EMPTY, ROW_COUNT, COLUMN_COUNT, WINDOW_LENGTH
+from nnbattle.constants import RED_TEAM, YEL_TEAM, EMPTY, ROW_COUNT, COLUMN_COUNT
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)

@@ -57,11 +57,15 @@ def self_play(agent, num_games):
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
         result = game.get_result()
-        # Ensure that state is preprocessed correctly
-        preprocessed_state = agent.preprocess(game.get_state())  # Shape: [2,6,7]
-        mcts_prob = torch.zeros(agent.action_dim, dtype=torch.float32)  # Initialize as Tensor
-        memory.append((preprocessed_state, mcts_prob, result))
-        logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
+        # Ensure that agent.memory has been populated
+        if not agent.memory:
+            logger.warning("No self-play games were generated.")
+        else:
+            # Ensure that state is preprocessed correctly
+            preprocessed_state = agent.preprocess(game.get_board())  # Changed from game.get_state() to game.get_board()
+            mcts_prob = torch.zeros(agent.action_dim, dtype=torch.float32)  # Initialize as Tensor
+            memory.append((preprocessed_state, mcts_prob, result))
+            logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
     agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
 

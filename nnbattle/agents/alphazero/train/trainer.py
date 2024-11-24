@@ -44,19 +44,19 @@ def self_play(agent, num_games):
     game = ConnectFourGame()
     for game_num in range(num_games):
         game.reset()
-        agent.team = 1  # Initialize current player at the start of the game
+        agent.team = RED_TEAM  # Initialize current player at the start of the game
         logger.info(f"Starting game {game_num + 1}/{num_games}")
         game_start_time = time.time()
         while not game.is_terminal():
             # Unpack selected_action and action_probs
             selected_action, action_probs = agent.select_move(game)
             game.make_move(selected_action, agent.team)  # Pass only the action, not the tuple
-            agent.team = 3 - agent.team  # Update current player
+            agent.team = YEL_TEAM if agent.team == RED_TEAM else RED_TEAM  # Update current player
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
-        result = game.get_result()
+        result = game.get_game_state()
         # Ensure that state is preprocessed correctly
-        preprocessed_state = agent.preprocess(game.get_state())  # Shape: [2,6,7]
+        preprocessed_state = agent.preprocess(game.get_board())  # Shape: [2,6,7]
         mcts_prob = torch.zeros(agent.action_dim, dtype=torch.float32)  # Initialize as Tensor
         memory.append((preprocessed_state, mcts_prob, result))
         logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
@@ -80,39 +80,64 @@ def train_alphazero(
     :param use_gpu: Whether to use GPU for training.
     :param load_model: Whether to load an existing model before training.
     """
-    agent = initialize_agent(
-        action_dim=7,
-        state_dim=2,
-        use_gpu=use_gpu,
-        num_simulations=800,
-        c_puct=1.4,
-        load_model=load_model
-    )
-    
-    data_module = ConnectFourDataModule(agent, num_self_play_games)
-    lightning_module = ConnectFourLightningModule(agent)
-    
-    trainer = pl.Trainer(
-        # Removed max_time parameter
-        accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
-        log_every_n_steps=1,  # Set logging interval to 1
-        fast_dev_run=False  # Ensure fast_dev_run is False for actual training
-    )
-    
+    try:
+        agent = initialize_agent(
+            action_dim=7,
+            state_dim=2,
+            use_gpu=use_gpu,
+            num_simulations=800,
+            c_puct=1.4,
+            load_model=load_model
+        )
+        logger.info("Agent initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize agent: {e}")
+        raise
+
+    try:
+        data_module = ConnectFourDataModule(agent, num_self_play_games)
+        lightning_module = ConnectFourLightningModule(agent)
+        logger.info("Data module and Lightning module initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize data or lightning module: {e}")
+        raise
+
+    try:
+        trainer = pl.Trainer(
+            accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
+            devices=1,
+            log_every_n_steps=1,  # Set logging interval to 1
+            fast_dev_run=False  # Ensure fast_dev_run is False for actual training
+        )
+        logger.info("PyTorch Lightning Trainer initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize PyTorch Lightning Trainer: {e}")
+        raise
+
     for iteration in range(1, max_iterations + 1):
         logger.info(f"Starting training iteration {iteration}/{max_iterations}...")
-        logger.info("Starting self-play games...")
-        data_module.generate_self_play_games()
-        
-        logger.info("Starting training iteration...")
-        trainer.fit(lightning_module, data_module)
-        
-        logger.info("Saving the model...")
-        save_agent_model(agent)
+        try:
+            logger.info("Starting self-play games...")
+            data_module.generate_self_play_games()
+            logger.info(f"Generated {num_self_play_games} self-play games.")
+
+            logger.info("Starting training iteration...")
+            trainer.fit(lightning_module, data_module)
+            logger.info("Training iteration completed.")
+
+            logger.info("Saving the model...")
+            save_agent_model(agent)
+            logger.info("Model saved successfully.")
+        except (InvalidMoveError, InvalidTurnError) as e:
+            logger.error(f"An error occurred during training iteration {iteration}: {e}")
+            break  # Exit the training loop on critical errors
+        except Exception as e:
+            logger.error(f"Unexpected error during training iteration {iteration}: {e}")
+            break  # Exit the training loop on unexpected errors
 
         logger.info(f"Completed training iteration {iteration}/{max_iterations}.")
-    
-    logger.info("Training completed.")
+
+    logger.info("Training process completed.")
 
 if __name__ == "__main__":
     # Ensure CUDA_VISIBLE_DEVICES is set
