@@ -50,9 +50,13 @@ class ConnectFourGame:
             raise InvalidMoveError(f"Invalid move: Column {column} is full or out of bounds.")
 
         row = self.get_next_open_row(column)
+        if row is None:
+            logger.error(f"No open rows available in column {column}.")
+            return False
+
         self.board[row][column] = team
         self.last_team = team
-        logger.debug(f"team {team} placed in column {column}, row {row}.")
+        logger.debug(f"Team {team} placed in column {column}, row {row}.")
         return True
 
     def is_valid_move(self, column):
@@ -61,8 +65,8 @@ class ConnectFourGame:
                 self.board[ROW_COUNT-1][column] == EMPTY)
 
     def get_next_open_row(self, column):
-        """Get the next available row in the given column."""
-        for row in range(ROW_COUNT):
+        """Get the next available row in the given column starting from the bottom."""
+        for row in range(ROW_COUNT-1, -1, -1):
             if self.board[row][column] == EMPTY:
                 return row
         return None
@@ -124,4 +128,5 @@ class ConnectFourGame:
             YEL_TEAM: '\033[93m\u25CF\033[0m',  # Yellow circle
             EMPTY: '\u25CB'                      # White circle
         }
-        return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board)
+        # Reverse the board for correct visualization (bottom row first)
+        return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board[::-1])

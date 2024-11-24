@@ -84,7 +84,7 @@ class MinimaxAgent(Agent):
                 value = math.inf
                 best_column = random.choice(valid_moves)
                 for col in valid_moves:
-                    temp_game = game.new_game()
+                    temp_game = copy.deepcopy(game)  # Changed from game.new_game() to copy.deepcopy(game)
                     move_successful = temp_game.make_move(col, 3 - self.team)
                     if not move_successful:
                         continue  # Skip invalid moves

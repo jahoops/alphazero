@@ -1,5 +1,5 @@
 {
-    "MinimaxAgent": 50,
-    "AlphaZeroAgent": 50,
-    "draws": 0
+    "MinimaxAgent": 5,
+    "AlphaZeroAgent": 0,
+    "draws": 5
 }

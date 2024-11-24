@@ -6,7 +6,7 @@ import logging
 
 from nnbattle.agents.alphazero import AlphaZeroAgent
 from nnbattle.agents.minimax.agent_code import MinimaxAgent  # Ensure correct import path
-from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError
+from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
 from nnbattle.constants import RED_TEAM, YEL_TEAM
 
 # Configure logger
@@ -21,7 +21,8 @@ def run_tournament(agents, num_games=10):
     for i in range(num_games):
         game.reset()
         current_team = RED_TEAM if i % 2 == 0 else YEL_TEAM  # Alternate starting team
-        
+        logger.info(f"Starting Game {i+1}: Team {current_team} starts")
+
         while game.get_game_state() == "ONGOING":
             agent = next((a for a in agents if a.team == current_team), None)
             if agent is None:
@@ -31,11 +32,16 @@ def run_tournament(agents, num_games=10):
             # Handle different return types from select_move
             move_result = agent.select_move(game)
             selected_action = move_result[0] if isinstance(move_result, tuple) else move_result
+            logger.debug(f"Agent {agent.__class__.__name__} ({agent.team}) selects column {selected_action}")
             
             try:
-                game.make_move(selected_action, agent.team)
-                logger.info(f"Team {agent.team} placed piece in column {selected_action}")
-                logger.info(f"Board state:\n{game.board_to_string()}")
+                move_successful = game.make_move(selected_action, agent.team)
+                if move_successful:
+                    logger.info(f"Team {agent.team} placed piece in column {selected_action}")
+                    logger.info(f"Board state:\n{game.board_to_string()}")
+                else:
+                    logger.error(f"Move unsuccessful for team {agent.team} in column {selected_action}")
+                    break
             except (InvalidMoveError, InvalidTurnError) as e:
                 logger.error(f"Invalid move by {agent.__class__.__name__}: {e}")
                 break
@@ -73,4 +79,4 @@ if __name__ == "__main__":
         team=RED_TEAM  # Set AlphaZeroAgent to RED_TEAM
     )
     agents = [agent1, agent2]
-    run_tournament(agents, num_games=100)
+    run_tournament(agents, num_games=10)
