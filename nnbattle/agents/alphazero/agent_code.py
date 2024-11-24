@@ -16,8 +16,8 @@ import torch
 import pytorch_lightning as pl
 import numpy as np
 import copy
-
-from nnbattle.game.connect_four_game import ConnectFourGame
+from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
+from nnbattle.constants import RED_TEAM, YEL_TEAM  # Ensure constants are imported
 from .network import Connect4Net
 from .utils.model_utils import load_agent_model, save_agent_model, MODEL_PATH
 from .mcts import MCTSNode
@@ -41,7 +41,8 @@ class AlphaZeroAgent(Agent):
         use_gpu=False,
         num_simulations=800,
         c_puct=1.4,
-        load_model=True
+        load_model=True,
+        team=RED_TEAM  # Default to RED_TEAM
     ):
         super().__init__()
         self.state_dim = state_dim
@@ -51,7 +52,7 @@ class AlphaZeroAgent(Agent):
         self.load_model_flag = load_model
         self.num_simulations = num_simulations
         self.c_puct = c_puct
-        self.team = 1
+        self.team = team
         self.memory = []
         self.model = Connect4Net(state_dim, action_dim).to(self.device)
         self.model_path = MODEL_PATH  # Added model_path attribute
@@ -107,139 +108,95 @@ class AlphaZeroAgent(Agent):
         save_agent_model(self, self.model_path)  # Pass the model_path explicitly
 
     def select_move(self, game: ConnectFourGame):
-        logger.info("Selecting a move...")
-        if self.load_model_flag and not self.model_loaded:
-            try:
-                load_agent_model(self)
-                self.model_loaded = True
-            except FileNotFoundError:
-                logger.warning("No model file found, using untrained model.")
-                self.model_loaded = False
+        logger.info(f"Agent {self.team} selecting a move.")
 
-        start_time = time.time()
-        selected_action, action_probs = self.act(game)
-        end_time = time.time()
-        logger.info(f"Time taken for select_move: {end_time - start_time:.4f} seconds")
+        # Ensure it's the agent's turn
+        if game.last_piece == self.team:
+            raise InvalidTurnError(f"It's not Agent {self.team}'s turn.")
 
-        if selected_action is None:
-            logger.warning("No valid action selected by MCTS.")
-            return None, torch.zeros(self.action_dim, device=self.device)
+        # Get the current valid moves
+        valid_moves = game.get_valid_moves()
+        if not valid_moves:
+            raise InvalidMoveError("No valid moves available.")
+
+        # Use MCTS or policy to select a move
+        selected_action, action_probs = self.act(game, valid_moves)
+        logger.debug(f"Agent {self.team} selected action {selected_action}.")
 
         return selected_action, action_probs
 
-    def act(self, game: ConnectFourGame):
-        selected_action, action_probs = self.mcts_simulate(game)
+    def act(self, game: ConnectFourGame, valid_moves):
+        selected_action, action_probs = self.mcts_simulate(game, valid_moves)
         if selected_action is None:
-            logger.warning("No valid action selected by MCTS.")
-            return None, torch.zeros(self.action_dim, device=self.device)
-
+            raise InvalidMoveError("Failed to select a valid action.")
         return selected_action, action_probs
 
-    def mcts_simulate(self, game: ConnectFourGame):
+    def mcts_simulate(self, game: ConnectFourGame, valid_moves):
         logger.info("Starting MCTS simulation...")
         root = MCTSNode(parent=None, action=None, env=deepcopy_env(game))
         root.visits = 1
 
         for _ in range(self.num_simulations):
             node = root
-            game_copy = deepcopy_env(game)
+            env = deepcopy_env(game)
 
-            while not node.is_leaf() and game_copy.get_game_state() == "ONGOING":
-                node = node.best_child(c_puct=self.c_puct)
+            # Selection
+            while not node.is_leaf():
+                node = node.best_child(self.c_puct)
                 if node is None:
                     break
-                game_copy.make_move(node.action, self.team)
-                self.team = 2 if self.team == 1 else 1
+                env.make_move(node.action, node.team)
 
-            if node is None:
-                continue
+            # Expansion
+            if not env.get_game_state() != "ONGOING":
+                state = self.preprocess(env.get_board())
+                action_probs, _ = self.model(state.unsqueeze(0))
+                action_probs = action_probs.squeeze().detach().cpu()
+                # Mask invalid moves
+                valid_actions = env.get_valid_moves()
+                action_mask = torch.zeros(self.action_dim)
+                action_mask[valid_actions] = 1
+                action_probs *= action_mask
+                action_probs /= action_probs.sum()
+                node.expand(action_probs, valid_actions)
 
-            state = game_copy.get_game_state()
-            if state in ["RED_WINS", "YEL_WINS", "DRAW"]:
-                if state == "RED_WINS":
-                    reward = 1 if game_copy.last_piece == RED_PIECE else -1
-                elif state == "YEL_WINS":
-                    reward = 1 if game_copy.last_piece == YEL_PIECE else -1
-                else:
-                    reward = 0
-                node.backpropagate(reward)
-                continue
+            # Simulation and Backpropagation
+            node.backpropagate(reward)
 
-            legal_moves = game_copy.get_valid_moves()
-            if not legal_moves:
-                node.backpropagate(0)
-                continue
-
-            state_tensor = self.preprocess(game_copy.get_board()).unsqueeze(0)
-            with torch.no_grad():
-                log_policy, value = self.model(state_tensor)
-                policy = torch.exp(log_policy).cpu().numpy().flatten()
-
-            filtered_probs = np.zeros(self.action_dim)
-            filtered_probs[legal_moves] = policy[legal_moves]
-            if filtered_probs.sum() > 0:
-                filtered_probs /= filtered_probs.sum()
-            else:
-                filtered_probs[legal_moves] = 1.0 / len(legal_moves)
-
-            node.expand(filtered_probs, legal_moves)
-            node.backpropagate(value.item())
-            logger.debug(f"Simulating from node: {node}")
-
+        # Choose the action with the highest visit count
         action_visits = [(child.action, child.visits) for child in root.children.values()]
         if not action_visits:
-            logger.error("No actions available after MCTS simulations.")
-            return None, torch.zeros(self.action_dim, device=self.device)
+            raise InvalidMoveError("No valid moves found during MCTS.")
 
         selected_action = max(action_visits, key=lambda x: x[1])[0]
-        total_visits = sum(child.visits for child in root.children.values())
-        action_probs = torch.zeros(self.action_dim, device=self.device)
-        for child in root.children.values():
-            action_probs[child.action] = child.visits / total_visits
+        action_probs = torch.zeros(self.action_dim)
+        for action, visits in action_visits:
+            action_probs[action] = visits
+        action_probs /= action_probs.sum()
 
         return selected_action, action_probs
 
     def self_play(self, max_moves=100):
-        game_data = []
         game = ConnectFourGame()
-        player = 1
-        move_count = 0
-
-        while game.get_game_state() == "ONGOING" and move_count < max_moves:
-            self.team = player
-            selected_action, action_probs = self.select_move(game)
-            if selected_action is None:
-                logger.error("Agent failed to select a valid action during self-play.")
+        current_team = RED_TEAM  # Start with RED_TEAM
+        for move_number in range(max_moves):
+            if game.get_game_state() != "ONGOING":
                 break
 
-            preprocessed_state = self.preprocess(game.get_board())
+            agent = self if self.team == current_team else opponent_agent
+            try:
+                selected_action, _ = agent.select_move(game)
+                game.make_move(selected_action, agent.team)
+            except (InvalidMoveError, InvalidTurnError) as e:
+                logger.error(f"An error occurred during self-play: {e}")
+                raise  # Stop the application
 
-            game_data.append((
-                preprocessed_state.cpu().numpy(),
-                action_probs.cpu().numpy(),
-                player
-            ))
-            game.make_move(selected_action, player)
-            player = 2 if player == 1 else 1
-            move_count += 1
+            # Alternate turns
+            current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
 
-            logger.info(f"Move {move_count}: {selected_action}, Current player: {player}")
-            logger.info(f"Board state:\n{game.board_to_string()}")
-
-        if move_count >= max_moves:
-            logger.warning("Reached maximum number of moves without a terminal state.")
-
-        state, _, player_in_game = game_data[-1]
-        state_last = game.get_game_state()
-        if state_last == "RED_WINS":
-            value = 1 if player_in_game == RED_PIECE else -1
-        elif state_last == "YEL_WINS":
-            value = 1 if player_in_game == YEL_PIECE else -1
-        else:
-            value = 0
-
-        for state_data, mcts_prob, player_in_game in game_data:
-            self.memory.append((state_data, mcts_prob, value))
+        # Handle the end of the game and update memory
+        result = game.get_game_state()
+        self.memory.append((game.get_board(), action_probs, result))
 
     def perform_training(self):
         """Perform training using train_alphazero.

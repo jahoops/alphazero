@@ -15,7 +15,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from pytorch_lightning.callbacks import ModelCheckpoint
 from nnbattle.agents.alphazero.agent_code import AlphaZeroAgent
-from nnbattle.game import ConnectFourGame
+from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
 from nnbattle.agents.alphazero.agent_code import initialize_agent  # Moved import here
 from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
@@ -102,18 +102,21 @@ def train_alphazero(
         fast_dev_run=False  # Ensure fast_dev_run is False for actual training
     )
     
-    for iteration in range(max_iterations):
-        logger.info(f"Starting self-play games for iteration {iteration + 1}...")
-        data_module.generate_self_play_games()
-        
-        logger.info(f"Starting training iteration {iteration + 1}...")
-        trainer.fit(lightning_module, data_module)
-        
-        logger.info(f"Completed training iteration {iteration + 1}.")
-        
-        logger.info("Saving the model...")
-        save_agent_model(agent)
-        
+    for iteration in range(1, max_iterations + 1):
+        logger.info(f"Starting training iteration {iteration}/{max_iterations}...")
+        try:
+            logger.info("Starting self-play games...")
+            data_module.generate_self_play_games()
+
+            logger.info("Starting training iteration...")
+            trainer.fit(lightning_module, data_module)
+
+            logger.info("Saving the model...")
+            save_agent_model(agent)
+        except (InvalidMoveError, InvalidTurnError) as e:
+            logger.error(f"An error occurred during training: {e}")
+            raise  # Stop the application
+
     logger.info("Training completed.")
 
 if __name__ == "__main__":

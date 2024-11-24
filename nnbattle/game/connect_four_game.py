@@ -8,11 +8,19 @@ from nnbattle.constants import RED_TEAM, YEL_TEAM, EMPTY, ROW_COUNT, COLUMN_COUN
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
+class InvalidMoveError(Exception):
+    """Exception raised when an invalid move is made."""
+    pass
+
+class InvalidTurnError(Exception):
+    """Exception raised when a player tries to move out of turn."""
+    pass
+
 class ConnectFourGame:
     def __init__(self):
         self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
-        self.last_piece = None  # Track last piece played
-        self.enforce_turns = True  # Add flag to control turn enforcement
+        self.last_piece = None
+        self.enforce_turns = True  # Always enforce turns
 
     def new_game(self):
         """Creates and returns a new game instance."""
@@ -28,25 +36,25 @@ class ConnectFourGame:
         return self.board.copy()
 
     def make_move(self, column, piece):
-        """Make a move for the given piece in the specified column.
-        Returns True if move was valid and made, False otherwise."""
-        if not (piece in [RED_TEAM, YEL_TEAM]):
-            logger.error(f"Invalid piece: {piece}. Must be {RED_TEAM} or {YEL_TEAM}")
-            return False
-            
-        # Check turn order only if enforcement is enabled
-        if self.enforce_turns and self.last_piece is not None and piece == self.last_piece:
-            logger.error(f"Invalid turn: Piece {piece} cannot move twice in a row")
-            return False
+        """Make a move for the given piece in the specified column."""
+        if piece not in [RED_TEAM, YEL_TEAM]:
+            logger.error(f"Invalid piece: {piece}. Must be {RED_TEAM} or {YEL_TEAM}.")
+            raise InvalidMoveError(f"Invalid piece: {piece}. Must be {RED_TEAM} or {YEL_TEAM}.")
 
-        if self.is_valid_move(column):
-            row = self.get_next_open_row(column)
-            self.board[row][column] = piece
-            self.last_piece = piece
-            return True
-            
-        logger.error(f"Invalid move: Column {column} is full")
-        return False
+        if self.enforce_turns:
+            if self.last_piece is not None and piece == self.last_piece:
+                logger.error(f"Invalid turn: Piece {piece} cannot move twice in a row.")
+                raise InvalidTurnError(f"Invalid turn: Piece {piece} cannot move twice in a row.")
+
+        if not self.is_valid_move(column):
+            logger.error(f"Invalid move: Column {column} is full or out of bounds.")
+            raise InvalidMoveError(f"Invalid move: Column {column} is full or out of bounds.")
+
+        row = self.get_next_open_row(column)
+        self.board[row][column] = piece
+        self.last_piece = piece
+        logger.debug(f"Piece {piece} placed in column {column}, row {row}.")
+        return True
 
     def is_valid_move(self, column):
         """Check if a move is valid."""

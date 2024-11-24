@@ -63,6 +63,66 @@ class MCTSNode:
         if self.parent:
             self.parent.backpropagate(-reward)
 
+def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
+    logger.info("Starting MCTS simulation...")
+    root = MCTSNode(parent=None, action=None, env=deepcopy_env(game))
+    root.visits = 1
+
+    for _ in range(agent.num_simulations):
+        node = root
+        env = deepcopy_env(game)
+
+        # **Selection**
+        while not node.is_leaf():
+            node = node.best_child(agent.c_puct)
+            if node is None:
+                break
+            env.make_move(node.action, node.team)
+
+        # **Expansion**
+        if env.get_game_state() == "ONGOING":
+            state = agent.preprocess(env.get_board())
+            action_probs, value = agent.model(state.unsqueeze(0))
+            action_probs = action_probs.squeeze().detach().cpu()
+            value = value.item()
+            # Mask invalid moves
+            valid_actions = env.get_valid_moves()
+            action_mask = torch.zeros(agent.action_dim)
+            action_mask[valid_actions] = 1
+            action_probs *= action_mask
+            if action_probs.sum() > 0:
+                action_probs /= action_probs.sum()
+            else:
+                # If all probabilities are zero, assign equal probability to valid actions
+                action_probs[valid_actions] = 1.0 / len(valid_actions)
+            node.expand(action_probs, valid_actions)
+            reward = value  # **Use the network's value prediction as reward**
+
+        else:
+            # **Terminal State**
+            final_state = env.get_game_state()
+            if final_state == "WIN":
+                winner = env.last_piece
+                reward = 1.0 if winner == agent.team else -1.0
+            else:
+                reward = 0.0  # Draw
+
+        # **Backpropagation**
+        node.backpropagate(reward)
+
+    # **Selection of the Best Action**
+    action_visits = [(child.action, child.visits) for child in root.children.values()]
+    if not action_visits:
+        raise InvalidMoveError("No valid moves found during MCTS.")
+
+    selected_action = max(action_visits, key=lambda x: x[1])[0]
+    action_probs = torch.zeros(agent.action_dim)
+    for action, visits in action_visits:
+        action_probs[action] = visits
+    action_probs /= action_probs.sum()
+
+    return selected_action, action_probs
+
 __all__ = ['MCTSNode']
 
 # No changes needed if not mocking base classes
