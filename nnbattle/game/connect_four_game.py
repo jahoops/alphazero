@@ -28,6 +28,7 @@ class ConnectFourGame:
         new_game.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
         new_game.last_team = None
         return new_game
+
     def reset(self):
         """Resets the game to initial state."""
         self.board = np.zeros((ROW_COUNT, COLUMN_COUNT), dtype=np.int8)
@@ -132,4 +133,5 @@ class ConnectFourGame:
             EMPTY: '\u25CB'                      # White circle
         }
         # Reverse the board for correct visualization (bottom row first)
+        return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board[::-1])
         return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board[::-1])

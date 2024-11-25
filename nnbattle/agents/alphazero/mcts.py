@@ -2,14 +2,12 @@
 
 import logging
 import math
-import numpy as np
-from typing import Optional, List
 import copy
+from typing import Optional, List
 
 import torch
-
-from nnbattle.game import ConnectFourGame, InvalidMoveError  # Updated import path
-from nnbattle.constants import RED_TEAM, YEL_TEAM  # Ensure constants are imported
+from nnbattle.game import ConnectFourGame, InvalidMoveError
+from nnbattle.constants import RED_TEAM, YEL_TEAM
 from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
 
 logger = logging.getLogger(__name__)
@@ -71,7 +69,7 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
     for simulation in range(agent.num_simulations):
         node = root
         env = deepcopy_env(game)
-        logger.debug(f"Simulation {simulation + 1}/{agent.num_simulations}")
+        logger.debug(f"Simulation {simulation + 1}/{agent.num_simulations} started.")
 
         # **Selection**
         while not node.is_leaf():
@@ -87,7 +85,7 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
 
         # **Expansion**
         if env.get_game_state() == "ONGOING":
-            state = agent.preprocess(env.get_board())  # Use preprocess to ensure correct shape
+            state = agent.preprocess(env.get_board()).to(agent.device)  # Move to device
             action_probs, value = agent.model(state.unsqueeze(0))
             action_probs = action_probs.squeeze().detach().cpu()
             value = value.item()
@@ -104,6 +102,7 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves):
                 action_probs[valid_actions] = 1.0 / len(valid_actions)
             node.expand(action_probs, valid_actions)
             reward = value  # **Use the network's value prediction as reward**
+            logger.debug(f"Assigned reward {reward} to the node based on network prediction.")
 
         else:
             # **Terminal State**

@@ -16,7 +16,7 @@ from nnbattle.agents.alphazero.utils.model_utils import (
     save_agent_model, 
     MODEL_PATH
 )
-from nnbattle.agents.alphazero.train.trainer import train_alphazero
+from nnbattle.agents.alphazero.train.train_alpha_zero import train_alphazero
 from nnbattle.agents.alphazero.network import Connect4Net  # Add this import
 
 logger = logging.getLogger(__name__)  # Add this line
@@ -76,11 +76,11 @@ class TestTrainAlphaZero(unittest.TestCase):
     # Ensure the number of @patch decorators matches the number of mock parameters
     @patch('nnbattle.agents.alphazero.lightning_module.ConnectFourLightningModule')
     @patch('nnbattle.agents.alphazero.data_module.ConnectFourDataModule')
-    @patch('nnbattle.agents.alphazero.train.trainer.self_play')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.self_play')
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model')
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
     @patch('nnbattle.agents.alphazero.agent_code.initialize_agent')
-    @patch('nnbattle.agents.alphazero.train.trainer.logger')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.logger')
     def test_train_alphazero_success(
         self, mock_logger, mock_initialize_agent, mock_load_agent_model,
         mock_save_agent_model, mock_self_play, mock_data_module_class,
@@ -126,11 +126,11 @@ class TestTrainAlphaZero(unittest.TestCase):
 
     @patch('nnbattle.agents.alphazero.lightning_module.ConnectFourLightningModule')
     @patch('nnbattle.agents.alphazero.data_module.ConnectFourDataModule')
-    @patch('nnbattle.agents.alphazero.train.trainer.self_play')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.self_play')
     @patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model', side_effect=Exception("Save failed"))
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
-    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
-    @patch('nnbattle.agents.alphazero.train.trainer.logger')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.logger')
     def test_train_alphazero_save_failure(
         self, mock_logger, mock_initialize_agent, mock_load_agent_model,
         mock_save_agent_model, mock_self_play, mock_data_module_class,
@@ -166,7 +166,7 @@ class TestTrainAlphaZero(unittest.TestCase):
                 )
             self.assertIn("Save failed", str(context.exception))
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     def test_perform_training(self, mock_train):
         # Set the device to CPU for this test
         self.agent.device = torch.device("cpu")
@@ -180,7 +180,7 @@ class TestTrainAlphaZero(unittest.TestCase):
             load_model=self.agent.load_model_flag
         )
 
-    @patch('nnbattle.agents.alphazero.train.trainer.logger')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.logger')
     @patch('nnbattle.agents.alphazero.agent_code.initialize_agent')
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model', side_effect=FileNotFoundError("Model path does not exist."))
     def test_train_alphazero_load_failure(self, mock_load_agent_model, mock_initialize_agent, mock_logger):
@@ -197,10 +197,10 @@ class TestTrainAlphaZero(unittest.TestCase):
         mock_load_agent_model.assert_called_once_with(mock_agent)
         mock_logger.error.assert_called_with("Model path nnbattle/agents/alphazero/model/alphazero_model_final.pth does not exist.")
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')  # Fix import path
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')  # Fix import path
     def test_perform_training_correct(self, mock_train):
         """Test that perform_training calls train_alphazero with correct parameters."""
-        from nnbattle.agents.alphazero.train.trainer import train_alphazero  # Explicit import
+        from nnbattle.agents.alphazero.train.train_alpha_zero import train_alphazero  # Explicit import
         
         self.agent.perform_training()
         
@@ -211,7 +211,7 @@ class TestTrainAlphaZero(unittest.TestCase):
             load_model=False
         )
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     def test_perform_training_gpu(self, mock_train):
         """Test that perform_training uses GPU when available."""
         # Only run this test if GPU is available
@@ -228,7 +228,7 @@ class TestTrainAlphaZero(unittest.TestCase):
             load_model=False
         )
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     def test_perform_training_cpu_fallback(self, mock_train):
         """Test that perform_training falls back to CPU when GPU is not available."""
         self.agent.device = torch.device("cpu")
@@ -242,7 +242,7 @@ class TestTrainAlphaZero(unittest.TestCase):
         )
 
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     @patch('nnbattle.agents.alphazero.agent_code.AlphaZeroAgent')  # Updated patch path
     def test_train_alphazero(self, mock_agent_class, mock_train, mock_load_agent_model):
         # Create mock agent
@@ -251,10 +251,10 @@ class TestTrainAlphaZero(unittest.TestCase):
         # Patch AlphaZeroAgent constructor in the trainer module
         mock_agent_class.return_value = mock_agent
             
-        with patch('nnbattle.agents.alphazero.train.trainer.self_play') as mock_self_play, \
-             patch('nnbattle.agents.alphazero.train.trainer.ConnectFourDataModule'), \
+        with patch('nnbattle.agents.alphazero.train.train_alpha_zero.self_play') as mock_self_play, \
+             patch('nnbattle.agents.alphazero.train.train_alpha_zero.ConnectFourDataModule'), \
              patch('nnbattle.agents.alphazero.lightning_module.ConnectFourLightningModule'), \
-             patch('nnbattle.agents.alphazero.train.trainer.pl.Trainer') as mock_trainer_class, \
+             patch('nnbattle.agents.alphazero.train.train_alpha_zero.pl.Trainer') as mock_trainer_class, \
              patch('nnbattle.agents.alphazero.utils.model_utils.save_agent_model') as mock_save_agent_model:
             
             # Set up additional mocks
@@ -263,7 +263,7 @@ class TestTrainAlphaZero(unittest.TestCase):
             mock_trainer_class.return_value = mock_trainer
                 
             # Call the function under test
-            from nnbattle.agents.alphazero.train.trainer import train_alphazero
+            from nnbattle.agents.alphazero.train.train_alpha_zero import train_alphazero
             train_alphazero(
                 max_iterations=2,  # Replaced from 1000 to 2 for testing
                 num_self_play_games=10,  # Replaced from 1000 to 10 for testing
@@ -285,8 +285,8 @@ class TestTrainAlphaZero(unittest.TestCase):
             mock_trainer.fit.assert_called_once()
             mock_save_agent_model.assert_called_once_with(mock_agent)
 
-    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')  # Patch where it's used
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.initialize_agent')  # Patch where it's used
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     @patch('nnbattle.agents.alphazero.utils.model_utils.load_agent_model')
     @patch('nnbattle.agents.alphazero.data_module.ConnectFourDataModule')  # Added patch for ConnectFourDataModule
     def test_train_alphazero(self, mock_data_module_class, mock_load_agent_model, mock_train, mock_initialize_agent):
@@ -339,7 +339,7 @@ class TestTrainAlphaZero(unittest.TestCase):
             # Rest of assertions...
 
     @patch('nnbattle.agents.alphazero.agent_code.initialize_agent')  
-    @patch('nnbattle.agents.alphazero.train.trainer.logger')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.logger')
     def test_initialize_agent(self, mock_logger, mock_initialize_agent):
         """Test initialize_agent without loading model."""
         # Create a mock agent
@@ -370,11 +370,11 @@ class TestTrainAlphaZero(unittest.TestCase):
         )
         self.assertIsInstance(agent, AlphaZeroAgent)
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     def test_perform_training(self, mock_train):
         """Test that perform_training calls train_alphazero with correct parameters."""
         # Explicitly import the train_alphazero function
-        from nnbattle.agents.alphazero.train.trainer import train_alphazero
+        from nnbattle.agents.alphazero.train.train_alpha_zero import train_alphazero
         
         # Set use_gpu based on device
         use_gpu = self.agent.device.type == 'cuda'
@@ -407,7 +407,7 @@ class TestTrainAlphaZero(unittest.TestCase):
         
         mock_load.assert_called_once_with(self.agent)
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')  # Fix import path
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')  # Fix import path
     def test_perform_training(self, mock_train):
         self.agent.perform_training()
         mock_train.assert_called_once_with(
@@ -617,8 +617,8 @@ class TestTrainAlphaZero(unittest.TestCase):
     # Ensure all incomplete methods are properly filled following similar patterns
 
     @patch('pytorch_lightning.Trainer.fit')  # Correctly patch the 'fit' method
-    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
-    @patch('nnbattle.agents.alphazero.train.trainer.save_agent_model')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.save_agent_model')
     def test_train_alphazero_flow(
         self, mock_save_agent_model, mock_initialize_agent, mock_fit
     ):
@@ -641,8 +641,8 @@ class TestTrainAlphaZero(unittest.TestCase):
         mock_fit.assert_called()  # Ensure 'fit' was called at least once
 
     @patch('pytorch_lightning.Trainer.fit')
-    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
-    @patch('nnbattle.agents.alphazero.train.trainer.save_agent_model')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.save_agent_model')
     def test_train_alphazero_iterations(
         self, mock_save_agent_model, mock_initialize_agent, mock_fit
     ):
@@ -752,7 +752,7 @@ class TestTrainingPipeline(unittest.TestCase):
     def setup_mock_lightning_module(self):
         return MagicMock()
 
-    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.initialize_agent')
     def test_training_initialization(self, mock_initialize_agent):
         """Test training initialization."""
         mock_initialize_agent.return_value = self.mock_agent

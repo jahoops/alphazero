@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader
 
 from nnbattle.agents.alphazero.data_module import ConnectFourDataset, ConnectFourDataModule
 from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
-from nnbattle.agents.alphazero.train.trainer import train_alphazero
+from nnbattle.agents.alphazero.train.train_alpha_zero import train_alphazero
 
 class TestDatasetOperations(unittest.TestCase):
     def setUp(self):
@@ -99,11 +99,11 @@ class TestOptimizer(unittest.TestCase):
             self.lightning_module.configure_optimizers()
 
 class TestTrainingComponents(unittest.TestCase):
-    @patch('nnbattle.agents.alphazero.train.trainer.save_agent_model')
-    @patch('nnbattle.agents.alphazero.train.trainer.pl.Trainer')
-    @patch('nnbattle.agents.alphazero.train.trainer.ConnectFourLightningModule')
-    @patch('nnbattle.agents.alphazero.train.trainer.ConnectFourDataModule')
-    @patch('nnbattle.agents.alphazero.train.trainer.initialize_agent')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.save_agent_model')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.pl.Trainer')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.ConnectFourLightningModule')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.ConnectFourDataModule')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.initialize_agent')
     def test_train_alphazero_flow(
         self, mock_initialize_agent, mock_data_module, mock_lightning_module, mock_trainer, mock_save_model
     ):
@@ -122,7 +122,7 @@ class TestTrainingComponents(unittest.TestCase):
         mock_trainer.return_value.fit.assert_called_once()
         mock_save_model.assert_called()
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero')
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero')
     def test_training_success(
         self, mock_train, mock_initialize_agent, mock_load_agent_model,
         mock_save_agent_model, mock_self_play, mock_data_module_class,
@@ -145,7 +145,7 @@ class TestTrainingComponents(unittest.TestCase):
         )
         # ...existing assertions...
 
-    @patch('nnbattle.agents.alphazero.train.trainer.train_alphazero', side_effect=Exception("Training failed"))
+    @patch('nnbattle.agents.alphazero.train.train_alpha_zero.train_alphazero', side_effect=Exception("Training failed"))
     def test_training_failure(
         self, mock_train, mock_initialize_agent, mock_load_agent_model,
         mock_save_agent_model, mock_self_play, mock_data_module_class,

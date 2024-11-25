@@ -70,9 +70,8 @@ def run_tournament(agents, num_games=10):
     print("Tournament completed. Results saved to tournament/results/tournament_results.json")
 
 if __name__ == "__main__":
-    agent1 = MinimaxAgent(depth=3, team=RED_TEAM)  # Set MinimaxAgent to YEL_TEAM
-    agent2 = MinimaxAgent(depth=3, team=YEL_TEAM)  # Set MinimaxAgent to YEL_TEAM
-    """agent2 = AlphaZeroAgent(
+    agent1 = MinimaxAgent(depth=3, team=YEL_TEAM)  # Set MinimaxAgent to YEL_TEAM
+    agent2 = AlphaZeroAgent(
         action_dim=7,
         state_dim=2,
         use_gpu=True,
@@ -80,6 +79,6 @@ if __name__ == "__main__":
         c_puct=1.4,
         load_model=True,
         team=RED_TEAM  # Set AlphaZeroAgent to RED_TEAM
-    )"""
+    )
     agents = [agent1, agent2]
     run_tournament(agents, num_games=10)

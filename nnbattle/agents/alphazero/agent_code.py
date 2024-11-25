@@ -65,12 +65,13 @@ class AlphaZeroAgent(Agent):
         if load_model:
             try:
                 load_agent_model(self)
+                self.model_loaded = True
+                logger.info("Model loaded successfully.")
             except FileNotFoundError:
-                logger.warning("No model file found, starting with fresh model.")
+                logger.warning("No model file found, starting with a fresh model.")
                 self.model_loaded = False
 
         logger.info("Initialized AlphaZeroAgent.")
-        logger.info("AlphaZeroAgent initialized.")
 
     def log_gpu_stats(self):
         if torch.cuda.is_available():
@@ -84,7 +85,7 @@ class AlphaZeroAgent(Agent):
 
             torch.cuda.reset_peak_memory_stats()
 
-    def preprocess(self, board):
+    def preprocess(self, board, to_device=None):
         board = board.copy()
         # Ensure board is in correct shape for processing
         if len(board.shape) == 3 and board.shape[0] > 2:
@@ -98,7 +99,10 @@ class AlphaZeroAgent(Agent):
         
         # Ensure final shape is [2, 6, 7]
         assert board.shape == (2, 6, 7), f"Invalid board shape after preprocessing: {board.shape}"
-        return torch.FloatTensor(board).to(self.device)
+        tensor = torch.FloatTensor(board)
+        if to_device:
+            return tensor.to(to_device)
+        return tensor  # Default to CPU
 
     def load_model_method(self):
         logger.warning("load_model method is deprecated. Use load_agent_model from utils.py instead.")
@@ -112,26 +116,31 @@ class AlphaZeroAgent(Agent):
 
         # Ensure it's the agent's turn
         if game.last_team == self.team:
+            logger.error(f"It's not Agent {self.team}'s turn.")
             raise InvalidTurnError(f"It's not Agent {self.team}'s turn.")
 
         # Get the current valid moves
         valid_moves = game.get_valid_moves()
         if not valid_moves:
+            logger.error("No valid moves available.")
             raise InvalidMoveError("No valid moves available.")
 
         # Use MCTS or policy to select a move
         selected_action, action_probs = self.act(game, valid_moves)
-        logger.debug(f"Agent {self.team} selected action {selected_action}.")
+        logger.info(f"Agent {self.team} selected action {selected_action}.")
 
         return selected_action, action_probs
 
     def act(self, game: ConnectFourGame, valid_moves):
+        logger.debug("Starting MCTS simulation for action selection.")
         selected_action, action_probs = mcts_simulate(self, game, valid_moves)
         if selected_action is None:
+            logger.error("Failed to select a valid action.")
             raise InvalidMoveError("Failed to select a valid action.")
+        logger.debug(f"MCTS simulation completed. Selected Action: {selected_action}")
         return selected_action, action_probs
 
-    def self_play(self, max_moves=100):
+    def self_play(self, max_moves=5):  # Reduced max_moves for quicker testing
         game = ConnectFourGame()
         current_team = RED_TEAM  # Start with RED_TEAM
 
@@ -149,7 +158,7 @@ class AlphaZeroAgent(Agent):
 
         for move_number in range(max_moves):
             if game.get_game_state() != "ONGOING":
-                logger.info(f"Game ended before reaching max moves: {game.get_game_state()}")
+                logger.info(f"Game ended at move {move_number + 1}: {game.get_game_state()}")
                 break
 
             agent = self if self.team == current_team else opponent_agent
@@ -172,24 +181,61 @@ class AlphaZeroAgent(Agent):
         result = game.get_game_state()
         logger.info(f"Game Result: {result}")
         
+        # Convert result to numerical reward
+        if result == self.team:
+            reward = 1.0
+        elif result == (3 - self.team):
+            reward = -1.0
+        elif result == "Draw":
+            reward = 0.0
+        else:
+            reward = 0.0  # For 'ONGOING'
+        
         # Preprocess the final game state before appending
         preprocessed_state = self.preprocess(game.get_board())  # Shape: [2,6,7]
         mcts_prob = torch.zeros(self.action_dim, dtype=torch.float32)  # Initialize as Tensor
-        self.memory.append((preprocessed_state, mcts_prob, result))
+        self.memory.append((preprocessed_state, mcts_prob, float(reward)))  # Ensure reward is float
+        logger.info(f"Appended game result to memory with reward {reward}.")
 
     def perform_training(self):
         """Perform training using train_alphazero.
 
         :param max_iterations: Maximum number of training iterations.
         """
-        # Removed unnecessary import
-
+        logger.info("Commencing training procedure.")
         train_alphazero(
-            max_iterations=1000,  # Replaced time_limit=3600 with max_iterations=1000
-            num_self_play_games=1000,
+            max_iterations=100,          # Set to a reasonable number
+            num_self_play_games=100,     # Set to a reasonable number
             use_gpu=self.device.type == 'cuda',  # Ensure correct GPU usage
             load_model=self.load_model_flag
         )
+        logger.info("Training procedure completed.")
+
+    def evaluate_model(self):
+        """Evaluate the model on a set of validation games to monitor learning progress."""
+        logger.info("Starting model evaluation.")
+        # Implement evaluation logic, e.g., play against a random agent
+        wins = 0
+        draws = 0
+        losses = 0
+        num_evaluations = 100
+        for _ in range(num_evaluations):
+            game = ConnectFourGame()
+            while game.get_game_state() == "ONGOING":
+                action, _ = self.select_move(game)
+                game.make_move(action, self.team)
+                if game.get_game_state() != "ONGOING":
+                    break
+                opponent_action = np.random.choice(game.get_valid_moves())
+                game.make_move(opponent_action, 3 - self.team)
+            result = game.get_game_state()
+            if result == self.team:
+                wins += 1
+            elif result == "Draw":
+                draws += 1
+            else:
+                losses += 1
+        logger.info(f"Evaluation Results over {num_evaluations} games: Wins={wins}, Draws={draws}, Losses={losses}")
 
     def initialize_agent_correctly(self):
         # Ensure the patch path is correct
