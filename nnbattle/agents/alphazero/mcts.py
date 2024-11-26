@@ -63,7 +63,7 @@ class MCTSNode:
             self.parent.backpropagate(-reward)
 
 def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
-    logger.info("Starting MCTS simulation...")
+    #logger.info("Starting MCTS simulation...")
     root = MCTSNode(parent=None, action=None, env=deepcopy_env(game))
     root.visits = 1
 
@@ -163,7 +163,7 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
         probs = probs / np.sum(probs)
         selected_action = np.random.choice(actions, p=probs)
 
-    logger.info(f"MCTS selected action {selected_action} with action_probs {action_probs}")
+    #logger.info(f"MCTS selected action {selected_action} with action_probs {action_probs}")
     return selected_action, torch.tensor(action_probs, dtype=torch.float32, device=agent.device)
 
 __all__ = ['MCTSNode', 'mcts_simulate']

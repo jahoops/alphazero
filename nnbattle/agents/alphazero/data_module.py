@@ -60,8 +60,8 @@ class ConnectFourDataModule(pl.LightningDataModule):
         """Generate self-play games and append to the main dataset."""
         logger.info(f"Generating {self.num_games} self-play games with temperature {temperature}.")
         try:
-            for _ in range(self.num_games):
-                self.agent.self_play(max_moves=100, temperature=temperature)
+            for game_number in range(self.num_games):
+                self.agent.self_play(game_number,self.num_games, max_moves=100, temperature=temperature)
             if self.agent.memory:
                 self.dataset.data.extend(self.agent.memory)
                 logger.info(f"Appending {len(self.agent.memory)} game samples to the dataset.")

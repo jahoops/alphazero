@@ -106,7 +106,7 @@ class AlphaZeroAgent(BaseAgent):
         return tensor.cpu()
 
     def select_move(self, game: ConnectFourGame, temperature=1.0):
-        logger.info(f"Agent {self.team} selecting a move.")
+        #logger.info(f"Agent {self.team} selecting a move.")
 
         # Ensure it's the agent's turn
         if game.last_team is not None:  # Only check if not first move
@@ -122,7 +122,7 @@ class AlphaZeroAgent(BaseAgent):
 
         # Use MCTS or policy to select a move
         selected_action, action_probs = self.act(game, valid_moves, temperature=temperature)
-        logger.info(f"Agent {self.team} selected action {selected_action}.")
+        #logger.info(f"Agent {self.team} selected action {selected_action}.")
 
         return selected_action, action_probs
 
@@ -138,7 +138,7 @@ class AlphaZeroAgent(BaseAgent):
         logger.debug(f"MCTS simulation completed. Selected Action: {selected_action}")
         return selected_action, action_probs
 
-    def self_play(self, max_moves=100, temperature=1.0):
+    def self_play(self, game_number, games_max, max_moves=100, temperature=1.0):
         game = ConnectFourGame()
         current_team = RED_TEAM
         original_team = self.team
@@ -175,22 +175,8 @@ class AlphaZeroAgent(BaseAgent):
             
             self.memory.append((state, mcts_prob, float(reward)))
 
-        logger.info(f"Game completed with {len(game_history)} moves, result: {result}")
+        logger.info(f"Game {game_number} of {games_max} completed with {len(game_history)} moves, result: {result}")
         return len(game_history)
-
-    def perform_training(self):
-        """Perform training using train_alphazero.
-
-        :param max_iterations: Maximum number of training iterations.
-        """
-        logger.info("Commencing training procedure.")
-        train_alphazero(
-            max_iterations=100,          # Set to a reasonable number
-            num_self_play_games=100,     # Set to a reasonable number
-            use_gpu=self.device.type == 'cuda',  # Ensure correct GPU usage
-            load_model=self.load_model_flag
-        )
-        logger.info("Training procedure completed.")
 
     def evaluate_model(self):
         """Evaluate the model on a set of validation games to monitor learning progress."""

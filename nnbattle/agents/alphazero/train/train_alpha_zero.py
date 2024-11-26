@@ -74,16 +74,15 @@ def self_play(agent, num_games):
     agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
 
-# Remove this redundant comment
-
 def train_alphazero(
-    max_iterations: int = 1000,         # Increased from 20 to 1000
-    num_self_play_games: int = 1000,    # Increased from 20 to 1000
+    max_iterations: int = 1000,
+    num_self_play_games: int = 1000,
     use_gpu: bool = False,
     load_model: bool = False,
-    patience: int = 10  # Number of iterations with no improvement before stopping
+    patience: int = 10
 ):
     """Trains the AlphaZero agent using self-play and reinforcement learning."""
+    logger.info(f"Starting training with {max_iterations} iterations, {num_self_play_games} games per iteration")
     # Only load the model once at the start if requested
     agent = initialize_agent(
         action_dim=7,
@@ -147,7 +146,7 @@ def train_alphazero(
         callbacks=[checkpoint_callback, early_stop_callback],
         logger=logger_tb,
         log_every_n_steps=10,
-        detect_anomaly=True
+        detect_anomaly=False
     )
     
     # Disable model loading in agent's select_move during training
@@ -155,15 +154,9 @@ def train_alphazero(
     
     best_performance = 0.0
     no_improvement_count = 0
-
-    # Initialize metrics dictionary
-    metrics = {
-        'win_rate': [],
-        'game_length': [],
-        'exploration_rate': []
-    }
-
+    
     for iteration in range(1, max_iterations + 1):
+        performance = None  # Initialize performance at start of each iteration
         # Adjust temperature parameter
         if iteration < max_iterations * 0.5:
             temperature = 1.0  # High temperature for more exploration
@@ -177,7 +170,7 @@ def train_alphazero(
         logger.info(f"Using temperature: {temperature}, c_puct: {agent.c_puct}")
         iteration_start_time = time.time()
         try:
-            logger.info("Generating self-play games...")
+            logger.info(f"Generating {num_self_play_games} self-play games...")
             data_module.generate_self_play_games(temperature=temperature)
             
             if len(data_module.dataset) == 0:
@@ -195,25 +188,55 @@ def train_alphazero(
                 logger.info(f"Iteration {iteration} Training Loss: {training_loss:.6f}")
                 logger_tb.log_metrics({
                     'training/loss': training_loss,
-                    'training/performance': performance,
-                    'training/win_rate': performance,
-                    'training/game_length': len(game_history),
-                    'training/exploration_temp': temperature,
+                    'training/performance': performance if performance is not None else 0.0,
+                    'training/win_rate': performance if performance is not None else 0.0,
                     'training/iteration': iteration,
                     'memory/buffer_size': len(data_module.dataset),
                     'hyperparameters/learning_rate': trainer.optimizers[0].param_groups[0]['lr'],
                     'hyperparameters/c_puct': agent.c_puct
                 }, step=iteration)
+                
+                # Log evaluation metrics every 10 iterations
+                if iteration % 10 == 0:
+                    validation_metrics = evaluate_agent(agent, num_games=50)
+                    logger_tb.log_metrics({
+                        'validation/win_rate': validation_metrics,
+                        'validation/iteration': iteration,
+                    }, step=iteration)
             else:
                 logger.warning(f"Training loss not available for iteration {iteration}")
             
+            # First evaluate performance
+            performance = evaluate_agent(agent, num_games=50)
+            logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
+            
+            # Then save model if performance improved
+            if performance > best_performance:
+                best_performance = performance
+                no_improvement_count = 0
+                logger.info("Performance improved. Saving model and resetting no_improvement_count.")
+                save_agent_model(agent, MODEL_PATH)
+                logger.info(f"Model saved for iteration {iteration} at {MODEL_PATH}")
+            else:
+                no_improvement_count += 1
+                logger.info(f"No improvement for {no_improvement_count} iterations.")
+            
+            # Log metrics after we have performance
+            logger_tb.log_metrics({
+                'training/loss': training_loss,
+                'training/performance': performance,
+                'training/win_rate': performance,
+                'training/iteration': iteration,
+                'memory/buffer_size': len(data_module.dataset),
+                'hyperparameters/learning_rate': trainer.optimizers[0].param_groups[0]['lr'],
+                'hyperparameters/c_puct': agent.c_puct
+            }, step=iteration)
+
             # Evaluate the agent's performance after training iteration
             if iteration % 10 == 0:
                 logger.info("Evaluating agent's performance...")
                 performance = evaluate_agent(agent, num_games=50)  # Increase evaluation games
                 logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
-                save_agent_model(agent, MODEL_PATH)
-                logger.info(f"Model saved for iteration {iteration} at {MODEL_PATH}")
 
                 # Log validation metrics separately
                 validation_metrics = evaluate_agent(agent, num_games=50)
@@ -247,6 +270,10 @@ def train_alphazero(
             logger.error(f"Unexpected error during training: {e}")
             raise
         finally:
+            if performance is not None:
+                logger.info(f"=== Iteration {iteration} completed with performance: {performance:.2%} ===")
+            else:
+                logger.info(f"=== Iteration {iteration} completed (performance not measured) ===")
             # Clear CUDA cache to release memory
             torch.cuda.empty_cache()
     
@@ -288,13 +315,13 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     try:
         train_alphazero(
-            max_iterations=1000,
-            num_self_play_games=1000,
+            max_iterations=100,
+            num_self_play_games=100,
             use_gpu=True,
             load_model=True
         )
     except KeyboardInterrupt:
-        logger.info("Training interrupted by user.")
+        logger.info("\nTraining interrupted by user.")
     except Exception as e:
         logger.error(f"Unexpected error during training: {e}")    
     finally:
