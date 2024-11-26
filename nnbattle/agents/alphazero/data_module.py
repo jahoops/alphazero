@@ -24,15 +24,15 @@ class ConnectFourDataset(Dataset):
         if not isinstance(reward, float):
             logger.error(f"Invalid reward type at index {idx}: {type(reward)}. Expected float.")
             reward = 0.0  # Assign a default value or handle as needed
-        # Ensure state has the correct shape [2, 6, 7]
+        # Ensure state has the correct shape [3, 6, 7]
         if isinstance(state, np.ndarray):
-            if state.shape != (2, 6, 7):
+            if state.shape != (3, 6, 7):
                 preprocessed_state = self.agent.preprocess(state)
-                logger.info("Preprocessing state to shape (2, 6, 7).")
+                logger.info("Preprocessing state to shape (3, 6, 7).")
                 state = preprocessed_state.cpu().numpy()  # Move to CPU before converting to numpy
-                if state.shape != (2, 6, 7):
-                    logger.error(f"Invalid state shape after preprocessing: {state.shape}. Expected (2, 6, 7).")
-                    raise ValueError(f"Invalid state shape after preprocessing: {state.shape}. Expected (2, 6, 7).")
+                if state.shape != (3, 6, 7):
+                    logger.error(f"Invalid state shape after preprocessing: {state.shape}. Expected (3, 6, 7).")
+                    raise ValueError(f"Invalid state shape after preprocessing: {state.shape}. Expected (3, 6, 7).")
         
         # Always return CPU tensors from dataset
         if torch.is_tensor(state) and state.device.type == 'cuda':

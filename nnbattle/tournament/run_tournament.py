@@ -72,10 +72,10 @@ def run_tournament(agents: List[BaseAgent], num_games=10):
     print("Tournament completed. Results saved to tournament/results/tournament_results.json")
 
 if __name__ == "__main__":
-    agent1 = MinimaxAgent(depth=3, team=YEL_TEAM)  # Set MinimaxAgent to YEL_TEAM
+    agent1 = MinimaxAgent(depth=1, team=YEL_TEAM)  # Set MinimaxAgent to YEL_TEAM
     agent2 = AlphaZeroAgent(
         action_dim=7,
-        state_dim=2,
+        state_dim=3,
         use_gpu=True,
         num_simulations=800,
         c_puct=1.4,

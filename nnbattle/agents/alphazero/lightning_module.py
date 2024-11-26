@@ -19,8 +19,8 @@ class ConnectFourLightningModule(pl.LightningModule):
         self.automatic_optimization = True
 
     def forward(self, x):
-        # Ensure x has shape [batch_size, 2, 6, 7]
-        assert x.shape[1:] == (2, 6, 7), f"Input tensor has incorrect shape: {x.shape}"
+        # Ensure x has shape [batch_size, 3, 6, 7]
+        assert x.shape[1:] == (3, 6, 7), f"Input tensor has incorrect shape: {x.shape}"
         # Use self.model instead of self.agent.model
         return self.model(x)
 
@@ -32,7 +32,7 @@ class ConnectFourLightningModule(pl.LightningModule):
         rewards = rewards.to(self.device, non_blocking=True).view(-1)
         
         # Forward pass
-        logits, values = self.forward(states)
+        logits, values = self(states)
         
         # Ensure proper shapes
         values = values.squeeze(-1)

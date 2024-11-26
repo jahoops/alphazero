@@ -37,8 +37,8 @@ class AlphaZeroAgent(BaseAgent):
     def __init__(
         self,
         action_dim,
-        state_dim=2,
-        use_gpu=False,
+        state_dim=3,  # Changed from 2 to 3 to match the state tensor shape
+        use_gpu=True,
         num_simulations=800,
         c_puct=1.4,
         load_model=True,
@@ -48,7 +48,7 @@ class AlphaZeroAgent(BaseAgent):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.device = torch.device("cuda" if use_gpu and torch.cuda.is_available() else "cpu")
-        self.model_loaded = False
+        self.model_loaded = True
         self.load_model_flag = load_model
         self.num_simulations = num_simulations
         self.c_puct = c_puct
@@ -88,30 +88,25 @@ class AlphaZeroAgent(BaseAgent):
 
     def preprocess(self, board, to_device=None):
         board = board.copy()
-        # Ensure board is in correct shape for processing
-        if len(board.shape) == 3 and board.shape[0] > 2:
-            board = board[:2]  # Take only first two channels if too many
-        elif len(board.shape) == 2:
-            # Create two channel board if single channel
-            current_board = (board == self.team).astype(float)
-            opponent_player = 2 if self.team == 1 else 1
-            opponent_board = (board == opponent_player).astype(float)
-            board = np.stack([current_board, opponent_board])
+        # Create a 3-channel state representation
+        # Channel 1: Current player's pieces
+        # Channel 2: Opponent's pieces
+        # Channel 3: Valid moves (binary mask)
+        current_board = (board == self.team).astype(np.float32)
+        opponent_board = (board == (3 - self.team)).astype(np.float32)
+        valid_moves = np.zeros_like(current_board)
+        for col in range(board.shape[1]):
+            for row in range(board.shape[0]-1, -1, -1):
+                if board[row][col] == 0:
+                    valid_moves[row][col] = 1
+                    break
         
-        # Ensure final shape is [2, 6, 7]
-        assert board.shape == (2, 6, 7), f"Invalid board shape after preprocessing: {board.shape}"
-        tensor = torch.FloatTensor(board)
-        # Always return CPU tensor unless explicitly requested otherwise
+        state = np.stack([current_board, opponent_board, valid_moves])
+        tensor = torch.FloatTensor(state)
+        
         if to_device:
             return tensor.to(to_device)
-        return tensor.cpu()  # Ensure CPU tensor is returned by default
-
-    def load_model_method(self):
-        logger.warning("load_model method is deprecated. Use load_agent_model from utils.py instead.")
-        load_agent_model(self)
-
-    def save_model_method(self):
-        save_agent_model(self, self.model_path)  # Pass the model_path explicitly
+        return tensor.cpu()
 
     def select_move(self, game: ConnectFourGame, temperature=1.0):
         logger.info(f"Agent {self.team} selecting a move.")
@@ -150,42 +145,41 @@ class AlphaZeroAgent(BaseAgent):
         game = ConnectFourGame()
         current_team = RED_TEAM
         original_team = self.team
-        states = []  # Store states for later
-        mcts_probs = []  # Store probabilities for later
+        game_history = []  # Store (state, mcts_prob, current_team) tuples
 
         try:
-            for move_number in range(max_moves):
-                if game.get_game_state() != "ONGOING":
-                    break
-
+            while game.get_game_state() == "ONGOING" and len(game_history) < max_moves:
                 self.team = current_team
-                # Store state before move
                 state = self.preprocess(game.get_board())
-                selected_action, action_prob = self.select_move(game, temperature=temperature)
                 
-                # Store state and probabilities on CPU
-                states.append(state.cpu())
-                mcts_probs.append(action_prob.cpu())
+                # Use higher temperature early in the game for exploration
+                current_temp = 1.0 if len(game_history) < 10 else temperature
+                selected_action, action_prob = self.select_move(game, temperature=current_temp)
+                
+                # Store state, action probability, and current team
+                game_history.append((state.cpu(), action_prob.cpu(), current_team))
                 
                 game.make_move(selected_action, current_team)
                 current_team = 3 - current_team
         finally:
             self.team = original_team
 
-        # Get final result
+        # Get final result and assign rewards
         result = game.get_game_state()
-        reward = 0.0
-        if result == self.team:
-            reward = 1.0
-        elif result == (3 - self.team):
-            reward = -1.0
-
-        # Add all states to memory with proper rewards
-        for state, mcts_prob in zip(states, mcts_probs):
+        
+        # Calculate rewards with a discount factor for move timing
+        discount = 0.99
+        for idx, (state, mcts_prob, team) in enumerate(reversed(game_history)):
+            if result == "Draw":
+                reward = 0.0
+            else:
+                # Winning moves get higher rewards if they end the game sooner
+                reward = discount ** idx if result == team else -(discount ** idx)
+            
             self.memory.append((state, mcts_prob, float(reward)))
-            reward = -reward  # Alternate reward for opponent's moves
 
-        logger.info(f"Added {len(states)} positions to memory from game result: {result}")
+        logger.info(f"Game completed with {len(game_history)} moves, result: {result}")
+        return len(game_history)
 
     def perform_training(self):
         """Perform training using train_alphazero.

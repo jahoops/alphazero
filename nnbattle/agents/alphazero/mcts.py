@@ -69,9 +69,10 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
 
     # Add Dirichlet noise to the root node's priors
     action_probs = np.ones(agent.action_dim) / agent.action_dim  # Uniform prior
-    dirichlet_alpha = 0.3  # Adjust alpha as needed
+    dirichlet_alpha = 0.5  # Increased from 0.3
+    noise_weight = 0.25  # 25% noise, 75% network prior
     dirichlet_noise = np.random.dirichlet([dirichlet_alpha] * agent.action_dim)
-    action_probs = 0.75 * action_probs + 0.25 * dirichlet_noise
+    action_probs = (1 - noise_weight) * action_probs + noise_weight * dirichlet_noise
     valid_actions = game.get_valid_moves()
     action_probs = torch.tensor(action_probs, dtype=torch.float32, device=agent.device)  # Ensure on correct device
     # Mask invalid moves
@@ -152,20 +153,15 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
     actions, visits = zip(*action_visits)
     visits = np.array(visits, dtype=np.float32)
 
-    if temperature == 0:
+    # Modified temperature-based action selection
+    if temperature < 0.01:  # Almost deterministic
         selected_action = actions[np.argmax(visits)]
-        action_probs = np.zeros(agent.action_dim, dtype=np.float32)
-        action_probs[selected_action] = 1.0
     else:
-        probs = visits ** (1 / temperature)
-        probs_sum = probs.sum()
-        if probs_sum > 0:
-            probs /= probs_sum
-        else:
-            probs = np.ones_like(visits) / len(visits)  # Fix: use visits length for proper shape
+        # Add small constant to prevent zero probabilities
+        visits = np.array(visits, dtype=np.float64) + 1e-8
+        probs = visits ** (1.0 / temperature)
+        probs = probs / np.sum(probs)
         selected_action = np.random.choice(actions, p=probs)
-        action_probs = np.zeros(agent.action_dim, dtype=np.float32)  # Fix: initialize full array
-        action_probs[list(actions)] = probs  # Fix: assign probabilities to correct indices
 
     logger.info(f"MCTS selected action {selected_action} with action_probs {action_probs}")
     return selected_action, torch.tensor(action_probs, dtype=torch.float32, device=agent.device)

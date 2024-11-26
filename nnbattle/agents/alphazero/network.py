@@ -25,13 +25,27 @@ class ResidualBlock(nn.Module):
 class Connect4Net(nn.Module):
     def __init__(self, state_dim, action_dim):
         super(Connect4Net, self).__init__()
-        # Example architecture
-        self.conv1 = nn.Conv2d(state_dim, 128, kernel_size=4, stride=1, padding=1)
-        self.conv2 = nn.Conv2d(128, 128, kernel_size=4, stride=1, padding=1)
-        self.fc1 = nn.Linear(128 * 4 * 5, 256)
-        self.fc_policy = nn.Linear(256, action_dim)
-        self.fc_value = nn.Linear(256, 1)
-    
+        # Initial convolution
+        self.conv1 = nn.Conv2d(state_dim, 128, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(128)
+        self.relu = nn.ReLU()
+
+        # Residual blocks
+        self.res_blocks = nn.Sequential(
+            *[ResidualBlock(128) for _ in range(5)]
+        )
+        
+        # Policy head
+        self.policy_conv = nn.Conv2d(128, 2, kernel_size=1)
+        self.policy_bn = nn.BatchNorm2d(2)
+        self.policy_fc = nn.Linear(2 * 6 * 7, action_dim)
+        
+        # Value head
+        self.value_conv = nn.Conv2d(128, 1, kernel_size=1)
+        self.value_bn = nn.BatchNorm2d(1)
+        self.value_fc1 = nn.Linear(1 * 6 * 7, 256)
+        self.value_fc2 = nn.Linear(256, 1)
+
     def to(self, device):
         """Ensure all parameters are moved to the specified device."""
         super().to(device)
@@ -42,16 +56,21 @@ class Connect4Net(nn.Module):
         return self
 
     def forward(self, x):
-        # Get the device of the first parameter
-        device = next(self.parameters()).device
-        # Ensure input is on same device as parameters
-        x = x.to(device)
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = x.view(x.size(0), -1)  # Flatten
-        x = F.relu(self.fc1(x))
-        policy = self.fc_policy(x)
-        value = self.fc_value(x)
+        # Main network
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.res_blocks(x)
+        
+        # Policy head
+        policy = self.relu(self.policy_bn(self.policy_conv(x)))
+        policy = policy.view(-1, 2 * 6 * 7)
+        policy = self.policy_fc(policy)
+        
+        # Value head
+        value = self.relu(self.value_bn(self.value_conv(x)))
+        value = value.view(-1, 1 * 6 * 7)
+        value = self.relu(self.value_fc1(value))
+        value = torch.tanh(self.value_fc2(value))
+        
         return policy, value
 
 __all__ = ['Connect4Net']

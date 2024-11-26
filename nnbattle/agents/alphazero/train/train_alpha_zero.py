@@ -56,6 +56,12 @@ def self_play(agent, num_games):
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
         result = game.get_game_state()
+        for idx, (state, mcts_prob, team) in enumerate(reversed(game_history)):
+            if result == "Draw":
+                reward = 0.0
+            else:
+                reward = 1.0 if result == team else -1.0  # Corrected reward assignment
+        memory.append((state, mcts_prob, float(reward)))
         # Ensure that agent.memory has been populated
         if not agent.memory:
             logger.warning("No self-play games were generated.")
@@ -71,8 +77,8 @@ def self_play(agent, num_games):
 # Remove this redundant comment
 
 def train_alphazero(
-    max_iterations: int = 100,  # Reduced from 1000 to 100 for manageable training
-    num_self_play_games: int = 100,  # Reduced from 1000 to 100 for quicker testing
+    max_iterations: int = 1000,         # Increased from 20 to 1000
+    num_self_play_games: int = 1000,    # Increased from 20 to 1000
     use_gpu: bool = False,
     load_model: bool = False,
     patience: int = 10  # Number of iterations with no improvement before stopping
@@ -81,7 +87,7 @@ def train_alphazero(
     # Only load the model once at the start if requested
     agent = initialize_agent(
         action_dim=7,
-        state_dim=2,
+        state_dim=3,  # Changed from 2 to 3
         use_gpu=use_gpu,
         num_simulations=800,
         c_puct=1.4,
@@ -178,18 +184,13 @@ def train_alphazero(
             else:
                 logger.warning(f"Training loss not available for iteration {iteration}")
             
-            # Save the model after each iteration
-            model_path = f"nnbattle/agents/alphazero/model/alphazero_model_{iteration}.pth"
-            save_agent_model(agent, model_path)
-            
-            # Also save as final model
-            save_agent_model(agent, MODEL_PATH)
-            logger.info(f"Model saved for iteration {iteration} at {model_path}")
-            
             # Evaluate the agent's performance after training iteration
-            logger.info("Evaluating agent's performance...")
-            performance = evaluate_agent(agent, num_games=20)
-            logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
+            if iteration % 10 == 0:
+                logger.info("Evaluating agent's performance...")
+                performance = evaluate_agent(agent, num_games=50)  # Increase evaluation games
+                logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
+                save_agent_model(agent, MODEL_PATH)
+                logger.info(f"Model saved for iteration {iteration} at {MODEL_PATH}")
 
             # Check for improvement
             if performance > best_performance:
@@ -253,10 +254,10 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     try:
         train_alphazero(
-            max_iterations=20,          # Reasonable number of iterations
-            num_self_play_games=20,     # Reasonable number of self-play games
-            use_gpu=True,               # Use GPU for training
-            load_model=False
+            max_iterations=1000,
+            num_self_play_games=1000,
+            use_gpu=True,
+            load_model=True
         )
     except KeyboardInterrupt:
         logger.info("Training interrupted by user.")
