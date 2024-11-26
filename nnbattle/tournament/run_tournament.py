@@ -3,17 +3,19 @@
 import json
 import os
 import logging
+from typing import List
 
 from nnbattle.agents.alphazero import AlphaZeroAgent
 from nnbattle.agents.minimax.agent_code import MinimaxAgent  # Ensure correct import path
 from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
 from nnbattle.constants import RED_TEAM, YEL_TEAM
+from nnbattle.agents.base_agent import BaseAgent
 
 # Configure logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def run_tournament(agents, num_games=10):
+def run_tournament(agents: List[BaseAgent], num_games=10):
     # Format agent names with team strings instead of numbers
     results = {f"{agent.__class__.__name__} ({'RED_TEAM' if agent.team == RED_TEAM else 'YEL_TEAM'})": 0 for agent in agents}
     results['draws'] = 0

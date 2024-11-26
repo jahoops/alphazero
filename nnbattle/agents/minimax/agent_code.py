@@ -4,7 +4,7 @@ import math
 import random
 import logging
 import copy
-from nnbattle.agents.base_agent import Agent
+from nnbattle.agents.base_agent import BaseAgent
 from nnbattle.constants import EMPTY, ROW_COUNT, COLUMN_COUNT
 
 # Configure logger
@@ -18,7 +18,7 @@ logger.addHandler(handler)
 from nnbattle.game.connect_four_game import ConnectFourGame 
 from nnbattle.constants import RED_TEAM, YEL_TEAM
 
-class MinimaxAgent(Agent):
+class MinimaxAgent(BaseAgent):
     def __init__(self, depth=4, team=YEL_TEAM):
         """
         Initializes the MinimaxAgent with a specified search depth and team number.
@@ -26,6 +26,7 @@ class MinimaxAgent(Agent):
         :param depth: The depth to which the Minimax algorithm will search.
         :param team: The team number (1 or 2) that the agent is playing for.
         """
+        super().__init__(team)
         self.depth = depth
         self.team = team  # Assign team to the agent
         logger.info(f"MinimaxAgent initialized with team {self.team} and depth {self.depth}")

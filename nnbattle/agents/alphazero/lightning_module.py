@@ -26,33 +26,27 @@ class ConnectFourLightningModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         states, mcts_probs, rewards = batch
-        states = states.to(self.device)  # Move states to the correct device
-        mcts_probs = mcts_probs.to(self.device)  # Move mcts_probs to the correct device
-        rewards = rewards.to(self.device).view(-1)  # Ensure rewards have shape [batch_size]
+        # Move tensors to device here after pin_memory has been called
+        states = states.to(self.device, non_blocking=True)
+        mcts_probs = mcts_probs.to(self.device, non_blocking=True)
+        rewards = rewards.to(self.device, non_blocking=True).view(-1)
         
         # Forward pass
         logits, values = self.forward(states)
         
         # Ensure proper shapes
-        values = values.squeeze(-1)  # Ensure values have shape [batch_size]
+        values = values.squeeze(-1)
         rewards = rewards.float()
         
         # Calculate losses with added small epsilon to prevent log(0)
         value_loss = F.mse_loss(values, rewards)
         policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
-        total_loss = value_loss + policy_loss
-
-        # Log metrics without _step suffix
-        self.log('value_loss', value_loss, on_step=True, on_epoch=True, prog_bar=True)
-        self.log('policy_loss', policy_loss, on_step=True, on_epoch=True, prog_bar=True)
-        # Log the total loss for monitoring
-        self.log('train_loss', total_loss, on_step=True, on_epoch=True, prog_bar=True)
         
-        # Add detailed logging for monitoring
-        if batch_idx % 10 == 0:
-            logger.info(f"Batch {batch_idx}: Value Loss={value_loss.item():.6f}, Policy Loss={policy_loss.item():.6f}, Total Loss={total_loss.item():.6f}")
-        
-        return total_loss  # Return just the loss tensor
+        loss = value_loss + policy_loss
+        self.log('loss', loss)
+        # If you prefer to monitor 'train_loss', add the following:
+        self.log('train_loss', loss)
+        return loss
 
     def on_train_epoch_end(self):
         # Get metrics that were logged during training steps
@@ -75,7 +69,7 @@ class ConnectFourLightningModule(pl.LightningModule):
         return {
             "optimizer": optimizer,
             "lr_scheduler": scheduler,
-            "monitor": "train_loss"
+            "monitor": "loss"  # Ensure this matches the logged metric
         }
 
     def loss_function(self, outputs, targets_policy, targets_value):
@@ -87,9 +81,10 @@ class ConnectFourLightningModule(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         """Add a validation step to monitor performance on a separate set."""
         states, mcts_probs, rewards = batch
-        states = states.to(self.device)
-        mcts_probs = mcts_probs.to(self.device)
-        rewards = rewards.to(self.device).view(-1)
+        # Move tensors to device here after pin_memory has been called
+        states = states.to(self.device, non_blocking=True)
+        mcts_probs = mcts_probs.to(self.device, non_blocking=True)
+        rewards = rewards.to(self.device, non_blocking=True).view(-1)
         
         logits, values = self.forward(states)
         values = values.squeeze(-1)

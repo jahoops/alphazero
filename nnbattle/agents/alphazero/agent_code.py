@@ -21,7 +21,7 @@ from nnbattle.constants import RED_TEAM, YEL_TEAM  # Ensure constants are import
 from .network import Connect4Net
 from .utils.model_utils import load_agent_model, save_agent_model, MODEL_PATH
 from .mcts import MCTSNode, mcts_simulate
-from nnbattle.agents.base_agent import Agent  # Ensure this import is correct
+from nnbattle.agents.base_agent import BaseAgent  # Ensure this import is correct
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
@@ -31,7 +31,7 @@ def deepcopy_env(env):
     """Deep copy the environment."""
     return copy.deepcopy(env)
 
-class AlphaZeroAgent(Agent):
+class AlphaZeroAgent(BaseAgent):
     logger = logging.getLogger(__name__)
 
     def __init__(
@@ -42,9 +42,9 @@ class AlphaZeroAgent(Agent):
         num_simulations=800,
         c_puct=1.4,
         load_model=True,
-        team=RED_TEAM  # Default to RED_TEAM
+        team=RED_TEAM  # Ensure team is initialized
     ):
-        super().__init__()
+        super().__init__(team)
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.device = torch.device("cuda" if use_gpu and torch.cuda.is_available() else "cpu")
@@ -52,16 +52,17 @@ class AlphaZeroAgent(Agent):
         self.load_model_flag = load_model
         self.num_simulations = num_simulations
         self.c_puct = c_puct
-        self.team = team
+        self.team = team  # Initialize as an instance attribute
         self.memory = []
-        self.model = Connect4Net(state_dim, action_dim).to(self.device)
+        self.model = Connect4Net(state_dim, action_dim)
+        self.model = self.model.to(self.device)
+        for param in self.model.parameters():
+            param.data = param.data.to(self.device)
+        
         self.model_path = MODEL_PATH  # Added model_path attribute
 
-        logger.info(f"Using device: {self.device}")
-        if self.device.type == "cuda":
-            logger.info(f"GPU: {torch.cuda.get_device_name()}")
-            logger.info(f"Memory allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
-
+        logger.info(f"Initialized AlphaZeroAgent on device: {self.device}")
+        
         if load_model:
             try:
                 load_agent_model(self)
@@ -100,9 +101,10 @@ class AlphaZeroAgent(Agent):
         # Ensure final shape is [2, 6, 7]
         assert board.shape == (2, 6, 7), f"Invalid board shape after preprocessing: {board.shape}"
         tensor = torch.FloatTensor(board)
+        # Always return CPU tensor unless explicitly requested otherwise
         if to_device:
             return tensor.to(to_device)
-        return tensor  # Default to CPU
+        return tensor.cpu()  # Ensure CPU tensor is returned by default
 
     def load_model_method(self):
         logger.warning("load_model method is deprecated. Use load_agent_model from utils.py instead.")
@@ -111,13 +113,14 @@ class AlphaZeroAgent(Agent):
     def save_model_method(self):
         save_agent_model(self, self.model_path)  # Pass the model_path explicitly
 
-    def select_move(self, game: ConnectFourGame):
+    def select_move(self, game: ConnectFourGame, temperature=1.0):
         logger.info(f"Agent {self.team} selecting a move.")
 
         # Ensure it's the agent's turn
-        if game.last_team == self.team:
-            logger.error(f"It's not Agent {self.team}'s turn.")
-            raise InvalidTurnError(f"It's not Agent {self.team}'s turn.")
+        if game.last_team is not None:  # Only check if not first move
+            if game.last_team == self.team:
+                logger.error(f"It's not Agent {self.team}'s turn.")
+                raise InvalidTurnError(f"It's not Agent {self.team}'s turn.")
 
         # Get the current valid moves
         valid_moves = game.get_valid_moves()
@@ -126,76 +129,63 @@ class AlphaZeroAgent(Agent):
             raise InvalidMoveError("No valid moves available.")
 
         # Use MCTS or policy to select a move
-        selected_action, action_probs = self.act(game, valid_moves)
+        selected_action, action_probs = self.act(game, valid_moves, temperature=temperature)
         logger.info(f"Agent {self.team} selected action {selected_action}.")
 
         return selected_action, action_probs
 
-    def act(self, game: ConnectFourGame, valid_moves):
+    def act(self, game: ConnectFourGame, valid_moves, temperature=1.0, **kwargs):
+        self.model.eval()  # Set to evaluation mode
+        self.model = self.model.to(self.device)  # Ensure model is on correct device
+        logger.debug(f"Model device: {next(self.model.parameters()).device}")
         logger.debug("Starting MCTS simulation for action selection.")
-        selected_action, action_probs = mcts_simulate(self, game, valid_moves)
+        selected_action, action_probs = mcts_simulate(self, game, valid_moves, temperature=temperature)
         if selected_action is None:
             logger.error("Failed to select a valid action.")
             raise InvalidMoveError("Failed to select a valid action.")
         logger.debug(f"MCTS simulation completed. Selected Action: {selected_action}")
         return selected_action, action_probs
 
-    def self_play(self, max_moves=5):  # Reduced max_moves for quicker testing
+    def self_play(self, max_moves=100, temperature=1.0):
         game = ConnectFourGame()
-        current_team = RED_TEAM  # Start with RED_TEAM
+        current_team = RED_TEAM
+        original_team = self.team
+        states = []  # Store states for later
+        mcts_probs = []  # Store probabilities for later
 
-        # Initialize opponent_agent correctly
-        opponent_agent = AlphaZeroAgent(
-            action_dim=self.action_dim,
-            state_dim=self.state_dim,
-            use_gpu=self.device.type == 'cuda',
-            num_simulations=self.num_simulations,
-            c_puct=self.c_puct,
-            load_model=self.load_model_flag,
-            team=YEL_TEAM if self.team == RED_TEAM else RED_TEAM
-        )
-        logger.info(f"Self-play initiated between Team {self.team} and Team {opponent_agent.team}")
+        try:
+            for move_number in range(max_moves):
+                if game.get_game_state() != "ONGOING":
+                    break
 
-        for move_number in range(max_moves):
-            if game.get_game_state() != "ONGOING":
-                logger.info(f"Game ended at move {move_number + 1}: {game.get_game_state()}")
-                break
+                self.team = current_team
+                # Store state before move
+                state = self.preprocess(game.get_board())
+                selected_action, action_prob = self.select_move(game, temperature=temperature)
+                
+                # Store state and probabilities on CPU
+                states.append(state.cpu())
+                mcts_probs.append(action_prob.cpu())
+                
+                game.make_move(selected_action, current_team)
+                current_team = 3 - current_team
+        finally:
+            self.team = original_team
 
-            agent = self if self.team == current_team else opponent_agent
-            logger.info(f"Move {move_number + 1}: Agent Team {agent.team} is making a move.")
-
-            try:
-                selected_action, _ = agent.select_move(game)
-                logger.info(f"Agent Team {agent.team} selected action {selected_action}.")
-                game.make_move(selected_action, agent.team)
-                logger.info(f"Agent Team {agent.team} placed piece in column {selected_action}.")
-            except (InvalidMoveError, InvalidTurnError) as e:
-                logger.error(f"An error occurred during self-play: {e}")
-                raise  # Stop the application
-
-            # Alternate turns
-            current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
-            logger.info(f"Next turn: Team {current_team}")
-        
-        # Handle the end of the game and update memory
+        # Get final result
         result = game.get_game_state()
-        logger.info(f"Game Result: {result}")
-        
-        # Convert result to numerical reward
+        reward = 0.0
         if result == self.team:
             reward = 1.0
         elif result == (3 - self.team):
             reward = -1.0
-        elif result == "Draw":
-            reward = 0.0
-        else:
-            reward = 0.0  # For 'ONGOING'
-        
-        # Preprocess the final game state before appending
-        preprocessed_state = self.preprocess(game.get_board())  # Shape: [2,6,7]
-        mcts_prob = torch.zeros(self.action_dim, dtype=torch.float32)  # Initialize as Tensor
-        self.memory.append((preprocessed_state, mcts_prob, float(reward)))  # Ensure reward is float
-        logger.info(f"Appended game result to memory with reward {reward}.")
+
+        # Add all states to memory with proper rewards
+        for state, mcts_prob in zip(states, mcts_probs):
+            self.memory.append((state, mcts_prob, float(reward)))
+            reward = -reward  # Alternate reward for opponent's moves
+
+        logger.info(f"Added {len(states)} positions to memory from game result: {result}")
 
     def perform_training(self):
         """Perform training using train_alphazero.
@@ -261,7 +251,7 @@ def initialize_agent(
 
     :return: AlphaZeroAgent instance
     """
-    return AlphaZeroAgent(
+    agent = AlphaZeroAgent(
         action_dim=action_dim,
         state_dim=state_dim,
         use_gpu=use_gpu,
@@ -269,5 +259,6 @@ def initialize_agent(
         c_puct=c_puct,
         load_model=load_model
     )
+    return agent
 
 __all__ = ['AlphaZeroAgent', 'initialize_agent']

@@ -59,5 +59,7 @@ def preprocess_board(board_state: np.ndarray) -> torch.Tensor:
     :return: preprocessed board state as a torch tensor
     """
     # Convert to float32 and create a batch dimension
-    processed = torch.FloatTensor(board_state).unsqueeze(0)
+    processed = torch.FloatTensor(board_state).unsqueeze(0).clone().detach()
     return processed
+
+__all__ = ['load_agent_model', 'save_agent_model', 'preprocess_board', 'MODEL_PATH']

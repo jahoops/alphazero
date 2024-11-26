@@ -1,5 +1,3 @@
-# nnbattle/agents/alphazero/data_module.py
-
 import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, Dataset
@@ -36,10 +34,17 @@ class ConnectFourDataset(Dataset):
                     logger.error(f"Invalid state shape after preprocessing: {state.shape}. Expected (2, 6, 7).")
                     raise ValueError(f"Invalid state shape after preprocessing: {state.shape}. Expected (2, 6, 7).")
         
+        # Always return CPU tensors from dataset
+        if torch.is_tensor(state) and state.device.type == 'cuda':
+            state = state.cpu()
+        if torch.is_tensor(mcts_prob) and mcts_prob.device.type == 'cuda':
+            mcts_prob = mcts_prob.cpu()
+        
+        # Convert to tensors on CPU
         return (
-            torch.tensor(state, dtype=torch.float32),
-            torch.tensor(mcts_prob, dtype=torch.float32).cpu(),  # Ensure mcts_prob is on CPU
-            torch.tensor(reward, dtype=torch.float32)
+            torch.tensor(state, dtype=torch.float32),  # Remove device
+            torch.tensor(mcts_prob, dtype=torch.float32),  # Remove device
+            torch.tensor(reward, dtype=torch.float32)  # Remove device
         )
 
 
@@ -50,63 +55,64 @@ class ConnectFourDataModule(pl.LightningDataModule):
         self.num_games = num_games
         self.dataset = ConnectFourDataset([], agent)
         self.batch_size = 32  # Add explicit batch size
-        self.val_dataset = ConnectFourDataset([], agent)  # Add validation dataset
 
-    def generate_self_play_games(self):
-        logger.info(f"Generating {self.num_games} self-play games.")
+    def generate_self_play_games(self, temperature=1.0):
+        """Generate self-play games and append to the main dataset."""
+        logger.info(f"Generating {self.num_games} self-play games with temperature {temperature}.")
         try:
-            # Limit the number of self-play games for testing
-            self.agent.self_play(max_moves=5)  # Limit moves for quicker execution
+            for _ in range(self.num_games):
+                self.agent.self_play(max_moves=100, temperature=temperature)
             if self.agent.memory:
                 self.dataset.data.extend(self.agent.memory)
-                logger.info(f"Appending {len(self.agent.memory)} games to the dataset.")
+                logger.info(f"Appending {len(self.agent.memory)} game samples to the dataset.")
                 self.agent.memory.clear()
                 logger.info(f"Dataset size after self-play: {len(self.dataset.data)} samples")
+            else:
+                logger.warning("Agent memory is empty. No games were added to the dataset.")
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
-            # Add dummy data for testing if self-play fails
-            dummy_state = np.zeros((2, 6, 7))
-            dummy_mcts_prob = np.ones(self.agent.action_dim) / self.agent.action_dim
-            dummy_reward = 0.0  # Ensure reward is float
-            self.dataset.data.append((dummy_state, dummy_mcts_prob, dummy_reward))
-            logger.info("Added dummy data for testing purposes.")
+            # Handle exceptions as needed
 
     def setup(self, stage=None):
         if stage == 'fit' or stage is None:
-            # Split data into training and validation
-            total = len(self.dataset)
-            val_size = int(0.2 * total)
-            train_size = total - val_size
-            self.train_dataset, self.val_dataset = torch.utils.data.random_split(self.dataset, [train_size, val_size])
-    
+            if len(self.dataset) == 0:
+                logger.warning("Dataset is empty. Assigning empty training and validation datasets.")
+                self.train_dataset = torch.utils.data.Subset(self.dataset, [])
+                self.val_dataset = torch.utils.data.Subset(self.dataset, [])
+            else:
+                # Split data into training and validation using random_split
+                total = len(self.dataset)
+                val_size = max(int(0.2 * total), 1)  # Ensure at least one sample
+                train_size = total - val_size
+                self.train_dataset, self.val_dataset = torch.utils.data.random_split(self.dataset, [train_size, val_size])
+
     def train_dataloader(self):
         if len(self.train_dataset) == 0:
-            logger.warning("Training dataset is empty! Adding dummy sample for testing.")
-            self.train_dataset.dataset.data.append((
-                np.zeros((2, 6, 7)),  # state
-                np.zeros(7),          # mcts_probs
-                0.0                    # reward
-            ))
+            logger.warning("Training dataset is empty! Training cannot proceed without data.")
+            raise ValueError("Training dataset is empty. Please generate self-play games before training.")
         return DataLoader(
             self.train_dataset, 
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=4,  # Set to 4 for multiprocessing efficiency
-            pin_memory=True
+            pin_memory=True if torch.cuda.is_available() else False,  # Only pin if CUDA available
+            persistent_workers=True
         )
     
     def val_dataloader(self):
+        if not hasattr(self, 'val_dataset'):
+            logger.error("Validation dataset has not been initialized. Ensure that `setup` is called before using val_dataloader.")
+            raise AttributeError("Validation dataset not initialized.")
+        
         if len(self.val_dataset) == 0:
-            logger.warning("Validation dataset is empty! Adding dummy sample for testing.")
-            self.val_dataset.dataset.data.append((
-                np.zeros((2, 6, 7)),  # state
-                np.zeros(7),          # mcts_probs
-                0.0                    # reward
-            ))
+            logger.warning("Validation dataset is empty! Validation cannot proceed without data.")
+            raise ValueError("Validation dataset is empty. Please generate self-play games before validation.")
+        
         return DataLoader(
             self.val_dataset, 
             batch_size=self.batch_size,
             shuffle=False,
             num_workers=4,
-            pin_memory=True
+            pin_memory=True if torch.cuda.is_available() else False,  # Only pin if CUDA available
+            persistent_workers=True  # Added to speed up worker initialization
         )

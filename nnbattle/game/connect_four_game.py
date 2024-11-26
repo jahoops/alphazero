@@ -62,18 +62,16 @@ class ConnectFourGame:
 
     def is_valid_move(self, column):
         """Check if a move is valid."""
-        return (0 <= column < COLUMN_COUNT and 
-                self.board[ROW_COUNT-1][column] == EMPTY)
+        if column < 0 or column >= COLUMN_COUNT:
+            return False
+        return self.board[0][column] == EMPTY
 
     def get_next_open_row(self, column):
         """Get the next available row in the given column starting from the bottom."""
-        # Change iteration from top-down to bottom-up
-        for row in range(ROW_COUNT):
-            if self.board[row][column] == EMPTY:
-                logger.debug(f"Next open row for column {column} is {row}")
-                return row
-        logger.debug(f"No open rows for column {column}")
-        return None
+        for r in range(ROW_COUNT-1, -1, -1):
+            if self.board[r][column] == EMPTY:
+                return r
+        raise InvalidMoveError(f"Column {column} is full.")
 
     def check_win(self, team):
         """Check if the given team has won."""
@@ -105,7 +103,7 @@ class ConnectFourGame:
 
     def is_board_full(self):
         """Check if the board is full."""
-        return not any(self.board[ROW_COUNT-1][c] == EMPTY for c in range(COLUMN_COUNT))
+        return not any(self.board[0][c] == EMPTY for c in range(COLUMN_COUNT))
 
     def get_game_state(self):
         """Return the current game state."""
@@ -127,11 +125,8 @@ class ConnectFourGame:
 
     def board_to_string(self):
         """Return string representation of board with colored circles."""
-        mapping = {
-            RED_TEAM: '\033[91m\u25CF\033[0m',  # Red circle
-            YEL_TEAM: '\033[93m\u25CF\033[0m',  # Yellow circle
-            EMPTY: '\u25CB'                      # White circle
-        }
-        # Reverse the board for correct visualization (bottom row first)
-        return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board[::-1])
-        return '\n'.join(' '.join(mapping[cell] for cell in row) for row in self.board[::-1])
+        symbols = {EMPTY: '.', RED_TEAM: 'R', YEL_TEAM: 'Y'}
+        board_str = ''
+        for row in self.board:
+            board_str += ' '.join(symbols[cell] for cell in row) + '\n'
+        return board_str
