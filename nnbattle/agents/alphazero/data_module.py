@@ -5,7 +5,7 @@ import numpy as np
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)  # Changed from DEBUG to INFO
+logger.setLevel(logging.WARNING)  # Changed from DEBUG to INFO
 
 # Ensure __all__ is defined
 __all__ = ['ConnectFourDataset', 'ConnectFourDataModule']

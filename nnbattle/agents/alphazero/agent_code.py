@@ -4,7 +4,7 @@ import logging
 
 # Configure logging at the very start
 logging.basicConfig(
-    level=logging.INFO,  # Or DEBUG for more details
+    level=logging.WARNING,  # Or DEBUG for more details
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 
@@ -22,17 +22,14 @@ from .network import Connect4Net
 from .utils.model_utils import load_agent_model, save_agent_model, MODEL_PATH
 from .mcts import MCTSNode, mcts_simulate
 from nnbattle.agents.base_agent import BaseAgent  # Ensure this import is correct
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(name)s:%(levelname)s: %(message)s')
-logger = logging.getLogger(__name__)
+from nnbattle.utils.logger_config import logger
 
 def deepcopy_env(env):
     """Deep copy the environment."""
     return copy.deepcopy(env)
 
 class AlphaZeroAgent(BaseAgent):
-    logger = logging.getLogger(__name__)
+    logger = logger
 
     def __init__(
         self,

@@ -1,0 +1,365 @@
+2024-11-26 13:00:02,287 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path nnbattle/agents/alphazero/model/alphazero_model_final.pth does not exist.
+2024-11-26 13:00:02,287 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-26 13:09:59,552 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path nnbattle/agents/alphazero/model/alphazero_model_final.pth does not exist.
+2024-11-26 13:09:59,552 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-26 13:23:19,858 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path nnbattle/agents/alphazero/model/alphazero_model_final.pth does not exist.
+2024-11-26 13:23:19,858 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-26 13:30:06,197 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path nnbattle/agents/alphazero/model/alphazero_model_final.pth does not exist.
+2024-11-26 13:30:06,197 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-26 13:31:27,838 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-26 13:31:27,838 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path nnbattle/agents/alphazero/model/alphazero_model_final.pth does not exist.
+2024-11-26 13:31:27,838 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-26 13:31:27,838 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-26 13:31:27,842 - root - INFO - Generating initial self-play games...
+2024-11-26 13:31:27,842 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:27,842 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:28,704 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:28,704 - root - INFO - Agent 1 selected action 0.
+2024-11-26 13:31:28,705 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:28,705 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:29,425 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:29,425 - root - INFO - Agent 2 selected action 1.
+2024-11-26 13:31:29,425 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:29,426 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:30,141 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:30,142 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:30,142 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:30,144 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:30,904 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:30,904 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:30,904 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:30,905 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:31,617 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:31,618 - root - INFO - Agent 1 selected action 2.
+2024-11-26 13:31:31,618 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:31,618 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:32,334 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:32,334 - root - INFO - Agent 2 selected action 4.
+2024-11-26 13:31:32,334 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:32,334 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:33,049 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:33,049 - root - INFO - Agent 1 selected action 1.
+2024-11-26 13:31:33,049 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:33,049 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:33,762 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:33,762 - root - INFO - Agent 2 selected action 6.
+2024-11-26 13:31:33,762 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:33,762 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:34,525 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:34,525 - root - INFO - Agent 1 selected action 2.
+2024-11-26 13:31:34,525 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:34,526 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:35,237 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:35,237 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:35,238 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:35,253 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:35,965 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:35,965 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:35,965 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:35,966 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:36,683 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:36,683 - root - INFO - Agent 2 selected action 1.
+2024-11-26 13:31:36,684 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:36,684 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:37,400 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:37,400 - root - INFO - Agent 1 selected action 6.
+2024-11-26 13:31:37,400 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:37,401 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:38,117 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:38,117 - root - INFO - Agent 2 selected action 6.
+2024-11-26 13:31:38,117 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:38,117 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:38,887 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:38,887 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:38,887 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:38,887 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:39,597 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:39,597 - root - INFO - Agent 2 selected action 0.
+2024-11-26 13:31:39,598 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:39,598 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:40,281 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1667, 0.0000, 0.1667, 0.1667, 0.1667, 0.1667, 0.1667],
+       device='cuda:0')
+2024-11-26 13:31:40,281 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:40,281 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:40,282 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:40,957 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([-1.4450,  0.5365,  0.2947, -0.1371, -0.0000,  1.5170,  0.2339],
+       device='cuda:0')
+2024-11-26 13:31:40,957 - root - INFO - Agent 2 selected action 5.
+2024-11-26 13:31:40,957 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:40,958 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:41,016 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:41,016 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:41,016 - root - INFO - Game completed with 19 moves, result: 1
+2024-11-26 13:31:41,016 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:41,017 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:41,728 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:41,728 - root - INFO - Agent 1 selected action 1.
+2024-11-26 13:31:41,728 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:41,728 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:42,441 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:42,441 - root - INFO - Agent 2 selected action 5.
+2024-11-26 13:31:42,441 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:42,442 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:43,206 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:43,206 - root - INFO - Agent 1 selected action 2.
+2024-11-26 13:31:43,206 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:43,207 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:43,907 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:43,907 - root - INFO - Agent 2 selected action 1.
+2024-11-26 13:31:43,907 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:43,908 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:44,036 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:44,036 - root - INFO - Agent 1 selected action 0.
+2024-11-26 13:31:44,036 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:44,037 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:44,701 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:44,702 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:44,702 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:44,702 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:44,750 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:44,750 - root - INFO - Agent 1 selected action 3.
+2024-11-26 13:31:44,750 - root - INFO - Game completed with 7 moves, result: 1
+2024-11-26 13:31:44,750 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:44,750 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:45,458 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:45,458 - root - INFO - Agent 1 selected action 2.
+2024-11-26 13:31:45,458 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:45,459 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:46,171 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:46,171 - root - INFO - Agent 2 selected action 5.
+2024-11-26 13:31:46,171 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:46,172 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:46,879 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:46,879 - root - INFO - Agent 1 selected action 5.
+2024-11-26 13:31:46,879 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:46,879 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:47,643 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:47,643 - root - INFO - Agent 2 selected action 0.
+2024-11-26 13:31:47,643 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:47,644 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:48,352 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:48,352 - root - INFO - Agent 1 selected action 0.
+2024-11-26 13:31:48,352 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:48,353 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:49,064 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:49,064 - root - INFO - Agent 2 selected action 3.
+2024-11-26 13:31:49,064 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:49,065 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:49,817 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:49,818 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:49,818 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:49,818 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:50,559 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:50,559 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:50,560 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:50,560 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:51,330 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:51,331 - root - INFO - Agent 1 selected action 6.
+2024-11-26 13:31:51,331 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:51,331 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:52,056 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:52,056 - root - INFO - Agent 2 selected action 1.
+2024-11-26 13:31:52,056 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:52,056 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:52,817 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:52,817 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:52,817 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:52,817 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:53,531 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:53,531 - root - INFO - Agent 2 selected action 6.
+2024-11-26 13:31:53,531 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:53,532 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:54,260 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:54,260 - root - INFO - Agent 1 selected action 6.
+2024-11-26 13:31:54,260 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:54,260 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:55,087 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:55,087 - root - INFO - Agent 2 selected action 3.
+2024-11-26 13:31:55,087 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:55,087 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:55,566 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:55,566 - root - INFO - Agent 1 selected action 6.
+2024-11-26 13:31:55,566 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:55,567 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:56,275 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1667, 0.1667, 0.1667, -0.0000, 0.1667, 0.1667, 0.1667],
+       device='cuda:0')
+2024-11-26 13:31:56,276 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:56,276 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:56,276 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:56,711 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1667, 0.1667, 0.1667, 0.1667, 0.1667, 0.1667, -0.0000],
+       device='cuda:0')
+2024-11-26 13:31:56,711 - root - INFO - Agent 1 selected action 1.
+2024-11-26 13:31:56,712 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:56,712 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:57,152 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:57,152 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:57,152 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:57,152 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:57,491 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:57,491 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:31:57,491 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:57,491 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:57,595 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:57,595 - root - INFO - Agent 2 selected action 2.
+2024-11-26 13:31:57,595 - root - INFO - Game completed with 20 moves, result: 2
+2024-11-26 13:31:57,596 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:57,596 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:58,312 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:58,312 - root - INFO - Agent 1 selected action 1.
+2024-11-26 13:31:58,312 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:58,313 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:59,052 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:59,053 - root - INFO - Agent 2 selected action 1.
+2024-11-26 13:31:59,053 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:31:59,053 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:31:59,835 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:31:59,835 - root - INFO - Agent 1 selected action 2.
+2024-11-26 13:31:59,835 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:31:59,836 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:00,547 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:00,547 - root - INFO - Agent 2 selected action 0.
+2024-11-26 13:32:00,547 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:00,548 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:01,229 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:01,229 - root - INFO - Agent 1 selected action 3.
+2024-11-26 13:32:01,229 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:01,229 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:01,891 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:01,891 - root - INFO - Agent 2 selected action 0.
+2024-11-26 13:32:01,891 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:01,891 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:01,943 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:01,943 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:32:01,943 - root - INFO - Game completed with 7 moves, result: 1
+2024-11-26 13:32:01,943 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:01,943 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:02,669 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:02,670 - root - INFO - Agent 1 selected action 5.
+2024-11-26 13:32:02,670 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:02,670 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:03,380 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:03,380 - root - INFO - Agent 2 selected action 3.
+2024-11-26 13:32:03,380 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:03,380 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:04,177 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 2 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:04,177 - root - INFO - Agent 1 selected action 2.
+2024-11-26 13:32:04,177 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:04,177 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:04,909 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:04,909 - root - INFO - Agent 2 selected action 5.
+2024-11-26 13:32:04,909 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:04,910 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:05,641 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:05,641 - root - INFO - Agent 1 selected action 3.
+2024-11-26 13:32:05,641 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:05,641 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:06,400 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:06,400 - root - INFO - Agent 2 selected action 5.
+2024-11-26 13:32:06,400 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:06,400 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:07,117 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:07,117 - root - INFO - Agent 1 selected action 1.
+2024-11-26 13:32:07,117 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:07,118 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:07,871 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 1 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:07,871 - root - INFO - Agent 2 selected action 1.
+2024-11-26 13:32:07,871 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:07,872 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:08,588 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 0 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:08,588 - root - INFO - Agent 1 selected action 0.
+2024-11-26 13:32:08,589 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:08,589 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:09,290 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:09,290 - root - INFO - Agent 2 selected action 6.
+2024-11-26 13:32:09,290 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:09,290 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:10,009 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:10,009 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:32:10,009 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:10,010 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:10,712 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 3 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:10,712 - root - INFO - Agent 2 selected action 3.
+2024-11-26 13:32:10,713 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:10,713 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:11,432 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 5 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:11,432 - root - INFO - Agent 1 selected action 5.
+2024-11-26 13:32:11,432 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:11,435 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:12,173 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1667, 0.1667, 0.1667, 0.1667, 0.1667, 0.0000, 0.1667],
+       device='cuda:0')
+2024-11-26 13:32:12,173 - root - INFO - Agent 2 selected action 4.
+2024-11-26 13:32:12,173 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:12,174 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:12,253 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 4 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:12,253 - root - INFO - Agent 1 selected action 4.
+2024-11-26 13:32:12,253 - root - INFO - Game completed with 15 moves, result: 1
+2024-11-26 13:32:12,254 - root - INFO - Agent 1 selecting a move.
+2024-11-26 13:32:12,254 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...
+2024-11-26 13:32:12,985 - nnbattle.agents.alphazero.mcts - INFO - MCTS selected action 6 with action_probs tensor([0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429, 0.1429],
+       device='cuda:0')
+2024-11-26 13:32:12,985 - root - INFO - Agent 1 selected action 6.
+2024-11-26 13:32:12,985 - root - INFO - Agent 2 selecting a move.
+2024-11-26 13:32:12,986 - nnbattle.agents.alphazero.mcts - INFO - Starting MCTS simulation...

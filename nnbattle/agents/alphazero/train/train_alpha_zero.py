@@ -1,12 +1,9 @@
+from nnbattle.utils.logger_config import logger, set_log_level
 import logging
 
-# Configure logging at the very start
-logging.basicConfig(
-    level=logging.DEBUG,  # Set to DEBUG for more detailed logs
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Set global log level at the start of your program
+set_log_level(logging.INFO)
 
-# Now import other modules
 import os
 import time
 from datetime import timedelta
@@ -24,24 +21,26 @@ from nnbattle.agents.alphazero.utils.model_utils import (
     save_agent_model
 )
 
-# Configure logging
-logger = logging.getLogger(__name__)
+# Remove any existing logging configuration
+# ...existing code...
+
 # Set float32 matmul precision for Tensor Cores
 torch.set_float32_matmul_precision('high')
 
 def log_gpu_info(agent):
     """Log GPU information."""
     if torch.cuda.is_available():
-        logger.info(f"Training on GPU: {torch.cuda.get_device_name()}")
+        logger.warning(f"Training on GPU: {torch.cuda.get_device_name()}")
         allocated = torch.cuda.memory_allocated() / 1e9
         reserved = torch.cuda.memory_reserved() / 1e9
-        logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
+        logger.warning(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
     else:
         logger.warning("No CUDA device available")
 
 def self_play(agent, num_games):
     memory = []
     game = ConnectFourGame()
+    game_history = []
     for game_num in range(num_games):
         game.reset()
         agent.team = 1  # Initialize current player at the start of the game
@@ -51,7 +50,8 @@ def self_play(agent, num_games):
             # Pass the temperature parameter
             selected_action, action_probs = agent.select_move(game, temperature=1.0)
             logger.info(f"Move {selected_action}/{agent.team}")
-            game.make_move(selected_action, agent.team)  # Pass only the action, not the tuple
+            game_history.append((game.get_board(), action_probs, agent.team))
+            agent.team = 3 - agent.team  # switch team
             agent.team = 3 - agent.team  # switch team
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
@@ -132,17 +132,22 @@ def train_alphazero(
     
     from pytorch_lightning.loggers import TensorBoardLogger  # Add TensorBoard logger import
 
-    # Initialize TensorBoard logger
-    logger_tb = TensorBoardLogger("tb_logs", name="alphazero")
+    # Initialize TensorBoard logger with more details
+    logger_tb = TensorBoardLogger(
+        save_dir="tb_logs",
+        name="alphazero",
+        version=None,  # Auto-increment version
+        default_hp_metric=False  # Don't log hp_metric
+    )
 
     trainer = pl.Trainer(
-        max_epochs=1,  # Reduced from 100 to 1 to shorten training
+        max_epochs=10,  # Increased from 1 to 10 to allow more training on each batch
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
         devices=1,
-        callbacks=[checkpoint_callback, early_stop_callback],  # Include the callback here
-        logger=logger_tb,  # Add TensorBoard logger to Trainer
-        log_every_n_steps=10,  # Log every 10 steps
-        detect_anomaly=True  # Automatically terminate on NaN to prevent hangs
+        callbacks=[checkpoint_callback, early_stop_callback],
+        logger=logger_tb,
+        log_every_n_steps=10,
+        detect_anomaly=True
     )
     
     # Disable model loading in agent's select_move during training
@@ -150,6 +155,13 @@ def train_alphazero(
     
     best_performance = 0.0
     no_improvement_count = 0
+
+    # Initialize metrics dictionary
+    metrics = {
+        'win_rate': [],
+        'game_length': [],
+        'exploration_rate': []
+    }
 
     for iteration in range(1, max_iterations + 1):
         # Adjust temperature parameter
@@ -181,6 +193,17 @@ def train_alphazero(
             if 'train_loss' in lightning_module.trainer.callback_metrics:
                 training_loss = lightning_module.trainer.callback_metrics['train_loss']
                 logger.info(f"Iteration {iteration} Training Loss: {training_loss:.6f}")
+                logger_tb.log_metrics({
+                    'training/loss': training_loss,
+                    'training/performance': performance,
+                    'training/win_rate': performance,
+                    'training/game_length': len(game_history),
+                    'training/exploration_temp': temperature,
+                    'training/iteration': iteration,
+                    'memory/buffer_size': len(data_module.dataset),
+                    'hyperparameters/learning_rate': trainer.optimizers[0].param_groups[0]['lr'],
+                    'hyperparameters/c_puct': agent.c_puct
+                }, step=iteration)
             else:
                 logger.warning(f"Training loss not available for iteration {iteration}")
             
@@ -191,6 +214,14 @@ def train_alphazero(
                 logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
                 save_agent_model(agent, MODEL_PATH)
                 logger.info(f"Model saved for iteration {iteration} at {MODEL_PATH}")
+
+                # Log validation metrics separately
+                validation_metrics = evaluate_agent(agent, num_games=50)
+                logger_tb.log_metrics({
+                    'validation/win_rate': validation_metrics['win_rate'],
+                    'validation/draw_rate': validation_metrics['draw_rate'],
+                    'validation/avg_game_length': validation_metrics['avg_game_length']
+                }, step=iteration)
 
             # Check for improvement
             if performance > best_performance:
@@ -246,6 +277,9 @@ def play_game(agent):
     return game.get_game_state()
 
 if __name__ == "__main__":
+    # Set logging level for all modules
+    set_log_level(logging.INFO)  # Suppress INFO messages
+    
     # Set the start method inside the main guard
     import torch.multiprocessing
     torch.multiprocessing.set_start_method('spawn', force=True)
@@ -262,7 +296,7 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("Training interrupted by user.")
     except Exception as e:
-        logger.error(f"Unexpected error during training: {e}")
+        logger.error(f"Unexpected error during training: {e}")    
     finally:
         # Release all CUDA resources
         torch.cuda.empty_cache()
