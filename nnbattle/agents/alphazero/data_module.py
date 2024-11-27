@@ -72,7 +72,7 @@ class ConnectFourDataModule(pl.LightningDataModule):
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
             # Handle exceptions as needed
-
+        self.agent.log_gpu_stats()
     def setup(self, stage=None):
         if stage == 'fit' or stage is None:
             if len(self.dataset) == 0:

@@ -34,43 +34,46 @@ class Connect4Net(nn.Module):
         self.res_blocks = nn.Sequential(
             *[ResidualBlock(128) for _ in range(5)]
         )
-        
+
         # Policy head
         self.policy_conv = nn.Conv2d(128, 2, kernel_size=1)
         self.policy_bn = nn.BatchNorm2d(2)
         self.policy_fc = nn.Linear(2 * 6 * 7, action_dim)
-        
+
         # Value head
         self.value_conv = nn.Conv2d(128, 1, kernel_size=1)
         self.value_bn = nn.BatchNorm2d(1)
         self.value_fc1 = nn.Linear(1 * 6 * 7, 256)
         self.value_fc2 = nn.Linear(256, 1)
 
+        # Ensure device attribute is set
+        self._device = torch.device('cpu')
+
     def to(self, device):
-        """Ensure all parameters are moved to the specified device."""
         super().to(device)
         self._device = device
-        # Explicitly move all parameters to device
-        for param in self.parameters():
-            param.data = param.data.to(device)
-        return self
 
     def forward(self, x):
-        # Main network
+        # Ensure x is on the correct device
+        x = x.to(self._device)
+
+        # Initial convolutional block
         x = self.relu(self.bn1(self.conv1(x)))
+
+        # Residual blocks
         x = self.res_blocks(x)
-        
+
         # Policy head
         policy = self.relu(self.policy_bn(self.policy_conv(x)))
-        policy = policy.view(-1, 2 * 6 * 7)
+        policy = policy.view(policy.size(0), -1)
         policy = self.policy_fc(policy)
-        
+
         # Value head
         value = self.relu(self.value_bn(self.value_conv(x)))
-        value = value.view(-1, 1 * 6 * 7)
+        value = value.view(value.size(0), -1)
         value = self.relu(self.value_fc1(value))
         value = torch.tanh(self.value_fc2(value))
-        
+
         return policy, value
 
 __all__ = ['Connect4Net']

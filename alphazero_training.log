@@ -45041,3 +45041,3031 @@ Training interrupted by user.
 2024-11-26 17:57:34,281 - root - ERROR - Unexpected error during training: '>' not supported between instances of 'NoneType' and 'float'
 2024-11-26 17:57:34,281 - root - ERROR - Unexpected error during training: unsupported format string passed to NoneType.__format__
 2024-11-26 17:57:34,281 - root - INFO - CUDA resources have been released.
+2024-11-26 18:05:52,454 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-26 18:05:52,538 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-26 18:05:52,544 - nnbattle.agents.alphazero.utils.model_utils - INFO - Model loaded successfully from nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-26 18:05:52,544 - root - INFO - Model loaded successfully.
+2024-11-26 18:05:52,545 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-26 18:05:52,547 - root - INFO - Generating initial self-play games...
+2024-11-26 18:05:59,779 - root - INFO - Game 0 of 100 completed with 11 moves, result: 1
+2024-11-26 18:06:03,280 - root - INFO - Game 1 of 100 completed with 7 moves, result: 1
+2024-11-26 18:06:07,550 - root - INFO - Game 2 of 100 completed with 7 moves, result: 1
+2024-11-26 18:06:13,077 - root - INFO - Game 3 of 100 completed with 9 moves, result: 1
+2024-11-26 18:06:16,441 - root - INFO - 
+Training interrupted by user.
+2024-11-26 18:06:16,441 - root - INFO - CUDA resources have been released.
+2024-11-26 18:06:23,149 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-26 18:06:23,156 - nnbattle.agents.alphazero.utils.model_utils - INFO - Model loaded successfully from nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-26 18:06:23,156 - root - INFO - Model loaded successfully.
+2024-11-26 18:06:23,157 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-26 18:06:23,157 - __main__ - INFO - Starting Game 1: Team 1 starts
+2024-11-26 18:06:23,987 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:23,987 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . R . .
+
+2024-11-26 18:06:23,988 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:23,988 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+
+2024-11-26 18:06:24,700 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:24,700 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y R . .
+
+2024-11-26 18:06:24,701 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:24,701 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . R . . .
+. . . Y R . .
+
+2024-11-26 18:06:25,410 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:25,410 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . R R . .
+. . . Y R . .
+
+2024-11-26 18:06:25,411 - __main__ - INFO - Team 2 placed piece in column 4
+2024-11-26 18:06:25,411 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y Y . .
+. . . R R . .
+. . . Y R . .
+
+2024-11-26 18:06:26,168 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:26,168 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y Y . .
+. . . R R . .
+. . . Y R . R
+
+2024-11-26 18:06:26,169 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:26,169 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y Y . .
+. . . R R . .
+. . . Y R . R
+
+2024-11-26 18:06:26,871 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:26,871 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y Y . .
+. . . R R . R
+. . . Y R . R
+
+2024-11-26 18:06:26,872 - __main__ - INFO - Team 2 placed piece in column 4
+2024-11-26 18:06:26,872 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y Y . .
+. . . Y Y . .
+. . . R R . R
+. . . Y R . R
+
+2024-11-26 18:06:27,461 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:27,461 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y Y . .
+. . . Y Y . R
+. . . R R . R
+. . . Y R . R
+
+2024-11-26 18:06:27,462 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:27,462 - __main__ - INFO - Board state:
+. . . . . . .
+. . . Y . . .
+. . . Y Y . .
+. . . Y Y . R
+. . . R R . R
+. . . Y R . R
+
+2024-11-26 18:06:27,525 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:27,525 - __main__ - INFO - Board state:
+. . . . . . .
+. . . Y . . .
+. . . Y Y . R
+. . . Y Y . R
+. . . R R . R
+. . . Y R . R
+
+2024-11-26 18:06:27,525 - __main__ - INFO - Game 1 ended with result: 1
+2024-11-26 18:06:27,525 - __main__ - INFO - Final board:
+. . . . . . .
+. . . Y . . .
+. . . Y Y . R
+. . . Y Y . R
+. . . R R . R
+. . . Y R . R
+
+2024-11-26 18:06:27,525 - __main__ - INFO - Starting Game 2: Team 2 starts
+2024-11-26 18:06:27,526 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:27,526 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-26 18:06:28,231 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:28,231 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y . . .
+
+2024-11-26 18:06:28,232 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:28,232 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . Y Y . . .
+
+2024-11-26 18:06:28,933 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:28,933 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . Y Y R . .
+
+2024-11-26 18:06:28,934 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:28,934 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y R . . .
+. . Y Y R . .
+
+2024-11-26 18:06:29,632 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-26 18:06:29,632 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R . . . .
+. . Y R . . .
+. . Y Y R . .
+
+2024-11-26 18:06:29,633 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:29,633 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+. . Y R . . .
+. . Y Y R . .
+
+2024-11-26 18:06:30,384 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:30,384 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+. . Y R . . .
+. R Y Y R . .
+
+2024-11-26 18:06:30,385 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:30,385 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . Y . . . .
+. . R Y . . .
+. . Y R . . .
+. R Y Y R . .
+
+2024-11-26 18:06:31,066 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-26 18:06:31,066 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . Y . . . .
+. . R Y . . .
+. . Y R . . .
+. R Y Y R R .
+
+2024-11-26 18:06:31,067 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:31,067 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. . R Y . . .
+. . Y R . . .
+. R Y Y R R .
+
+2024-11-26 18:06:31,767 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:31,767 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. . R Y . . .
+. . Y R R . .
+. R Y Y R R .
+
+2024-11-26 18:06:31,768 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:31,768 - __main__ - INFO - Board state:
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+. . R Y . . .
+. . Y R R . .
+. R Y Y R R .
+
+2024-11-26 18:06:32,467 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:32,467 - __main__ - INFO - Board state:
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+. . R Y . . .
+. R Y R R . .
+. R Y Y R R .
+
+2024-11-26 18:06:32,468 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:32,468 - __main__ - INFO - Board state:
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+. . R Y . . .
+. R Y R R . .
+. R Y Y R R .
+
+2024-11-26 18:06:32,468 - __main__ - INFO - Game 2 ended with result: 2
+2024-11-26 18:06:32,468 - __main__ - INFO - Final board:
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+. . R Y . . .
+. R Y R R . .
+. R Y Y R R .
+
+2024-11-26 18:06:32,468 - __main__ - INFO - Starting Game 3: Team 1 starts
+2024-11-26 18:06:33,165 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:33,165 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . . . . .
+
+2024-11-26 18:06:33,166 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:33,166 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . Y . . .
+
+2024-11-26 18:06:33,873 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-26 18:06:33,873 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . Y . R .
+
+2024-11-26 18:06:33,874 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:33,874 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y . R .
+
+2024-11-26 18:06:34,632 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:34,632 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y . . .
+. R . Y . R .
+
+2024-11-26 18:06:34,633 - __main__ - INFO - Team 2 placed piece in column 1
+2024-11-26 18:06:34,635 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. Y . Y . . .
+. R . Y . R .
+
+2024-11-26 18:06:35,334 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:35,334 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. Y . Y . . .
+. R . Y R R .
+
+2024-11-26 18:06:35,335 - __main__ - INFO - Team 2 placed piece in column 4
+2024-11-26 18:06:35,335 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. Y . Y Y . .
+. R . Y R R .
+
+2024-11-26 18:06:35,999 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-26 18:06:35,999 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. Y . Y Y . .
+. R R Y R R .
+
+2024-11-26 18:06:35,999 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:35,999 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. Y Y Y Y . .
+. R R Y R R .
+
+2024-11-26 18:06:36,000 - __main__ - INFO - Game 3 ended with result: 2
+2024-11-26 18:06:36,000 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. Y Y Y Y . .
+. R R Y R R .
+
+2024-11-26 18:06:36,000 - __main__ - INFO - Starting Game 4: Team 2 starts
+2024-11-26 18:06:36,000 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:36,001 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-26 18:06:36,697 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-26 18:06:36,697 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . R .
+
+2024-11-26 18:06:36,698 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:36,698 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . R .
+
+2024-11-26 18:06:37,398 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:37,398 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y . . .
+. . . Y . R .
+
+2024-11-26 18:06:37,399 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:37,399 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y . . .
+. . Y Y . R .
+
+2024-11-26 18:06:38,093 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:38,093 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . R . . .
+. . . Y . . .
+. . Y Y . R .
+
+2024-11-26 18:06:38,094 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:38,094 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . R . . .
+. . Y Y . . .
+. . Y Y . R .
+
+2024-11-26 18:06:38,840 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:38,840 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . R . . .
+. . Y Y . . .
+. . Y Y . R R
+
+2024-11-26 18:06:38,841 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:38,841 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . Y R . . .
+. . Y Y . . .
+. . Y Y . R R
+
+2024-11-26 18:06:39,492 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:39,492 - __main__ - INFO - Board state:
+. . . . . . .
+. . . R . . .
+. . . R . . .
+. . Y R . . .
+. . Y Y . . .
+. . Y Y . R R
+
+2024-11-26 18:06:39,492 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:39,492 - __main__ - INFO - Board state:
+. . . . . . .
+. . . R . . .
+. . Y R . . .
+. . Y R . . .
+. . Y Y . . .
+. . Y Y . R R
+
+2024-11-26 18:06:39,492 - __main__ - INFO - Game 4 ended with result: 2
+2024-11-26 18:06:39,492 - __main__ - INFO - Final board:
+. . . . . . .
+. . . R . . .
+. . Y R . . .
+. . Y R . . .
+. . Y Y . . .
+. . Y Y . R R
+
+2024-11-26 18:06:39,493 - __main__ - INFO - Starting Game 5: Team 1 starts
+2024-11-26 18:06:40,190 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-26 18:06:40,190 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R . . . .
+
+2024-11-26 18:06:40,191 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:40,191 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+
+2024-11-26 18:06:40,890 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:40,890 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y R . .
+
+2024-11-26 18:06:40,891 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:40,891 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y R . .
+
+2024-11-26 18:06:41,590 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:41,590 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R R Y R . .
+
+2024-11-26 18:06:41,591 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:41,591 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. R R Y R . .
+
+2024-11-26 18:06:42,343 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:42,343 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R Y Y . . .
+. R R Y R . .
+
+2024-11-26 18:06:42,344 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:42,344 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R Y Y . . .
+. R R Y R . .
+
+2024-11-26 18:06:43,010 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:43,010 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R Y Y R . .
+. R R Y R . .
+
+2024-11-26 18:06:43,011 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:43,011 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R Y Y R . .
+. R R Y R . .
+
+2024-11-26 18:06:43,011 - __main__ - INFO - Game 5 ended with result: 2
+2024-11-26 18:06:43,011 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R Y Y R . .
+. R R Y R . .
+
+2024-11-26 18:06:43,011 - __main__ - INFO - Starting Game 6: Team 2 starts
+2024-11-26 18:06:43,012 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:43,012 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-26 18:06:43,714 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-26 18:06:43,714 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y . . .
+
+2024-11-26 18:06:43,715 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:43,715 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . Y Y . . .
+
+2024-11-26 18:06:44,405 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-26 18:06:44,405 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+R . Y Y . . .
+
+2024-11-26 18:06:44,406 - __main__ - INFO - Team 2 placed piece in column 4
+2024-11-26 18:06:44,406 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+R . Y Y Y . .
+
+2024-11-26 18:06:44,942 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-26 18:06:44,942 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+R . . R . . .
+R . Y Y Y . .
+
+2024-11-26 18:06:44,943 - __main__ - INFO - Team 2 placed piece in column 1
+2024-11-26 18:06:44,943 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+R . . R . . .
+R Y Y Y Y . .
+
+2024-11-26 18:06:44,943 - __main__ - INFO - Game 6 ended with result: 2
+2024-11-26 18:06:44,943 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+R . . R . . .
+R Y Y Y Y . .
+
+2024-11-26 18:06:44,943 - __main__ - INFO - Starting Game 7: Team 1 starts
+2024-11-26 18:06:45,637 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:45,638 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . R
+
+2024-11-26 18:06:45,638 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:45,638 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . R
+
+2024-11-26 18:06:46,394 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:46,394 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . R
+. . . Y . . R
+
+2024-11-26 18:06:46,395 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:46,395 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . R
+. . Y Y . . R
+
+2024-11-26 18:06:47,053 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-26 18:06:47,053 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R . . . R
+. . Y Y . . R
+
+2024-11-26 18:06:47,054 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:47,056 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . R
+. . Y Y . . R
+
+2024-11-26 18:06:47,714 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-26 18:06:47,714 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . R
+. . Y Y . R R
+
+2024-11-26 18:06:47,715 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:47,715 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . R
+. . Y Y . R R
+
+2024-11-26 18:06:48,375 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:48,376 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . R
+. . R Y . . R
+. . Y Y . R R
+
+2024-11-26 18:06:48,376 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:48,376 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . R
+. . R Y . . R
+. . Y Y . R R
+
+2024-11-26 18:06:48,376 - __main__ - INFO - Game 7 ended with result: 2
+2024-11-26 18:06:48,376 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . R
+. . R Y . . R
+. . Y Y . R R
+
+2024-11-26 18:06:48,376 - __main__ - INFO - Starting Game 8: Team 2 starts
+2024-11-26 18:06:48,377 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:48,377 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-26 18:06:49,083 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:49,083 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . Y . . .
+
+2024-11-26 18:06:49,084 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:49,084 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y . . .
+
+2024-11-26 18:06:49,788 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:49,788 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y R . .
+
+2024-11-26 18:06:49,789 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:49,789 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R . Y R . .
+
+2024-11-26 18:06:50,545 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:50,545 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y . . .
+. R . Y R . .
+
+2024-11-26 18:06:50,546 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:50,546 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R . Y . . .
+. R . Y R . .
+
+2024-11-26 18:06:50,546 - __main__ - INFO - Game 8 ended with result: 2
+2024-11-26 18:06:50,546 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R . Y . . .
+. R . Y R . .
+
+2024-11-26 18:06:50,546 - __main__ - INFO - Starting Game 9: Team 1 starts
+2024-11-26 18:06:51,244 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:51,244 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . . . . .
+
+2024-11-26 18:06:51,245 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:51,245 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . Y . . .
+
+2024-11-26 18:06:51,942 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-26 18:06:51,942 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R R Y . . .
+
+2024-11-26 18:06:51,943 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:51,943 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R R Y . . .
+
+2024-11-26 18:06:52,636 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:52,636 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R R Y . . R
+
+2024-11-26 18:06:52,637 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:52,637 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. R R Y . . R
+
+2024-11-26 18:06:53,331 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-26 18:06:53,331 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. R R Y . R R
+
+2024-11-26 18:06:53,332 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:53,332 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+. R R Y . R R
+
+2024-11-26 18:06:54,029 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:54,030 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . R
+. R R Y . R R
+
+2024-11-26 18:06:54,030 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:54,030 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . R
+. R R Y . R R
+
+2024-11-26 18:06:54,030 - __main__ - INFO - Game 9 ended with result: 2
+2024-11-26 18:06:54,030 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . R
+. R R Y . R R
+
+2024-11-26 18:06:54,030 - __main__ - INFO - Starting Game 10: Team 2 starts
+2024-11-26 18:06:54,031 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:54,031 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-26 18:06:54,791 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-26 18:06:54,791 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . R
+
+2024-11-26 18:06:54,792 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:54,792 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . R
+
+2024-11-26 18:06:55,481 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 18:06:55,481 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R Y Y . . R
+
+2024-11-26 18:06:55,482 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:55,482 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R Y Y . . R
+
+2024-11-26 18:06:56,183 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-26 18:06:56,183 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R Y Y . R R
+
+2024-11-26 18:06:56,184 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 18:06:56,184 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. R Y Y . R R
+
+2024-11-26 18:06:56,870 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-26 18:06:56,870 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+R R Y Y . R R
+
+2024-11-26 18:06:56,871 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:56,871 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R R Y Y . R R
+
+2024-11-26 18:06:57,559 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 18:06:57,559 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R R Y Y R R R
+
+2024-11-26 18:06:57,560 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 18:06:57,560 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+R R Y Y R R R
+
+2024-11-26 18:06:57,560 - __main__ - INFO - Game 10 ended with result: 2
+2024-11-26 18:06:57,560 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+R R Y Y R R R
+
+2024-11-26 18:07:44,365 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-26 18:07:44,441 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-26 18:07:44,447 - nnbattle.agents.alphazero.utils.model_utils - INFO - Model loaded successfully from nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-26 18:07:44,447 - root - INFO - Model loaded successfully.
+2024-11-26 18:07:44,448 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-26 18:07:44,450 - root - INFO - Generating initial self-play games...
+2024-11-26 18:07:50,311 - root - INFO - Game 0 of 100 completed with 9 moves, result: 1
+2024-11-26 18:07:54,552 - root - INFO - Game 1 of 100 completed with 7 moves, result: 1
+2024-11-26 18:07:59,591 - root - INFO - Game 2 of 100 completed with 8 moves, result: 2
+2024-11-26 18:08:07,256 - root - INFO - Game 3 of 100 completed with 12 moves, result: 2
+2024-11-26 18:08:11,426 - root - INFO - Game 4 of 100 completed with 7 moves, result: 1
+2024-11-26 18:08:24,734 - root - INFO - Game 5 of 100 completed with 20 moves, result: 2
+2024-11-26 18:08:32,486 - root - INFO - Game 6 of 100 completed with 12 moves, result: 2
+2024-11-26 18:08:38,375 - root - INFO - Game 7 of 100 completed with 10 moves, result: 2
+2024-11-26 18:08:48,257 - root - INFO - Game 8 of 100 completed with 15 moves, result: 1
+2024-11-26 18:08:52,505 - root - INFO - Game 9 of 100 completed with 7 moves, result: 1
+2024-11-26 18:08:58,134 - root - INFO - Game 10 of 100 completed with 9 moves, result: 1
+2024-11-26 18:09:10,657 - root - INFO - Game 11 of 100 completed with 19 moves, result: 1
+2024-11-26 18:09:15,053 - root - INFO - Game 12 of 100 completed with 8 moves, result: 2
+2024-11-26 18:09:19,257 - root - INFO - Game 13 of 100 completed with 7 moves, result: 1
+2024-11-26 18:09:24,215 - root - INFO - Game 14 of 100 completed with 8 moves, result: 2
+2024-11-26 18:09:29,225 - root - INFO - Game 15 of 100 completed with 8 moves, result: 2
+2024-11-26 18:09:34,255 - root - INFO - Game 16 of 100 completed with 8 moves, result: 2
+2024-11-26 18:09:38,522 - root - INFO - Game 17 of 100 completed with 7 moves, result: 1
+2024-11-26 18:09:45,301 - root - INFO - Game 18 of 100 completed with 11 moves, result: 1
+2024-11-26 18:09:50,955 - root - INFO - Game 19 of 100 completed with 9 moves, result: 1
+2024-11-26 18:09:56,502 - root - INFO - Game 20 of 100 completed with 9 moves, result: 1
+2024-11-26 18:10:00,641 - root - INFO - Game 21 of 100 completed with 7 moves, result: 1
+2024-11-26 18:10:04,884 - root - INFO - Game 22 of 100 completed with 7 moves, result: 1
+2024-11-26 18:10:09,691 - root - INFO - Game 23 of 100 completed with 8 moves, result: 2
+2024-11-26 18:10:15,765 - root - INFO - Game 24 of 100 completed with 11 moves, result: 1
+2024-11-26 18:10:22,700 - root - INFO - Game 25 of 100 completed with 11 moves, result: 1
+2024-11-26 18:10:34,895 - root - INFO - Game 26 of 100 completed with 18 moves, result: 2
+2024-11-26 18:10:41,299 - root - INFO - Game 27 of 100 completed with 10 moves, result: 2
+2024-11-26 18:10:46,990 - root - INFO - Game 28 of 100 completed with 9 moves, result: 1
+2024-11-26 18:10:52,664 - root - INFO - Game 29 of 100 completed with 9 moves, result: 1
+2024-11-26 18:10:59,080 - root - INFO - Game 30 of 100 completed with 10 moves, result: 2
+2024-11-26 18:11:06,163 - root - INFO - Game 31 of 100 completed with 11 moves, result: 1
+2024-11-26 18:11:10,427 - root - INFO - Game 32 of 100 completed with 7 moves, result: 1
+2024-11-26 18:11:17,821 - root - INFO - Game 33 of 100 completed with 11 moves, result: 1
+2024-11-26 18:11:24,813 - root - INFO - Game 34 of 100 completed with 11 moves, result: 1
+2024-11-26 18:11:30,454 - root - INFO - Game 35 of 100 completed with 9 moves, result: 1
+2024-11-26 18:11:37,584 - root - INFO - Game 36 of 100 completed with 11 moves, result: 1
+2024-11-26 18:11:41,871 - root - INFO - Game 37 of 100 completed with 7 moves, result: 1
+2024-11-26 18:11:51,703 - root - INFO - Game 38 of 100 completed with 15 moves, result: 1
+2024-11-26 18:11:56,203 - root - INFO - Game 39 of 100 completed with 7 moves, result: 1
+2024-11-26 18:12:00,625 - root - INFO - Game 40 of 100 completed with 7 moves, result: 1
+2024-11-26 18:12:08,790 - root - INFO - Game 41 of 100 completed with 12 moves, result: 2
+2024-11-26 18:12:16,042 - root - INFO - Game 42 of 100 completed with 11 moves, result: 1
+2024-11-26 18:12:21,132 - root - INFO - Game 43 of 100 completed with 8 moves, result: 2
+2024-11-26 18:12:26,402 - root - INFO - Game 44 of 100 completed with 8 moves, result: 2
+2024-11-26 18:12:30,237 - root - INFO - Game 45 of 100 completed with 7 moves, result: 1
+2024-11-26 18:12:34,700 - root - INFO - Game 46 of 100 completed with 8 moves, result: 2
+2024-11-26 18:12:40,633 - root - INFO - Game 47 of 100 completed with 9 moves, result: 1
+2024-11-26 18:12:46,255 - root - INFO - Game 48 of 100 completed with 9 moves, result: 1
+2024-11-26 18:12:54,216 - root - INFO - Game 49 of 100 completed with 12 moves, result: 2
+2024-11-26 18:12:58,367 - root - INFO - Game 50 of 100 completed with 7 moves, result: 1
+2024-11-26 18:13:02,783 - root - INFO - Game 51 of 100 completed with 7 moves, result: 1
+2024-11-26 18:13:08,582 - root - INFO - Game 52 of 100 completed with 9 moves, result: 1
+2024-11-26 18:13:13,008 - root - INFO - Game 53 of 100 completed with 7 moves, result: 1
+2024-11-26 18:13:18,103 - root - INFO - Game 54 of 100 completed with 8 moves, result: 2
+2024-11-26 18:13:22,518 - root - INFO - Game 55 of 100 completed with 7 moves, result: 1
+2024-11-26 18:13:26,992 - root - INFO - Game 56 of 100 completed with 7 moves, result: 1
+2024-11-26 18:13:31,413 - root - INFO - Game 57 of 100 completed with 7 moves, result: 1
+2024-11-26 18:13:37,403 - root - INFO - Game 58 of 100 completed with 9 moves, result: 1
+2024-11-26 18:13:43,327 - root - INFO - Game 59 of 100 completed with 9 moves, result: 1
+2024-11-26 18:13:49,146 - root - INFO - Game 60 of 100 completed with 9 moves, result: 1
+2024-11-26 18:13:55,678 - root - INFO - Game 61 of 100 completed with 11 moves, result: 1
+2024-11-26 18:14:00,770 - root - INFO - Game 62 of 100 completed with 8 moves, result: 2
+2024-11-26 18:14:05,853 - root - INFO - Game 63 of 100 completed with 8 moves, result: 2
+2024-11-26 18:14:10,935 - root - INFO - Game 64 of 100 completed with 8 moves, result: 2
+2024-11-26 18:14:16,671 - root - INFO - Game 65 of 100 completed with 9 moves, result: 1
+2024-11-26 18:14:21,057 - root - INFO - Game 66 of 100 completed with 8 moves, result: 2
+2024-11-26 18:14:25,287 - root - INFO - Game 67 of 100 completed with 7 moves, result: 1
+2024-11-26 18:14:29,621 - root - INFO - Game 68 of 100 completed with 7 moves, result: 1
+2024-11-26 18:14:38,138 - root - INFO - Game 69 of 100 completed with 14 moves, result: 2
+2024-11-26 18:14:42,565 - root - INFO - Game 70 of 100 completed with 7 moves, result: 1
+2024-11-26 18:14:55,802 - root - INFO - Game 71 of 100 completed with 19 moves, result: 1
+2024-11-26 18:15:00,874 - root - INFO - Game 72 of 100 completed with 8 moves, result: 2
+2024-11-26 18:15:08,630 - root - INFO - Game 73 of 100 completed with 12 moves, result: 2
+2024-11-26 18:15:12,834 - root - INFO - Game 74 of 100 completed with 7 moves, result: 1
+2024-11-26 18:15:21,347 - root - INFO - Game 75 of 100 completed with 13 moves, result: 1
+2024-11-26 18:15:29,168 - root - INFO - Game 76 of 100 completed with 12 moves, result: 2
+2024-11-26 18:15:34,161 - root - INFO - Game 77 of 100 completed with 9 moves, result: 1
+2024-11-26 18:15:38,386 - root - INFO - Game 78 of 100 completed with 7 moves, result: 1
+2024-11-26 18:15:47,017 - root - INFO - Game 79 of 100 completed with 14 moves, result: 2
+2024-11-26 18:15:51,996 - root - INFO - Game 80 of 100 completed with 8 moves, result: 2
+2024-11-26 18:15:59,658 - root - INFO - Game 81 of 100 completed with 12 moves, result: 2
+2024-11-26 18:16:05,674 - root - INFO - Game 82 of 100 completed with 10 moves, result: 2
+2024-11-26 18:16:09,837 - root - INFO - Game 83 of 100 completed with 7 moves, result: 1
+2024-11-26 18:16:14,971 - root - INFO - Game 84 of 100 completed with 8 moves, result: 2
+2024-11-26 18:16:24,388 - root - INFO - Game 85 of 100 completed with 14 moves, result: 2
+2024-11-26 18:16:32,434 - root - INFO - Game 86 of 100 completed with 12 moves, result: 2
+2024-11-26 18:16:41,755 - root - INFO - Game 87 of 100 completed with 14 moves, result: 2
+2024-11-26 18:16:50,175 - root - INFO - Game 88 of 100 completed with 13 moves, result: 1
+2024-11-26 18:16:55,852 - root - INFO - Game 89 of 100 completed with 9 moves, result: 1
+2024-11-26 18:17:00,825 - root - INFO - Game 90 of 100 completed with 8 moves, result: 2
+2024-11-26 18:17:07,978 - root - INFO - Game 91 of 100 completed with 11 moves, result: 1
+2024-11-26 18:17:15,264 - root - INFO - Game 92 of 100 completed with 11 moves, result: 1
+2024-11-26 18:17:25,216 - root - INFO - Game 93 of 100 completed with 15 moves, result: 1
+2024-11-26 18:17:30,934 - root - INFO - Game 94 of 100 completed with 9 moves, result: 1
+2024-11-26 18:17:37,218 - root - INFO - Game 95 of 100 completed with 10 moves, result: 2
+2024-11-26 18:17:41,536 - root - INFO - Game 96 of 100 completed with 7 moves, result: 1
+2024-11-26 18:17:47,895 - root - INFO - Game 97 of 100 completed with 10 moves, result: 2
+2024-11-26 18:17:53,658 - root - INFO - Game 98 of 100 completed with 9 moves, result: 1
+2024-11-26 18:17:57,862 - root - INFO - Game 99 of 100 completed with 7 moves, result: 1
+2024-11-26 18:17:57,866 - pytorch_lightning.utilities.rank_zero - INFO - GPU available: True (cuda), used: True
+2024-11-26 18:17:57,866 - pytorch_lightning.utilities.rank_zero - INFO - TPU available: False, using: 0 TPU cores
+2024-11-26 18:17:57,866 - pytorch_lightning.utilities.rank_zero - INFO - HPU available: False, using: 0 HPUs
+2024-11-26 18:17:57,867 - root - INFO - === Starting Training Iteration 1/100 ===
+2024-11-26 18:17:57,867 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-26 18:17:57,867 - root - INFO - Generating 100 self-play games...
+2024-11-26 18:18:01,448 - root - INFO - Game 0 of 100 completed with 7 moves, result: 1
+2024-11-26 18:18:13,020 - root - INFO - Game 1 of 100 completed with 18 moves, result: 2
+2024-11-26 18:18:22,326 - root - INFO - Game 2 of 100 completed with 14 moves, result: 2
+2024-11-26 18:18:29,625 - root - INFO - Game 3 of 100 completed with 11 moves, result: 1
+2024-11-26 18:18:39,460 - root - INFO - Game 4 of 100 completed with 15 moves, result: 1
+2024-11-26 18:18:43,758 - root - INFO - Game 5 of 100 completed with 7 moves, result: 1
+2024-11-26 18:18:47,888 - root - INFO - Game 6 of 100 completed with 7 moves, result: 1
+2024-11-26 18:18:53,768 - root - INFO - Game 7 of 100 completed with 9 moves, result: 1
+2024-11-26 18:19:01,392 - root - INFO - Game 8 of 100 completed with 13 moves, result: 1
+2024-11-26 18:19:11,184 - root - INFO - Game 9 of 100 completed with 15 moves, result: 1
+2024-11-26 18:19:15,393 - root - INFO - Game 10 of 100 completed with 7 moves, result: 1
+2024-11-26 18:19:23,340 - root - INFO - Game 11 of 100 completed with 12 moves, result: 2
+2024-11-26 18:19:28,398 - root - INFO - Game 12 of 100 completed with 8 moves, result: 2
+2024-11-26 18:19:35,839 - root - INFO - Game 13 of 100 completed with 12 moves, result: 2
+2024-11-26 18:19:44,073 - root - INFO - Game 14 of 100 completed with 13 moves, result: 1
+2024-11-26 18:19:47,800 - root - INFO - Game 15 of 100 completed with 7 moves, result: 1
+2024-11-26 18:19:51,454 - root - INFO - Game 16 of 100 completed with 7 moves, result: 1
+2024-11-26 18:19:55,751 - root - INFO - Game 17 of 100 completed with 7 moves, result: 1
+2024-11-26 18:20:05,574 - root - INFO - Game 18 of 100 completed with 15 moves, result: 1
+2024-11-26 18:20:16,751 - root - INFO - Game 19 of 100 completed with 17 moves, result: 1
+2024-11-26 18:20:21,251 - root - INFO - Game 20 of 100 completed with 7 moves, result: 1
+2024-11-26 18:20:24,977 - root - INFO - Game 21 of 100 completed with 7 moves, result: 1
+2024-11-26 18:20:30,780 - root - INFO - Game 22 of 100 completed with 9 moves, result: 1
+2024-11-26 18:20:42,153 - root - INFO - Game 23 of 100 completed with 17 moves, result: 1
+2024-11-26 18:20:46,415 - root - INFO - Game 24 of 100 completed with 7 moves, result: 1
+2024-11-26 18:20:50,548 - root - INFO - Game 25 of 100 completed with 7 moves, result: 1
+2024-11-26 18:20:56,151 - root - INFO - Game 26 of 100 completed with 9 moves, result: 1
+2024-11-26 18:21:01,207 - root - INFO - Game 27 of 100 completed with 8 moves, result: 2
+2024-11-26 18:21:07,161 - root - INFO - Game 28 of 100 completed with 9 moves, result: 1
+2024-11-26 18:21:14,113 - root - INFO - Game 29 of 100 completed with 11 moves, result: 1
+2024-11-26 18:21:19,230 - root - INFO - Game 30 of 100 completed with 9 moves, result: 1
+2024-11-26 18:21:26,391 - root - INFO - Game 31 of 100 completed with 11 moves, result: 1
+2024-11-26 18:21:32,252 - root - INFO - Game 32 of 100 completed with 9 moves, result: 1
+2024-11-26 18:21:36,419 - root - INFO - Game 33 of 100 completed with 7 moves, result: 1
+2024-11-26 18:21:43,606 - root - INFO - Game 34 of 100 completed with 11 moves, result: 1
+2024-11-26 18:21:54,501 - root - INFO - Game 35 of 100 completed with 16 moves, result: 2
+2024-11-26 18:22:00,594 - root - INFO - Game 36 of 100 completed with 11 moves, result: 1
+2024-11-26 18:22:07,763 - root - INFO - Game 37 of 100 completed with 11 moves, result: 1
+2024-11-26 18:22:13,560 - root - INFO - Game 38 of 100 completed with 9 moves, result: 1
+2024-11-26 18:22:23,092 - root - INFO - Game 39 of 100 completed with 14 moves, result: 2
+2024-11-26 18:22:31,328 - root - INFO - Game 40 of 100 completed with 13 moves, result: 1
+2024-11-26 18:22:38,610 - root - INFO - Game 41 of 100 completed with 11 moves, result: 1
+2024-11-26 18:22:48,336 - root - INFO - Game 42 of 100 completed with 15 moves, result: 1
+2024-11-26 18:22:53,906 - root - INFO - Game 43 of 100 completed with 9 moves, result: 1
+2024-11-26 18:22:58,327 - root - INFO - Game 44 of 100 completed with 8 moves, result: 2
+2024-11-26 18:23:08,166 - root - INFO - Game 45 of 100 completed with 16 moves, result: 2
+2024-11-26 18:23:16,199 - root - INFO - Game 46 of 100 completed with 13 moves, result: 1
+2024-11-26 18:23:21,932 - root - INFO - Game 47 of 100 completed with 9 moves, result: 1
+2024-11-26 18:23:33,509 - root - INFO - Game 48 of 100 completed with 17 moves, result: 1
+2024-11-26 18:23:39,935 - root - INFO - Game 49 of 100 completed with 10 moves, result: 2
+2024-11-26 18:23:45,038 - root - INFO - Game 50 of 100 completed with 9 moves, result: 1
+2024-11-26 18:23:51,360 - root - INFO - Game 51 of 100 completed with 10 moves, result: 2
+2024-11-26 18:23:55,113 - root - INFO - Game 52 of 100 completed with 7 moves, result: 1
+2024-11-26 18:24:06,410 - root - INFO - Game 53 of 100 completed with 17 moves, result: 1
+2024-11-26 18:24:11,384 - root - INFO - Game 54 of 100 completed with 8 moves, result: 2
+2024-11-26 18:24:19,666 - root - INFO - Game 55 of 100 completed with 13 moves, result: 1
+2024-11-26 18:24:25,336 - root - INFO - Game 56 of 100 completed with 10 moves, result: 2
+2024-11-26 18:24:31,944 - root - INFO - Game 57 of 100 completed with 11 moves, result: 1
+2024-11-26 18:24:37,595 - root - INFO - Game 58 of 100 completed with 9 moves, result: 1
+2024-11-26 18:24:44,652 - root - INFO - Game 59 of 100 completed with 11 moves, result: 1
+2024-11-26 18:24:48,424 - root - INFO - Game 60 of 100 completed with 7 moves, result: 1
+2024-11-26 18:24:56,385 - root - INFO - Game 61 of 100 completed with 12 moves, result: 2
+2024-11-26 18:25:05,077 - root - INFO - Game 62 of 100 completed with 13 moves, result: 1
+2024-11-26 18:25:12,924 - root - INFO - Game 63 of 100 completed with 13 moves, result: 1
+2024-11-26 18:25:18,783 - root - INFO - Game 64 of 100 completed with 9 moves, result: 1
+2024-11-26 18:25:23,122 - root - INFO - Game 65 of 100 completed with 7 moves, result: 1
+2024-11-26 18:25:29,942 - root - INFO - Game 66 of 100 completed with 11 moves, result: 1
+2024-11-26 18:25:35,777 - root - INFO - Game 67 of 100 completed with 9 moves, result: 1
+2024-11-26 18:25:39,986 - root - INFO - Game 68 of 100 completed with 7 moves, result: 1
+2024-11-26 18:25:46,476 - root - INFO - Game 69 of 100 completed with 10 moves, result: 2
+2024-11-26 18:25:52,905 - root - INFO - Game 70 of 100 completed with 10 moves, result: 2
+2024-11-26 18:26:05,618 - root - INFO - Game 71 of 100 completed with 19 moves, result: 1
+2024-11-26 18:26:10,166 - root - INFO - Game 72 of 100 completed with 7 moves, result: 1
+2024-11-26 18:26:15,950 - root - INFO - Game 73 of 100 completed with 9 moves, result: 1
+2024-11-26 18:26:20,395 - root - INFO - Game 74 of 100 completed with 7 moves, result: 1
+2024-11-26 18:26:26,471 - root - INFO - Game 75 of 100 completed with 9 moves, result: 1
+2024-11-26 18:26:34,010 - root - INFO - Game 76 of 100 completed with 12 moves, result: 2
+2024-11-26 18:26:39,038 - root - INFO - Game 77 of 100 completed with 9 moves, result: 1
+2024-11-26 18:26:44,598 - root - INFO - Game 78 of 100 completed with 11 moves, result: 1
+2024-11-26 18:26:48,850 - root - INFO - Game 79 of 100 completed with 7 moves, result: 1
+2024-11-26 18:27:00,475 - root - INFO - Game 80 of 100 completed with 17 moves, result: 1
+2024-11-26 18:27:04,745 - root - INFO - Game 81 of 100 completed with 7 moves, result: 1
+2024-11-26 18:27:09,031 - root - INFO - Game 82 of 100 completed with 7 moves, result: 1
+2024-11-26 18:27:16,113 - root - INFO - Game 83 of 100 completed with 11 moves, result: 1
+2024-11-26 18:27:20,368 - root - INFO - Game 84 of 100 completed with 7 moves, result: 1
+2024-11-26 18:27:29,892 - root - INFO - Game 85 of 100 completed with 14 moves, result: 2
+2024-11-26 18:27:39,162 - root - INFO - Game 86 of 100 completed with 14 moves, result: 2
+2024-11-26 18:27:43,464 - root - INFO - Game 87 of 100 completed with 7 moves, result: 1
+2024-11-26 18:27:49,926 - root - INFO - Game 88 of 100 completed with 10 moves, result: 2
+2024-11-26 18:27:54,030 - root - INFO - Game 89 of 100 completed with 9 moves, result: 1
+2024-11-26 18:27:58,303 - root - INFO - Game 90 of 100 completed with 7 moves, result: 1
+2024-11-26 18:28:03,467 - root - INFO - Game 91 of 100 completed with 8 moves, result: 2
+2024-11-26 18:28:08,649 - root - INFO - Game 92 of 100 completed with 8 moves, result: 2
+2024-11-26 18:28:17,869 - root - INFO - Game 93 of 100 completed with 14 moves, result: 2
+2024-11-26 18:28:21,518 - root - INFO - Game 94 of 100 completed with 7 moves, result: 1
+2024-11-26 18:28:28,135 - root - INFO - Game 95 of 100 completed with 10 moves, result: 2
+2024-11-26 18:28:32,415 - root - INFO - Game 96 of 100 completed with 7 moves, result: 1
+2024-11-26 18:28:36,706 - root - INFO - Game 97 of 100 completed with 7 moves, result: 1
+2024-11-26 18:28:43,777 - root - INFO - Game 98 of 100 completed with 11 moves, result: 1
+2024-11-26 18:28:47,602 - root - INFO - Game 99 of 100 completed with 7 moves, result: 1
+2024-11-26 18:28:47,602 - root - INFO - Commencing training phase...
+2024-11-26 18:28:47,653 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-26 18:28:47,655 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode
+---------------------------------------------
+0 | model | Connect4Net | 1.5 M  | eval
+---------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+0         Modules in train mode
+42        Modules in eval mode
+2024-11-26 18:28:56,283 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.929558, Policy Loss=-138518654890915104030720.000000, Total Loss=-138518654890915104030720.000000
+2024-11-26 18:29:01,754 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.949069, Policy Loss=-427070552027224082481152.000000, Total Loss=-427070552027224082481152.000000
+2024-11-26 18:29:01,781 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 10: Value Loss=0.924638, Policy Loss=-438479827208016421191680.000000, Total Loss=-438479827208016421191680.000000
+2024-11-26 18:29:02,087 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.924278, Policy Loss=-447918074990292298104832.000000, Total Loss=-447918074990292298104832.000000
+2024-11-26 18:29:02,111 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 10: Value Loss=0.916304, Policy Loss=-460326032395653299044352.000000, Total Loss=-460326032395653299044352.000000
+2024-11-26 18:29:02,350 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.950086, Policy Loss=-468296827275346773540864.000000, Total Loss=-468296827275346773540864.000000
+2024-11-26 18:29:02,370 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 10: Value Loss=0.925010, Policy Loss=-481684840017217632337920.000000, Total Loss=-481684840017217632337920.000000
+2024-11-26 18:29:02,608 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.917631, Policy Loss=-488671039931976859516928.000000, Total Loss=-488671039931976859516928.000000
+2024-11-26 18:29:02,637 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 10: Value Loss=0.914350, Policy Loss=-503051610002923156668416.000000, Total Loss=-503051610002923156668416.000000
+2024-11-26 18:29:02,879 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.927109, Policy Loss=-509010268626701531480064.000000, Total Loss=-509010268626701531480064.000000
+2024-11-26 18:29:02,899 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 10: Value Loss=0.917175, Policy Loss=-524389592979810528788480.000000, Total Loss=-524389592979810528788480.000000
+2024-11-26 18:29:03,127 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.933846, Policy Loss=-529707335333418553573376.000000, Total Loss=-529707335333418553573376.000000
+2024-11-26 18:29:03,158 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 10: Value Loss=0.919337, Policy Loss=-546111210587355829239808.000000, Total Loss=-546111210587355829239808.000000
+2024-11-26 18:29:04,050 - root - INFO - Iteration 1 Training Loss: -605651715993752322441216.000000
+2024-11-26 18:32:14,559 - root - INFO - Iteration 1 Performance: 96.00%
+2024-11-26 18:32:14,559 - root - INFO - Performance improved. Saving model and resetting no_improvement_count.
+2024-11-26 18:32:14,569 - nnbattle.agents.alphazero.utils.model_utils - INFO - Model saved successfully to nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-26 18:32:14,569 - root - INFO - Model saved for iteration 1 at nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-26 18:32:14,569 - root - INFO - No improvement for 1 iterations.
+2024-11-26 18:32:14,569 - root - INFO - === Iteration 1 completed in 0:14:16.702512 ===
+2024-11-26 18:32:14,569 - root - INFO - === Iteration 1 completed with performance: 96.00% ===
+2024-11-26 18:32:14,569 - root - INFO - === Starting Training Iteration 2/100 ===
+2024-11-26 18:32:14,569 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-26 18:32:14,569 - root - INFO - Generating 100 self-play games...
+2024-11-26 18:32:18,870 - root - INFO - Game 0 of 100 completed with 8 moves, result: 2
+2024-11-26 18:32:23,128 - root - INFO - Game 1 of 100 completed with 7 moves, result: 1
+2024-11-26 18:32:26,893 - root - INFO - Game 2 of 100 completed with 7 moves, result: 1
+2024-11-26 18:32:30,586 - root - INFO - Game 3 of 100 completed with 7 moves, result: 1
+2024-11-26 18:32:34,271 - root - INFO - Game 4 of 100 completed with 7 moves, result: 1
+2024-11-26 18:32:40,105 - root - INFO - Game 5 of 100 completed with 9 moves, result: 1
+2024-11-26 18:32:46,609 - root - INFO - Game 6 of 100 completed with 10 moves, result: 2
+2024-11-26 18:32:57,141 - root - INFO - Game 7 of 100 completed with 16 moves, result: 2
+2024-11-26 18:33:02,198 - root - INFO - Game 8 of 100 completed with 8 moves, result: 2
+2024-11-26 18:33:07,413 - root - INFO - Game 9 of 100 completed with 9 moves, result: 1
+2024-11-26 18:33:13,015 - root - INFO - Game 10 of 100 completed with 9 moves, result: 1
+2024-11-26 18:33:20,011 - root - INFO - Game 11 of 100 completed with 11 moves, result: 1
+2024-11-26 18:33:25,791 - root - INFO - Game 12 of 100 completed with 9 moves, result: 1
+2024-11-26 18:33:35,848 - root - INFO - Game 13 of 100 completed with 15 moves, result: 1
+2024-11-26 18:33:43,685 - root - INFO - Game 14 of 100 completed with 12 moves, result: 2
+2024-11-26 18:33:52,652 - root - INFO - Game 15 of 100 completed with 14 moves, result: 2
+2024-11-26 18:33:57,677 - root - INFO - Game 16 of 100 completed with 8 moves, result: 2
+2024-11-26 18:34:02,630 - root - INFO - Game 17 of 100 completed with 8 moves, result: 2
+2024-11-26 18:34:08,885 - root - INFO - Game 18 of 100 completed with 10 moves, result: 2
+2024-11-26 18:34:15,211 - root - INFO - Game 19 of 100 completed with 10 moves, result: 2
+2024-11-26 18:34:27,312 - root - INFO - Game 20 of 100 completed with 18 moves, result: 2
+2024-11-26 18:34:35,287 - root - INFO - Game 21 of 100 completed with 12 moves, result: 2
+2024-11-26 18:34:38,821 - root - INFO - Game 22 of 100 completed with 7 moves, result: 1
+2024-11-26 18:34:47,310 - root - INFO - Game 23 of 100 completed with 13 moves, result: 1
+2024-11-26 18:34:53,668 - root - INFO - Game 24 of 100 completed with 10 moves, result: 2
+2024-11-26 18:35:01,455 - root - INFO - Game 25 of 100 completed with 13 moves, result: 1
+2024-11-26 18:35:05,780 - root - INFO - Game 26 of 100 completed with 7 moves, result: 1
+2024-11-26 18:35:15,994 - root - INFO - Game 27 of 100 completed with 16 moves, result: 2
+2024-11-26 18:35:25,977 - root - INFO - Game 28 of 100 completed with 15 moves, result: 1
+2024-11-26 18:35:34,380 - root - INFO - Game 29 of 100 completed with 13 moves, result: 1
+2024-11-26 18:35:40,133 - root - INFO - Game 30 of 100 completed with 9 moves, result: 1
+2024-11-26 18:35:44,403 - root - INFO - Game 31 of 100 completed with 7 moves, result: 1
+2024-11-26 18:35:51,408 - root - INFO - Game 32 of 100 completed with 11 moves, result: 1
+2024-11-26 18:35:56,381 - root - INFO - Game 33 of 100 completed with 8 moves, result: 2
+2024-11-26 18:36:06,389 - root - INFO - Game 34 of 100 completed with 15 moves, result: 1
+2024-11-26 18:36:13,401 - root - INFO - Game 35 of 100 completed with 11 moves, result: 1
+2024-11-26 18:36:17,649 - root - INFO - Game 36 of 100 completed with 7 moves, result: 1
+2024-11-26 18:36:21,805 - root - INFO - Game 37 of 100 completed with 7 moves, result: 1
+2024-11-26 18:36:27,068 - root - INFO - Game 38 of 100 completed with 10 moves, result: 2
+2024-11-26 18:36:37,050 - root - INFO - Game 39 of 100 completed with 15 moves, result: 1
+2024-11-26 18:36:42,635 - root - INFO - Game 40 of 100 completed with 9 moves, result: 1
+2024-11-26 18:36:49,038 - root - INFO - Game 41 of 100 completed with 10 moves, result: 2
+2024-11-26 18:36:58,803 - root - INFO - Game 42 of 100 completed with 15 moves, result: 1
+2024-11-26 18:37:05,963 - root - INFO - Game 43 of 100 completed with 11 moves, result: 1
+2024-11-26 18:37:10,312 - root - INFO - Game 44 of 100 completed with 7 moves, result: 1
+2024-11-26 18:37:18,925 - root - INFO - Game 45 of 100 completed with 13 moves, result: 1
+2024-11-26 18:37:26,943 - root - INFO - Game 46 of 100 completed with 12 moves, result: 2
+2024-11-26 18:37:31,248 - root - INFO - Game 47 of 100 completed with 7 moves, result: 1
+2024-11-26 18:37:38,293 - root - INFO - Game 48 of 100 completed with 11 moves, result: 1
+2024-11-26 18:37:43,228 - root - INFO - Game 49 of 100 completed with 8 moves, result: 2
+2024-11-26 18:37:51,266 - root - INFO - Game 50 of 100 completed with 13 moves, result: 1
+2024-11-26 18:37:54,955 - root - INFO - Game 51 of 100 completed with 7 moves, result: 1
+2024-11-26 18:38:03,291 - root - INFO - Game 52 of 100 completed with 13 moves, result: 1
+2024-11-26 18:38:08,372 - root - INFO - Game 53 of 100 completed with 8 moves, result: 2
+2024-11-26 18:38:16,027 - root - INFO - Game 54 of 100 completed with 13 moves, result: 1
+2024-11-26 18:38:25,609 - root - INFO - Game 55 of 100 completed with 15 moves, result: 1
+2024-11-26 18:38:29,888 - root - INFO - Game 56 of 100 completed with 7 moves, result: 1
+2024-11-26 18:38:35,490 - root - INFO - Game 57 of 100 completed with 9 moves, result: 1
+2024-11-26 18:38:43,396 - root - INFO - Game 58 of 100 completed with 12 moves, result: 2
+2024-11-26 18:38:49,128 - root - INFO - Game 59 of 100 completed with 9 moves, result: 1
+2024-11-26 18:38:53,307 - root - INFO - Game 60 of 100 completed with 7 moves, result: 1
+2024-11-26 18:38:58,997 - root - INFO - Game 61 of 100 completed with 9 moves, result: 1
+2024-11-26 18:39:04,723 - root - INFO - Game 62 of 100 completed with 9 moves, result: 1
+2024-11-26 18:39:08,384 - root - INFO - Game 63 of 100 completed with 7 moves, result: 1
+2024-11-26 18:39:12,550 - root - INFO - Game 64 of 100 completed with 7 moves, result: 1
+2024-11-26 18:39:21,017 - root - INFO - Game 65 of 100 completed with 13 moves, result: 1
+2024-11-26 18:39:25,981 - root - INFO - Game 66 of 100 completed with 8 moves, result: 2
+2024-11-26 18:39:31,376 - root - INFO - Game 67 of 100 completed with 9 moves, result: 1
+2024-11-26 18:39:42,206 - root - INFO - Game 68 of 100 completed with 16 moves, result: 2
+2024-11-26 18:39:53,336 - root - INFO - Game 69 of 100 completed with 17 moves, result: 1
+2024-11-26 18:39:57,510 - root - INFO - Game 70 of 100 completed with 7 moves, result: 1
+2024-11-26 18:40:03,304 - root - INFO - Game 71 of 100 completed with 11 moves, result: 1
+2024-11-26 18:40:09,687 - root - INFO - Game 72 of 100 completed with 11 moves, result: 1
+2024-11-26 18:40:14,579 - root - INFO - Game 73 of 100 completed with 9 moves, result: 1
+2024-11-26 18:40:18,754 - root - INFO - Game 74 of 100 completed with 7 moves, result: 1
+2024-11-26 18:40:23,821 - root - INFO - Game 75 of 100 completed with 8 moves, result: 2
+2024-11-26 18:40:30,193 - root - INFO - Game 76 of 100 completed with 10 moves, result: 2
+2024-11-26 18:40:37,388 - root - INFO - Game 77 of 100 completed with 11 moves, result: 1
+2024-11-26 18:40:41,620 - root - INFO - Game 78 of 100 completed with 7 moves, result: 1
+2024-11-26 18:40:45,849 - root - INFO - Game 79 of 100 completed with 7 moves, result: 1
+2024-11-26 18:40:50,108 - root - INFO - Game 80 of 100 completed with 7 moves, result: 1
+2024-11-26 18:40:54,310 - root - INFO - Game 81 of 100 completed with 7 moves, result: 1
+2024-11-26 18:40:59,941 - root - INFO - Game 82 of 100 completed with 9 moves, result: 1
+2024-11-26 18:41:05,756 - root - INFO - Game 83 of 100 completed with 9 moves, result: 1
+2024-11-26 18:41:14,237 - root - INFO - Game 84 of 100 completed with 13 moves, result: 1
+2024-11-26 18:41:19,087 - root - INFO - Game 85 of 100 completed with 8 moves, result: 2
+2024-11-26 18:41:26,923 - root - INFO - Game 86 of 100 completed with 12 moves, result: 2
+2024-11-26 18:41:31,080 - root - INFO - Game 87 of 100 completed with 7 moves, result: 1
+2024-11-26 18:41:34,854 - root - INFO - Game 88 of 100 completed with 7 moves, result: 1
+2024-11-26 18:41:41,837 - root - INFO - Game 89 of 100 completed with 11 moves, result: 1
+2024-11-26 18:41:51,061 - root - INFO - Game 90 of 100 completed with 14 moves, result: 2
+2024-11-26 18:42:02,182 - root - INFO - Game 91 of 100 completed with 17 moves, result: 1
+2024-11-26 18:42:11,555 - root - INFO - Game 92 of 100 completed with 14 moves, result: 2
+2024-11-26 18:42:20,638 - root - INFO - Game 93 of 100 completed with 14 moves, result: 2
+2024-11-26 18:42:25,666 - root - INFO - Game 94 of 100 completed with 8 moves, result: 2
+2024-11-26 18:42:32,053 - root - INFO - Game 95 of 100 completed with 10 moves, result: 2
+2024-11-26 18:42:36,487 - root - INFO - Game 96 of 100 completed with 7 moves, result: 1
+2024-11-26 18:42:42,086 - root - INFO - Game 97 of 100 completed with 9 moves, result: 1
+2024-11-26 18:42:49,183 - root - INFO - Game 98 of 100 completed with 11 moves, result: 1
+2024-11-26 18:42:53,568 - root - INFO - Game 99 of 100 completed with 8 moves, result: 2
+2024-11-26 18:42:53,568 - root - INFO - Commencing training phase...
+2024-11-26 18:42:53,579 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-26 18:42:53,580 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode
+---------------------------------------------
+0 | model | Connect4Net | 1.5 M  | eval
+---------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+0         Modules in train mode
+42        Modules in eval mode
+2024-11-26 18:42:58,952 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.922013, Policy Loss=-576015076084298903715840.000000, Total Loss=-576015076084298903715840.000000
+2024-11-26 18:43:05,285 - root - WARNING - Training loss not available for iteration 2
+2024-11-26 18:46:19,886 - root - INFO - Iteration 2 Performance: 94.00%
+2024-11-26 18:46:19,886 - root - INFO - No improvement for 2 iterations.
+2024-11-26 18:46:19,887 - root - INFO - No improvement for 3 iterations.
+2024-11-26 18:46:19,887 - root - INFO - === Iteration 2 completed in 0:14:05.317240 ===
+2024-11-26 18:46:19,887 - root - INFO - === Iteration 2 completed with performance: 94.00% ===
+2024-11-26 18:46:19,887 - root - INFO - === Starting Training Iteration 3/100 ===
+2024-11-26 18:46:19,887 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-26 18:46:19,887 - root - INFO - Generating 100 self-play games...
+2024-11-26 18:46:26,309 - root - INFO - Game 0 of 100 completed with 10 moves, result: 2
+2024-11-26 18:46:34,880 - root - INFO - Game 1 of 100 completed with 13 moves, result: 1
+2024-11-26 18:46:39,135 - root - INFO - Game 2 of 100 completed with 7 moves, result: 1
+2024-11-26 18:46:43,449 - root - INFO - Game 3 of 100 completed with 7 moves, result: 1
+2024-11-26 18:46:55,537 - root - INFO - Game 4 of 100 completed with 18 moves, result: 2
+2024-11-26 18:47:01,387 - root - INFO - Game 5 of 100 completed with 9 moves, result: 1
+2024-11-26 18:47:06,451 - root - INFO - Game 6 of 100 completed with 8 moves, result: 2
+2024-11-26 18:47:10,695 - root - INFO - Game 7 of 100 completed with 7 moves, result: 1
+2024-11-26 18:47:14,304 - root - INFO - Game 8 of 100 completed with 7 moves, result: 1
+2024-11-26 18:47:20,050 - root - INFO - Game 9 of 100 completed with 9 moves, result: 1
+2024-11-26 18:47:29,203 - root - INFO - Game 10 of 100 completed with 14 moves, result: 2
+2024-11-26 18:47:35,014 - root - INFO - Game 11 of 100 completed with 9 moves, result: 1
+2024-11-26 18:47:38,766 - root - INFO - Game 12 of 100 completed with 7 moves, result: 1
+2024-11-26 18:47:45,940 - root - INFO - Game 13 of 100 completed with 11 moves, result: 1
+2024-11-26 18:47:56,026 - root - INFO - Game 14 of 100 completed with 15 moves, result: 1
+2024-11-26 18:48:03,840 - root - INFO - Game 15 of 100 completed with 13 moves, result: 1
+2024-11-26 18:48:10,895 - root - INFO - Game 16 of 100 completed with 11 moves, result: 1
+2024-11-26 18:48:14,737 - root - INFO - Game 17 of 100 completed with 7 moves, result: 1
+2024-11-26 18:48:28,429 - root - INFO - Game 18 of 100 completed with 20 moves, result: 2
+2024-11-26 18:48:33,997 - root - INFO - Game 19 of 100 completed with 9 moves, result: 1
+2024-11-26 18:48:37,788 - root - INFO - Game 20 of 100 completed with 7 moves, result: 1
+2024-11-26 18:48:41,990 - root - INFO - Game 21 of 100 completed with 7 moves, result: 1
+2024-11-26 18:48:48,560 - root - INFO - Game 22 of 100 completed with 11 moves, result: 1
+2024-11-26 18:48:57,845 - root - INFO - Game 23 of 100 completed with 15 moves, result: 1
+2024-11-26 18:49:06,446 - root - INFO - Game 24 of 100 completed with 13 moves, result: 1
+2024-11-26 18:49:14,287 - root - INFO - Game 25 of 100 completed with 12 moves, result: 2
+2024-11-26 18:49:19,965 - root - INFO - Game 26 of 100 completed with 9 moves, result: 1
+2024-11-26 18:49:27,927 - root - INFO - Game 27 of 100 completed with 12 moves, result: 2
+2024-11-26 18:49:33,594 - root - INFO - Game 28 of 100 completed with 9 moves, result: 1
+2024-11-26 18:49:44,901 - root - INFO - Game 29 of 100 completed with 17 moves, result: 1
+2024-11-26 18:49:52,077 - root - INFO - Game 30 of 100 completed with 11 moves, result: 1
+2024-11-26 18:49:58,585 - root - INFO - Game 31 of 100 completed with 10 moves, result: 2
+2024-11-26 18:50:05,765 - root - INFO - Game 32 of 100 completed with 11 moves, result: 1
+2024-11-26 18:50:09,357 - root - INFO - Game 33 of 100 completed with 7 moves, result: 1
+2024-11-26 18:50:17,079 - root - INFO - Game 34 of 100 completed with 12 moves, result: 2
+2024-11-26 18:50:25,024 - root - INFO - Game 35 of 100 completed with 12 moves, result: 2
+2024-11-26 18:50:32,945 - root - INFO - Game 36 of 100 completed with 12 moves, result: 2
+2024-11-26 18:50:38,658 - root - INFO - Game 37 of 100 completed with 9 moves, result: 1
+2024-11-26 18:50:49,665 - root - INFO - Game 38 of 100 completed with 17 moves, result: 1
+2024-11-26 18:50:53,391 - root - INFO - Game 39 of 100 completed with 7 moves, result: 1
+2024-11-26 18:51:00,220 - root - INFO - Game 40 of 100 completed with 11 moves, result: 1
+2024-11-26 18:51:08,193 - root - INFO - Game 41 of 100 completed with 13 moves, result: 1
+2024-11-26 18:51:17,866 - root - INFO - Game 42 of 100 completed with 15 moves, result: 1
+2024-11-26 18:51:24,995 - root - INFO - Game 43 of 100 completed with 11 moves, result: 1
+2024-11-26 18:51:35,745 - root - INFO - Game 44 of 100 completed with 16 moves, result: 2
+2024-11-26 18:51:42,850 - root - INFO - Game 45 of 100 completed with 11 moves, result: 1
+2024-11-26 18:51:48,448 - root - INFO - Game 46 of 100 completed with 9 moves, result: 1
+2024-11-26 18:51:52,376 - root - INFO - Game 47 of 100 completed with 8 moves, result: 2
+2024-11-26 18:52:03,564 - root - INFO - Game 48 of 100 completed with 17 moves, result: 1
+2024-11-26 18:52:10,156 - root - INFO - Game 49 of 100 completed with 10 moves, result: 2
+2024-11-26 18:52:15,832 - root - INFO - Game 50 of 100 completed with 9 moves, result: 1
+2024-11-26 18:52:22,912 - root - INFO - Game 51 of 100 completed with 12 moves, result: 2
+2024-11-26 18:52:29,333 - root - INFO - Game 52 of 100 completed with 10 moves, result: 2
+2024-11-26 18:52:33,662 - root - INFO - Game 53 of 100 completed with 7 moves, result: 1
+2024-11-26 18:52:37,800 - root - INFO - Game 54 of 100 completed with 7 moves, result: 1
+2024-11-26 18:52:42,248 - root - INFO - Game 55 of 100 completed with 8 moves, result: 2
+2024-11-26 18:52:50,610 - root - INFO - Game 56 of 100 completed with 13 moves, result: 1
+2024-11-26 18:52:58,451 - root - INFO - Game 57 of 100 completed with 12 moves, result: 2
+2024-11-26 18:53:04,910 - root - INFO - Game 58 of 100 completed with 10 moves, result: 2
+2024-11-26 18:53:10,639 - root - INFO - Game 59 of 100 completed with 9 moves, result: 1
+2024-11-26 18:53:26,036 - root - INFO - Game 60 of 100 completed with 23 moves, result: 1
+2024-11-26 18:53:33,194 - root - INFO - Game 61 of 100 completed with 12 moves, result: 2
+2024-11-26 18:53:37,471 - root - INFO - Game 62 of 100 completed with 7 moves, result: 1
+2024-11-26 18:53:43,147 - root - INFO - Game 63 of 100 completed with 9 moves, result: 1
+2024-11-26 18:53:48,786 - root - INFO - Game 64 of 100 completed with 9 moves, result: 1
+2024-11-26 18:53:53,773 - root - INFO - Game 65 of 100 completed with 8 moves, result: 2
+2024-11-26 18:53:57,978 - root - INFO - Game 66 of 100 completed with 7 moves, result: 1
+2024-11-26 18:54:01,691 - root - INFO - Game 67 of 100 completed with 7 moves, result: 1
+2024-11-26 18:54:09,472 - root - INFO - Game 68 of 100 completed with 13 moves, result: 1
+2024-11-26 18:54:14,535 - root - INFO - Game 69 of 100 completed with 9 moves, result: 1
+2024-11-26 18:54:22,327 - root - INFO - Game 70 of 100 completed with 13 moves, result: 1
+2024-11-26 18:54:29,517 - root - INFO - Game 71 of 100 completed with 11 moves, result: 1
+2024-11-26 18:54:35,329 - root - INFO - Game 72 of 100 completed with 9 moves, result: 1
+2024-11-26 18:54:40,293 - root - INFO - Game 73 of 100 completed with 8 moves, result: 2
+2024-11-26 18:54:51,728 - root - INFO - Game 74 of 100 completed with 17 moves, result: 1
+2024-11-26 18:54:56,034 - root - INFO - Game 75 of 100 completed with 7 moves, result: 1
+2024-11-26 18:55:04,914 - root - INFO - Game 76 of 100 completed with 14 moves, result: 2
+2024-11-26 18:55:08,551 - root - INFO - Game 77 of 100 completed with 7 moves, result: 1
+2024-11-26 18:55:12,301 - root - INFO - Game 78 of 100 completed with 7 moves, result: 1
+2024-11-26 18:55:16,648 - root - INFO - Game 79 of 100 completed with 7 moves, result: 1
+2024-11-26 18:55:23,110 - root - INFO - Game 80 of 100 completed with 10 moves, result: 2
+2024-11-26 18:55:31,756 - root - INFO - Game 81 of 100 completed with 14 moves, result: 2
+2024-11-26 18:55:38,274 - root - INFO - Game 82 of 100 completed with 11 moves, result: 1
+2024-11-26 18:55:46,559 - root - INFO - Game 83 of 100 completed with 13 moves, result: 1
+2024-11-26 18:55:58,587 - root - INFO - Game 84 of 100 completed with 18 moves, result: 2
+2024-11-26 18:56:02,882 - root - INFO - Game 85 of 100 completed with 7 moves, result: 1
+2024-11-26 18:56:12,233 - root - INFO - Game 86 of 100 completed with 14 moves, result: 2
+2024-11-26 18:56:23,132 - root - INFO - Game 87 of 100 completed with 17 moves, result: 1
+2024-11-26 18:56:30,306 - root - INFO - Game 88 of 100 completed with 11 moves, result: 1
+2024-11-26 18:56:44,999 - root - INFO - Game 89 of 100 completed with 22 moves, result: 2
+2024-11-26 18:56:49,302 - root - INFO - Game 90 of 100 completed with 7 moves, result: 1
+2024-11-26 18:56:55,009 - root - INFO - Game 91 of 100 completed with 9 moves, result: 1
+2024-11-26 18:57:02,070 - root - INFO - Game 92 of 100 completed with 12 moves, result: 2
+2024-11-26 18:57:06,241 - root - INFO - Game 93 of 100 completed with 7 moves, result: 1
+2024-11-26 18:57:10,351 - root - INFO - Game 94 of 100 completed with 7 moves, result: 1
+2024-11-26 18:57:23,980 - root - INFO - Game 95 of 100 completed with 21 moves, result: 1
+2024-11-26 18:57:30,393 - root - INFO - Game 96 of 100 completed with 10 moves, result: 2
+2024-11-26 18:57:36,782 - root - INFO - Game 97 of 100 completed with 10 moves, result: 2
+2024-11-26 18:57:44,172 - root - INFO - Game 98 of 100 completed with 12 moves, result: 2
+2024-11-26 18:57:49,864 - root - INFO - Game 99 of 100 completed with 9 moves, result: 1
+2024-11-26 18:57:49,864 - root - INFO - Commencing training phase...
+2024-11-26 18:57:49,871 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-26 18:57:49,873 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode
+---------------------------------------------
+0 | model | Connect4Net | 1.5 M  | eval
+---------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+0         Modules in train mode
+42        Modules in eval mode
+2024-11-26 18:57:55,499 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.908485, Policy Loss=-564063459421980100395008.000000, Total Loss=-564063459421980100395008.000000
+2024-11-26 18:58:02,025 - root - WARNING - Training loss not available for iteration 3
+2024-11-26 19:00:52,108 - root - INFO - Iteration 3 Performance: 82.00%
+2024-11-26 19:00:52,108 - root - INFO - No improvement for 4 iterations.
+2024-11-26 19:00:52,108 - root - INFO - No improvement for 5 iterations.
+2024-11-26 19:00:52,109 - root - INFO - === Iteration 3 completed in 0:14:32.221744 ===
+2024-11-26 19:00:52,109 - root - INFO - === Iteration 3 completed with performance: 82.00% ===
+2024-11-26 19:00:52,109 - root - INFO - === Starting Training Iteration 4/100 ===
+2024-11-26 19:00:52,109 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-26 19:00:52,109 - root - INFO - Generating 100 self-play games...
+2024-11-26 19:00:59,045 - root - INFO - Game 0 of 100 completed with 11 moves, result: 1
+2024-11-26 19:01:02,628 - root - INFO - Game 1 of 100 completed with 7 moves, result: 1
+2024-11-26 19:01:19,204 - root - INFO - Game 2 of 100 completed with 25 moves, result: 1
+2024-11-26 19:01:24,870 - root - INFO - Game 3 of 100 completed with 9 moves, result: 1
+2024-11-26 19:01:37,054 - root - INFO - Game 4 of 100 completed with 18 moves, result: 2
+2024-11-26 19:01:42,116 - root - INFO - Game 5 of 100 completed with 8 moves, result: 2
+2024-11-26 19:01:50,598 - root - INFO - Game 6 of 100 completed with 13 moves, result: 1
+2024-11-26 19:01:56,198 - root - INFO - Game 7 of 100 completed with 9 moves, result: 1
+2024-11-26 19:02:02,630 - root - INFO - Game 8 of 100 completed with 10 moves, result: 2
+2024-11-26 19:02:06,181 - root - INFO - Game 9 of 100 completed with 7 moves, result: 1
+2024-11-26 19:02:09,785 - root - INFO - Game 10 of 100 completed with 7 moves, result: 1
+2024-11-26 19:02:14,799 - root - INFO - Game 11 of 100 completed with 8 moves, result: 2
+2024-11-26 19:02:20,501 - root - INFO - Game 12 of 100 completed with 9 moves, result: 1
+2024-11-26 19:02:30,529 - root - INFO - Game 13 of 100 completed with 15 moves, result: 1
+2024-11-26 19:02:39,749 - root - INFO - Game 14 of 100 completed with 14 moves, result: 2
+2024-11-26 19:02:44,480 - root - INFO - Game 15 of 100 completed with 8 moves, result: 2
+2024-11-26 19:02:48,792 - root - INFO - Game 16 of 100 completed with 7 moves, result: 1
+2024-11-26 19:02:57,339 - root - INFO - Game 17 of 100 completed with 13 moves, result: 1
+2024-11-26 19:03:03,026 - root - INFO - Game 18 of 100 completed with 9 moves, result: 1
+2024-11-26 19:03:09,444 - root - INFO - Game 19 of 100 completed with 11 moves, result: 1
+2024-11-26 19:03:15,177 - root - INFO - Game 20 of 100 completed with 9 moves, result: 1
+2024-11-26 19:03:22,996 - root - INFO - Game 21 of 100 completed with 12 moves, result: 2
+2024-11-26 19:03:29,257 - root - INFO - Game 22 of 100 completed with 10 moves, result: 2
+2024-11-26 19:03:33,481 - root - INFO - Game 23 of 100 completed with 7 moves, result: 1
+2024-11-26 19:03:43,040 - root - INFO - Game 24 of 100 completed with 15 moves, result: 1
+2024-11-26 19:03:50,140 - root - INFO - Game 25 of 100 completed with 11 moves, result: 1
+2024-11-26 19:04:00,198 - root - INFO - Game 26 of 100 completed with 15 moves, result: 1
+2024-11-26 19:04:06,534 - root - INFO - Game 27 of 100 completed with 10 moves, result: 2
+2024-11-26 19:04:16,944 - root - INFO - Game 28 of 100 completed with 16 moves, result: 2
+2024-11-26 19:04:26,703 - root - INFO - Game 29 of 100 completed with 15 moves, result: 1
+2024-11-26 19:04:30,955 - root - INFO - Game 30 of 100 completed with 7 moves, result: 1
+2024-11-26 19:04:37,514 - root - INFO - Game 31 of 100 completed with 10 moves, result: 2
+2024-11-26 19:04:41,777 - root - INFO - Game 32 of 100 completed with 7 moves, result: 1
+2024-11-26 19:04:52,354 - root - INFO - Game 33 of 100 completed with 16 moves, result: 2
+2024-11-26 19:04:56,579 - root - INFO - Game 34 of 100 completed with 9 moves, result: 1
+2024-11-26 19:05:00,822 - root - INFO - Game 35 of 100 completed with 7 moves, result: 1
+2024-11-26 19:05:06,539 - root - INFO - Game 36 of 100 completed with 9 moves, result: 1
+2024-11-26 19:05:11,579 - root - INFO - Game 37 of 100 completed with 8 moves, result: 2
+2024-11-26 19:05:17,423 - root - INFO - Game 38 of 100 completed with 10 moves, result: 2
+2024-11-26 19:05:22,403 - root - INFO - Game 39 of 100 completed with 8 moves, result: 2
+2024-11-26 19:05:27,339 - root - INFO - Game 40 of 100 completed with 8 moves, result: 2
+2024-11-26 19:05:34,998 - root - INFO - Game 41 of 100 completed with 12 moves, result: 2
+2024-11-26 19:05:42,027 - root - INFO - Game 42 of 100 completed with 11 moves, result: 1
+2024-11-26 19:05:50,513 - root - INFO - Game 43 of 100 completed with 13 moves, result: 1
+2024-11-26 19:05:54,750 - root - INFO - Game 44 of 100 completed with 7 moves, result: 1
+2024-11-26 19:06:04,624 - root - INFO - Game 45 of 100 completed with 15 moves, result: 1
+2024-11-26 19:06:09,607 - root - INFO - Game 46 of 100 completed with 8 moves, result: 2
+2024-11-26 19:06:16,079 - root - INFO - Game 47 of 100 completed with 10 moves, result: 2
+2024-11-26 19:06:27,522 - root - INFO - Game 48 of 100 completed with 17 moves, result: 1
+2024-11-26 19:06:31,812 - root - INFO - Game 49 of 100 completed with 7 moves, result: 1
+2024-11-26 19:06:41,110 - root - INFO - Game 50 of 100 completed with 14 moves, result: 2
+2024-11-26 19:06:46,166 - root - INFO - Game 51 of 100 completed with 8 moves, result: 2
+2024-11-26 19:06:55,531 - root - INFO - Game 52 of 100 completed with 14 moves, result: 2
+2024-11-26 19:07:01,074 - root - INFO - Game 53 of 100 completed with 9 moves, result: 1
+2024-11-26 19:07:06,244 - root - INFO - Game 54 of 100 completed with 9 moves, result: 1
+2024-11-26 19:07:13,473 - root - INFO - Game 55 of 100 completed with 11 moves, result: 1
+2024-11-26 19:07:24,306 - root - INFO - Game 56 of 100 completed with 16 moves, result: 2
+2024-11-26 19:07:29,309 - root - INFO - Game 57 of 100 completed with 9 moves, result: 1
+2024-11-26 19:07:35,262 - root - INFO - Game 58 of 100 completed with 10 moves, result: 2
+2024-11-26 19:07:41,049 - root - INFO - Game 59 of 100 completed with 10 moves, result: 2
+2024-11-26 19:07:52,204 - root - INFO - Game 60 of 100 completed with 17 moves, result: 1
+2024-11-26 19:07:57,136 - root - INFO - Game 61 of 100 completed with 8 moves, result: 2
+2024-11-26 19:08:02,642 - root - INFO - Game 62 of 100 completed with 9 moves, result: 1
+2024-11-26 19:08:09,238 - root - INFO - Game 63 of 100 completed with 10 moves, result: 2
+2024-11-26 19:08:14,957 - root - INFO - Game 64 of 100 completed with 9 moves, result: 1
+2024-11-26 19:08:28,379 - root - INFO - Game 65 of 100 completed with 22 moves, result: 2
+2024-11-26 19:08:34,750 - root - INFO - Game 66 of 100 completed with 10 moves, result: 2
+2024-11-26 19:08:41,256 - root - INFO - Game 67 of 100 completed with 10 moves, result: 2
+2024-11-26 19:08:45,451 - root - INFO - Game 68 of 100 completed with 7 moves, result: 1
+2024-11-26 19:08:52,592 - root - INFO - Game 69 of 100 completed with 11 moves, result: 1
+2024-11-26 19:08:56,813 - root - INFO - Game 70 of 100 completed with 7 moves, result: 1
+2024-11-26 19:09:03,835 - root - INFO - Game 71 of 100 completed with 13 moves, result: 1
+2024-11-26 19:09:12,939 - root - INFO - Game 72 of 100 completed with 14 moves, result: 2
+2024-11-26 19:09:25,058 - root - INFO - Game 73 of 100 completed with 18 moves, result: 2
+2024-11-26 19:09:29,947 - root - INFO - Game 74 of 100 completed with 8 moves, result: 2
+2024-11-26 19:09:34,239 - root - INFO - Game 75 of 100 completed with 7 moves, result: 1
+2024-11-26 19:09:43,286 - root - INFO - Game 76 of 100 completed with 14 moves, result: 2
+2024-11-26 19:09:49,758 - root - INFO - Game 77 of 100 completed with 10 moves, result: 2
+2024-11-26 19:09:58,580 - root - INFO - Game 78 of 100 completed with 15 moves, result: 1
+2024-11-26 19:10:02,889 - root - INFO - Game 79 of 100 completed with 7 moves, result: 1
+2024-11-26 19:10:09,975 - root - INFO - Game 80 of 100 completed with 11 moves, result: 1
+2024-11-26 19:10:15,596 - root - INFO - Game 81 of 100 completed with 9 moves, result: 1
+2024-11-26 19:10:22,047 - root - INFO - Game 82 of 100 completed with 11 moves, result: 1
+2024-11-26 19:10:26,309 - root - INFO - Game 83 of 100 completed with 7 moves, result: 1
+2024-11-26 19:10:33,346 - root - INFO - Game 84 of 100 completed with 11 moves, result: 1
+2024-11-26 19:10:39,078 - root - INFO - Game 85 of 100 completed with 9 moves, result: 1
+2024-11-26 19:10:46,168 - root - INFO - Game 86 of 100 completed with 11 moves, result: 1
+2024-11-26 19:10:53,331 - root - INFO - Game 87 of 100 completed with 11 moves, result: 1
+2024-11-26 19:10:58,169 - root - INFO - Game 88 of 100 completed with 8 moves, result: 2
+2024-11-26 19:11:05,266 - root - INFO - Game 89 of 100 completed with 11 moves, result: 1
+2024-11-26 19:11:10,809 - root - INFO - Game 90 of 100 completed with 9 moves, result: 1
+2024-11-26 19:11:17,200 - root - INFO - Game 91 of 100 completed with 10 moves, result: 2
+2024-11-26 19:11:25,821 - root - INFO - Game 92 of 100 completed with 14 moves, result: 2
+2024-11-26 19:11:38,786 - root - INFO - Game 93 of 100 completed with 19 moves, result: 1
+2024-11-26 19:11:43,000 - root - INFO - Game 94 of 100 completed with 7 moves, result: 1
+2024-11-26 19:11:50,076 - root - INFO - Game 95 of 100 completed with 11 moves, result: 1
+2024-11-26 19:12:01,303 - root - INFO - Game 96 of 100 completed with 17 moves, result: 1
+2024-11-26 19:12:07,166 - root - INFO - Game 97 of 100 completed with 10 moves, result: 2
+2024-11-26 19:12:12,866 - root - INFO - Game 98 of 100 completed with 9 moves, result: 1
+2024-11-26 19:12:17,234 - root - INFO - Game 99 of 100 completed with 7 moves, result: 1
+2024-11-26 19:12:17,234 - root - INFO - Commencing training phase...
+2024-11-26 19:12:17,241 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-26 19:12:17,243 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode
+---------------------------------------------
+0 | model | Connect4Net | 1.5 M  | eval
+---------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+0         Modules in train mode
+42        Modules in eval mode
+2024-11-26 19:12:23,117 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.914625, Policy Loss=-542155717049034832084992.000000, Total Loss=-542155717049034832084992.000000
+2024-11-26 19:12:29,877 - root - WARNING - Training loss not available for iteration 4
+2024-11-26 19:15:38,908 - root - INFO - Iteration 4 Performance: 92.00%
+2024-11-26 19:15:38,908 - root - INFO - No improvement for 6 iterations.
+2024-11-26 19:15:38,908 - root - INFO - No improvement for 7 iterations.
+2024-11-26 19:15:38,908 - root - INFO - === Iteration 4 completed in 0:14:46.799698 ===
+2024-11-26 19:15:38,908 - root - INFO - === Iteration 4 completed with performance: 92.00% ===
+2024-11-26 19:15:38,909 - root - INFO - === Starting Training Iteration 5/100 ===
+2024-11-26 19:15:38,909 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-26 19:15:38,909 - root - INFO - Generating 100 self-play games...
+2024-11-26 19:15:43,933 - root - INFO - Game 0 of 100 completed with 8 moves, result: 2
+2024-11-26 19:15:50,986 - root - INFO - Game 1 of 100 completed with 11 moves, result: 1
+2024-11-26 19:16:00,290 - root - INFO - Game 2 of 100 completed with 14 moves, result: 2
+2024-11-26 19:16:04,539 - root - INFO - Game 3 of 100 completed with 7 moves, result: 1
+2024-11-26 19:16:11,572 - root - INFO - Game 4 of 100 completed with 11 moves, result: 1
+2024-11-26 19:16:15,855 - root - INFO - Game 5 of 100 completed with 7 moves, result: 1
+2024-11-26 19:16:21,541 - root - INFO - Game 6 of 100 completed with 9 moves, result: 1
+2024-11-26 19:16:32,164 - root - INFO - Game 7 of 100 completed with 16 moves, result: 2
+2024-11-26 19:16:42,634 - root - INFO - Game 8 of 100 completed with 16 moves, result: 2
+2024-11-26 19:16:48,333 - root - INFO - Game 9 of 100 completed with 9 moves, result: 1
+2024-11-26 19:16:52,446 - root - INFO - Game 10 of 100 completed with 7 moves, result: 1
+2024-11-26 19:17:04,400 - root - INFO - Game 11 of 100 completed with 18 moves, result: 2
+2024-11-26 19:17:09,438 - root - INFO - Game 12 of 100 completed with 8 moves, result: 2
+2024-11-26 19:17:13,744 - root - INFO - Game 13 of 100 completed with 7 moves, result: 1
+2024-11-26 19:17:19,349 - root - INFO - Game 14 of 100 completed with 9 moves, result: 1
+2024-11-26 19:17:26,493 - root - INFO - Game 15 of 100 completed with 11 moves, result: 1
+2024-11-26 19:17:33,595 - root - INFO - Game 16 of 100 completed with 11 moves, result: 1
+2024-11-26 19:17:37,166 - root - INFO - Game 17 of 100 completed with 7 moves, result: 1
+2024-11-26 19:17:41,416 - root - INFO - Game 18 of 100 completed with 7 moves, result: 1
+2024-11-26 19:17:47,754 - root - INFO - Game 19 of 100 completed with 10 moves, result: 2
+2024-11-26 19:17:53,316 - root - INFO - Game 20 of 100 completed with 9 moves, result: 1
+2024-11-26 19:18:00,299 - root - INFO - Game 21 of 100 completed with 11 moves, result: 1
+2024-11-26 19:18:12,491 - root - INFO - Game 22 of 100 completed with 18 moves, result: 2
+2024-11-26 19:18:16,321 - root - INFO - Game 23 of 100 completed with 7 moves, result: 1
+2024-11-26 19:18:22,829 - root - INFO - Game 24 of 100 completed with 10 moves, result: 2
+2024-11-26 19:18:35,747 - root - INFO - Game 25 of 100 completed with 19 moves, result: 1
+2024-11-26 19:18:39,953 - root - INFO - Game 26 of 100 completed with 7 moves, result: 1
+2024-11-26 19:18:44,227 - root - INFO - Game 27 of 100 completed with 7 moves, result: 1
+2024-11-26 19:18:48,472 - root - INFO - Game 28 of 100 completed with 7 moves, result: 1
+2024-11-26 19:18:52,768 - root - INFO - Game 29 of 100 completed with 7 moves, result: 1
+2024-11-26 19:18:57,717 - root - INFO - Game 30 of 100 completed with 8 moves, result: 2
+2024-11-26 19:19:03,517 - root - INFO - Game 31 of 100 completed with 9 moves, result: 1
+2024-11-26 19:19:07,163 - root - INFO - Game 32 of 100 completed with 7 moves, result: 1
+2024-11-26 19:19:19,302 - root - INFO - Game 33 of 100 completed with 19 moves, result: 1
+2024-11-26 19:19:27,195 - root - INFO - Game 34 of 100 completed with 12 moves, result: 2
+2024-11-26 19:19:32,701 - root - INFO - Game 35 of 100 completed with 9 moves, result: 1
+2024-11-26 19:19:37,711 - root - INFO - Game 36 of 100 completed with 8 moves, result: 2
+2024-11-26 19:19:43,370 - root - INFO - Game 37 of 100 completed with 9 moves, result: 1
+2024-11-26 19:19:46,984 - root - INFO - Game 38 of 100 completed with 7 moves, result: 1
+2024-11-26 19:19:51,169 - root - INFO - Game 39 of 100 completed with 7 moves, result: 1
+2024-11-26 19:19:56,165 - root - INFO - Game 40 of 100 completed with 9 moves, result: 1
+2024-11-26 19:20:01,790 - root - INFO - Game 41 of 100 completed with 9 moves, result: 1
+2024-11-26 19:20:07,498 - root - INFO - Game 42 of 100 completed with 9 moves, result: 1
+2024-11-26 19:20:14,695 - root - INFO - Game 43 of 100 completed with 11 moves, result: 1
+2024-11-26 19:20:20,484 - root - INFO - Game 44 of 100 completed with 9 moves, result: 1
+2024-11-26 19:20:31,830 - root - INFO - Game 45 of 100 completed with 17 moves, result: 1
+2024-11-26 19:20:36,112 - root - INFO - Game 46 of 100 completed with 7 moves, result: 1
+2024-11-26 19:20:46,034 - root - INFO - Game 47 of 100 completed with 15 moves, result: 1
+2024-11-26 19:20:51,172 - root - INFO - Game 48 of 100 completed with 8 moves, result: 2
+2024-11-26 19:20:55,455 - root - INFO - Game 49 of 100 completed with 7 moves, result: 1
+2024-11-26 19:21:01,189 - root - INFO - Game 50 of 100 completed with 9 moves, result: 1
+2024-11-26 19:21:10,084 - root - INFO - Game 51 of 100 completed with 14 moves, result: 2
+2024-11-26 19:21:13,644 - root - INFO - Game 52 of 100 completed with 7 moves, result: 1
+2024-11-26 19:21:28,356 - root - INFO - Game 53 of 100 completed with 22 moves, result: 2
+2024-11-26 19:21:34,024 - root - INFO - Game 54 of 100 completed with 9 moves, result: 1
+2024-11-26 19:21:41,373 - root - INFO - Game 55 of 100 completed with 12 moves, result: 2
+2024-11-26 19:21:51,982 - root - INFO - Game 56 of 100 completed with 16 moves, result: 2
+2024-11-26 19:21:56,939 - root - INFO - Game 57 of 100 completed with 8 moves, result: 2
+2024-11-26 19:22:01,272 - root - INFO - Game 58 of 100 completed with 8 moves, result: 2
+2024-11-26 19:22:08,537 - root - INFO - Game 59 of 100 completed with 12 moves, result: 2
+2024-11-26 19:22:17,932 - root - INFO - Game 60 of 100 completed with 14 moves, result: 2
+2024-11-26 19:22:22,197 - root - INFO - Game 61 of 100 completed with 7 moves, result: 1
+2024-11-26 19:22:29,234 - root - INFO - Game 62 of 100 completed with 11 moves, result: 1
+2024-11-26 19:22:37,821 - root - INFO - Game 63 of 100 completed with 13 moves, result: 1
+2024-11-26 19:22:45,665 - root - INFO - Game 64 of 100 completed with 13 moves, result: 1
+2024-11-26 19:22:54,148 - root - INFO - Game 65 of 100 completed with 13 moves, result: 1
+2024-11-26 19:23:01,379 - root - INFO - Game 66 of 100 completed with 11 moves, result: 1
+2024-11-26 19:23:08,497 - root - INFO - Game 67 of 100 completed with 11 moves, result: 1
+2024-11-26 19:23:14,899 - root - INFO - Game 68 of 100 completed with 10 moves, result: 2
+2024-11-26 19:23:19,799 - root - INFO - Game 69 of 100 completed with 8 moves, result: 2
+2024-11-26 19:23:24,031 - root - INFO - Game 70 of 100 completed with 7 moves, result: 1
+2024-11-26 19:23:28,995 - root - INFO - Game 71 of 100 completed with 8 moves, result: 2
+2024-11-26 19:23:35,466 - root - INFO - Game 72 of 100 completed with 10 moves, result: 2
+2024-11-26 19:23:41,348 - root - INFO - Game 73 of 100 completed with 9 moves, result: 1
+2024-11-26 19:23:45,638 - root - INFO - Game 74 of 100 completed with 7 moves, result: 1
+2024-11-26 19:23:52,674 - root - INFO - Game 75 of 100 completed with 11 moves, result: 1
+2024-11-26 19:23:57,562 - root - INFO - Game 76 of 100 completed with 8 moves, result: 2
+2024-11-26 19:24:03,965 - root - INFO - Game 77 of 100 completed with 10 moves, result: 2
+2024-11-26 19:24:08,992 - root - INFO - Game 78 of 100 completed with 8 moves, result: 2
+2024-11-26 19:24:13,214 - root - INFO - Game 79 of 100 completed with 7 moves, result: 1
+2024-11-26 19:24:17,468 - root - INFO - Game 80 of 100 completed with 7 moves, result: 1
+2024-11-26 19:24:23,042 - root - INFO - Game 81 of 100 completed with 9 moves, result: 1
+2024-11-26 19:24:32,456 - root - INFO - Game 82 of 100 completed with 14 moves, result: 2
+2024-11-26 19:24:41,572 - root - INFO - Game 83 of 100 completed with 14 moves, result: 2
+2024-11-26 19:24:49,476 - root - INFO - Game 84 of 100 completed with 12 moves, result: 2
+2024-11-26 19:24:53,763 - root - INFO - Game 85 of 100 completed with 7 moves, result: 1
+2024-11-26 19:25:01,715 - root - INFO - Game 86 of 100 completed with 12 moves, result: 2
+2024-11-26 19:25:11,001 - root - INFO - Game 87 of 100 completed with 14 moves, result: 2
+2024-11-26 19:25:20,160 - root - INFO - Game 88 of 100 completed with 14 moves, result: 2
+2024-11-26 19:25:29,400 - root - INFO - Game 89 of 100 completed with 14 moves, result: 2
+2024-11-26 19:25:37,985 - root - INFO - Game 90 of 100 completed with 13 moves, result: 1
+2024-11-26 19:25:41,626 - root - INFO - Game 91 of 100 completed with 7 moves, result: 1
+2024-11-26 19:25:50,394 - root - INFO - Game 92 of 100 completed with 14 moves, result: 2
+2024-11-26 19:26:00,973 - root - INFO - Game 93 of 100 completed with 16 moves, result: 2
+2024-11-26 19:26:05,269 - root - INFO - Game 94 of 100 completed with 7 moves, result: 1
+2024-11-26 19:26:10,309 - root - INFO - Game 95 of 100 completed with 8 moves, result: 2
+2024-11-26 19:26:14,555 - root - INFO - Game 96 of 100 completed with 7 moves, result: 1
+2024-11-26 19:26:20,144 - root - INFO - Game 97 of 100 completed with 9 moves, result: 1
+2024-11-26 19:26:25,089 - root - INFO - Game 98 of 100 completed with 9 moves, result: 1
+2024-11-26 19:26:29,360 - root - INFO - Game 99 of 100 completed with 7 moves, result: 1
+2024-11-26 19:26:29,360 - root - INFO - Commencing training phase...
+2024-11-26 19:26:29,367 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-26 19:26:29,368 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode
+---------------------------------------------
+0 | model | Connect4Net | 1.5 M  | eval
+---------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+0         Modules in train mode
+42        Modules in eval mode
+2024-11-26 19:26:35,712 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.882917, Policy Loss=-613086618546585726877696.000000, Total Loss=-613086618546585726877696.000000
+2024-11-26 19:26:42,903 - root - WARNING - Training loss not available for iteration 5
+2024-11-26 19:30:11,589 - root - INFO - Iteration 5 Performance: 86.00%
+2024-11-26 19:30:11,589 - root - INFO - No improvement for 8 iterations.
+2024-11-26 19:30:11,589 - root - INFO - No improvement for 9 iterations.
+2024-11-26 19:30:11,589 - root - INFO - === Iteration 5 completed in 0:14:32.680790 ===
+2024-11-26 19:30:11,589 - root - INFO - === Iteration 5 completed with performance: 86.00% ===
+2024-11-26 19:30:11,590 - root - INFO - === Starting Training Iteration 6/100 ===
+2024-11-26 19:30:11,590 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-26 19:30:11,590 - root - INFO - Generating 100 self-play games...
+2024-11-26 19:30:19,603 - root - INFO - Game 0 of 100 completed with 12 moves, result: 2
+2024-11-26 19:30:23,800 - root - INFO - Game 1 of 100 completed with 7 moves, result: 1
+2024-11-26 19:30:27,755 - root - INFO - Game 2 of 100 completed with 7 moves, result: 1
+2024-11-26 19:30:32,838 - root - INFO - Game 3 of 100 completed with 8 moves, result: 2
+2024-11-26 19:30:36,703 - root - INFO - Game 4 of 100 completed with 7 moves, result: 1
+2024-11-26 19:30:42,391 - root - INFO - Game 5 of 100 completed with 9 moves, result: 1
+2024-11-26 19:30:48,839 - root - INFO - Game 6 of 100 completed with 10 moves, result: 2
+2024-11-26 19:30:55,246 - root - INFO - Game 7 of 100 completed with 10 moves, result: 2
+2024-11-26 19:30:59,529 - root - INFO - Game 8 of 100 completed with 7 moves, result: 1
+2024-11-26 19:31:06,051 - root - INFO - Game 9 of 100 completed with 10 moves, result: 2
+2024-11-26 19:31:14,041 - root - INFO - Game 10 of 100 completed with 12 moves, result: 2
+2024-11-26 19:31:22,567 - root - INFO - Game 11 of 100 completed with 13 moves, result: 1
+2024-11-26 19:31:30,921 - root - INFO - Game 12 of 100 completed with 13 moves, result: 1
+2024-11-26 19:31:39,540 - root - INFO - Game 13 of 100 completed with 13 moves, result: 1
+2024-11-26 19:31:46,002 - root - INFO - Game 14 of 100 completed with 10 moves, result: 2
+2024-11-26 19:31:50,320 - root - INFO - Game 15 of 100 completed with 7 moves, result: 1
+2024-11-26 19:31:55,998 - root - INFO - Game 16 of 100 completed with 9 moves, result: 1
+2024-11-26 19:32:01,618 - root - INFO - Game 17 of 100 completed with 9 moves, result: 1
+2024-11-26 19:32:05,962 - root - INFO - Game 18 of 100 completed with 7 moves, result: 1
+2024-11-26 19:32:13,807 - root - INFO - Game 19 of 100 completed with 12 moves, result: 2
+2024-11-26 19:32:20,957 - root - INFO - Game 20 of 100 completed with 11 moves, result: 1
+2024-11-26 19:32:31,756 - root - INFO - Game 21 of 100 completed with 16 moves, result: 2
+2024-11-26 19:32:37,361 - root - INFO - Game 22 of 100 completed with 9 moves, result: 1
+2024-11-26 19:32:43,093 - root - INFO - Game 23 of 100 completed with 9 moves, result: 1
+2024-11-26 19:32:46,927 - root - INFO - Game 24 of 100 completed with 7 moves, result: 1
+2024-11-26 19:32:53,803 - root - INFO - Game 25 of 100 completed with 11 moves, result: 1
+2024-11-26 19:33:00,211 - root - INFO - Game 26 of 100 completed with 11 moves, result: 1
+2024-11-26 19:33:06,052 - root - INFO - Game 27 of 100 completed with 9 moves, result: 1
+2024-11-26 19:33:14,794 - root - INFO - Game 28 of 100 completed with 13 moves, result: 1
+2024-11-26 19:33:19,802 - root - INFO - Game 29 of 100 completed with 8 moves, result: 2
+2024-11-26 19:33:25,425 - root - INFO - Game 30 of 100 completed with 10 moves, result: 2
+2024-11-26 19:33:31,142 - root - INFO - Game 31 of 100 completed with 9 moves, result: 1
+2024-11-26 19:33:38,410 - root - INFO - Game 32 of 100 completed with 11 moves, result: 1
+2024-11-26 19:33:44,837 - root - INFO - Game 33 of 100 completed with 10 moves, result: 2
+2024-11-26 19:33:57,487 - root - INFO - Game 34 of 100 completed with 19 moves, result: 1
+2024-11-26 19:34:04,638 - root - INFO - Game 35 of 100 completed with 11 moves, result: 1
+2024-11-26 19:34:10,316 - root - INFO - Game 36 of 100 completed with 9 moves, result: 1
+2024-11-26 19:34:19,123 - root - INFO - Game 37 of 100 completed with 14 moves, result: 2
+2024-11-26 19:34:23,745 - root - INFO - Game 38 of 100 completed with 8 moves, result: 2
+2024-11-26 19:34:31,027 - root - INFO - Game 39 of 100 completed with 11 moves, result: 1
+2024-11-26 19:34:36,791 - root - INFO - Game 40 of 100 completed with 9 moves, result: 1
+2024-11-26 19:34:40,917 - root - INFO - Game 41 of 100 completed with 7 moves, result: 1
+2024-11-26 19:34:45,259 - root - INFO - Game 42 of 100 completed with 7 moves, result: 1
+2024-11-26 19:34:53,824 - root - INFO - Game 43 of 100 completed with 13 moves, result: 1
+2024-11-26 19:35:02,532 - root - INFO - Game 44 of 100 completed with 14 moves, result: 2
+2024-11-26 19:35:09,682 - root - INFO - Game 45 of 100 completed with 12 moves, result: 2
+2024-11-26 19:35:13,951 - root - INFO - Game 46 of 100 completed with 7 moves, result: 1
+2024-11-26 19:35:17,499 - root - INFO - Game 47 of 100 completed with 7 moves, result: 1
+2024-11-26 19:35:26,778 - root - INFO - Game 48 of 100 completed with 14 moves, result: 2
+2024-11-26 19:35:30,430 - root - INFO - Game 49 of 100 completed with 7 moves, result: 1
+2024-11-26 19:35:34,782 - root - INFO - Game 50 of 100 completed with 7 moves, result: 1
+2024-11-26 19:35:40,752 - root - INFO - Game 51 of 100 completed with 10 moves, result: 2
+2024-11-26 19:35:46,571 - root - INFO - Game 52 of 100 completed with 11 moves, result: 1
+2024-11-26 19:36:03,263 - root - INFO - Game 53 of 100 completed with 24 moves, result: 2
+2024-11-26 19:36:09,900 - root - INFO - Game 54 of 100 completed with 10 moves, result: 2
+2024-11-26 19:36:18,512 - root - INFO - Game 55 of 100 completed with 13 moves, result: 1
+2024-11-26 19:36:22,665 - root - INFO - Game 56 of 100 completed with 7 moves, result: 1
+2024-11-26 19:36:26,818 - root - INFO - Game 57 of 100 completed with 7 moves, result: 1
+2024-11-26 19:36:33,380 - root - INFO - Game 58 of 100 completed with 10 moves, result: 2
+2024-11-26 19:36:37,695 - root - INFO - Game 59 of 100 completed with 7 moves, result: 1
+2024-11-26 19:36:51,251 - root - INFO - Game 60 of 100 completed with 20 moves, result: 2
+2024-11-26 19:36:59,615 - root - INFO - Game 61 of 100 completed with 13 moves, result: 1
+2024-11-26 19:37:03,827 - root - INFO - Game 62 of 100 completed with 7 moves, result: 1
+2024-11-26 19:37:08,257 - root - INFO - Game 63 of 100 completed with 7 moves, result: 1
+2024-11-26 19:37:17,595 - root - INFO - Game 64 of 100 completed with 14 moves, result: 2
+2024-11-26 19:37:24,722 - root - INFO - Game 65 of 100 completed with 11 moves, result: 1
+2024-11-26 19:37:29,985 - root - INFO - Game 66 of 100 completed with 9 moves, result: 1
+2024-11-26 19:37:38,496 - root - INFO - Game 67 of 100 completed with 13 moves, result: 1
+2024-11-26 19:37:44,156 - root - INFO - Game 68 of 100 completed with 9 moves, result: 1
+2024-11-26 19:37:48,363 - root - INFO - Game 69 of 100 completed with 7 moves, result: 1
+2024-11-26 19:37:57,674 - root - INFO - Game 70 of 100 completed with 14 moves, result: 2
+2024-11-26 19:38:01,765 - root - INFO - Game 71 of 100 completed with 7 moves, result: 1
+2024-11-26 19:38:08,958 - root - INFO - Game 72 of 100 completed with 11 moves, result: 1
+2024-11-26 19:38:16,678 - root - INFO - Game 73 of 100 completed with 12 moves, result: 2
+2024-11-26 19:38:24,587 - root - INFO - Game 74 of 100 completed with 12 moves, result: 2
+2024-11-26 19:38:33,599 - root - INFO - Game 75 of 100 completed with 14 moves, result: 2
+2024-11-26 19:38:46,308 - root - INFO - Game 76 of 100 completed with 19 moves, result: 1
+2024-11-26 19:38:49,946 - root - INFO - Game 77 of 100 completed with 7 moves, result: 1
+2024-11-26 19:38:56,874 - root - INFO - Game 78 of 100 completed with 11 moves, result: 1
+2024-11-26 19:39:02,484 - root - INFO - Game 79 of 100 completed with 9 moves, result: 1
+2024-11-26 19:39:12,458 - root - INFO - Game 80 of 100 completed with 15 moves, result: 1
+2024-11-26 19:39:16,688 - root - INFO - Game 81 of 100 completed with 9 moves, result: 1
+2024-11-26 19:39:23,050 - root - INFO - Game 82 of 100 completed with 10 moves, result: 2
+2024-11-26 19:39:34,445 - root - INFO - Game 83 of 100 completed with 17 moves, result: 1
+2024-11-26 19:39:47,146 - root - INFO - Game 84 of 100 completed with 19 moves, result: 1
+2024-11-26 19:39:55,124 - root - INFO - Game 85 of 100 completed with 12 moves, result: 2
+2024-11-26 19:40:04,322 - root - INFO - Game 86 of 100 completed with 14 moves, result: 2
+2024-11-26 19:40:10,085 - root - INFO - Game 87 of 100 completed with 9 moves, result: 1
+2024-11-26 19:40:25,506 - root - INFO - Game 88 of 100 completed with 23 moves, result: 1
+2024-11-26 19:40:31,098 - root - INFO - Game 89 of 100 completed with 9 moves, result: 1
+2024-11-26 19:40:40,542 - root - INFO - Game 90 of 100 completed with 15 moves, result: 1
+2024-11-26 19:40:45,550 - root - INFO - Game 91 of 100 completed with 8 moves, result: 2
+2024-11-26 19:40:50,442 - root - INFO - Game 92 of 100 completed with 8 moves, result: 2
+2024-11-26 19:40:54,629 - root - INFO - Game 93 of 100 completed with 7 moves, result: 1
+2024-11-26 19:41:03,941 - root - INFO - Game 94 of 100 completed with 15 moves, result: 1
+2024-11-26 19:41:11,564 - root - INFO - Game 95 of 100 completed with 12 moves, result: 2
+2024-11-26 19:41:18,050 - root - INFO - Game 96 of 100 completed with 10 moves, result: 2
+2024-11-26 19:41:29,719 - root - INFO - Game 97 of 100 completed with 18 moves, result: 2
+2024-11-26 19:41:38,554 - root - INFO - Game 98 of 100 completed with 14 moves, result: 2
+2024-11-26 19:41:43,467 - root - INFO - Game 99 of 100 completed with 8 moves, result: 2
+2024-11-26 19:41:43,468 - root - INFO - Commencing training phase...
+2024-11-26 19:41:43,475 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-26 19:41:43,476 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode
+---------------------------------------------
+0 | model | Connect4Net | 1.5 M  | eval
+---------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+0         Modules in train mode
+42        Modules in eval mode
+2024-11-26 19:41:50,022 - nnbattle.agents.alphazero.lightning_module - INFO - Validation Batch 0: Value Loss=0.937663, Policy Loss=-580162891341107130531840.000000, Total Loss=-580162891341107130531840.000000
+2024-11-26 19:41:57,545 - root - WARNING - Training loss not available for iteration 6
+2024-11-26 19:44:45,720 - root - INFO - Iteration 6 Performance: 94.00%
+2024-11-26 19:44:45,720 - root - INFO - No improvement for 10 iterations.
+2024-11-26 19:44:45,721 - root - INFO - No improvement for 11 iterations.
+2024-11-26 19:44:45,721 - root - INFO - Early stopping triggered. Terminating training.
+2024-11-26 19:44:45,721 - root - INFO - === Iteration 6 completed with performance: 94.00% ===
+2024-11-26 19:44:45,721 - root - INFO - === Training Completed Successfully ===
+2024-11-26 19:44:45,721 - root - INFO - CUDA resources have been released.
+2024-11-26 23:59:56,856 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-26 23:59:56,864 - nnbattle.agents.alphazero.utils.model_utils - INFO - Model loaded successfully from nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-26 23:59:56,864 - root - INFO - Model loaded successfully.
+2024-11-26 23:59:56,864 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-26 23:59:56,864 - __main__ - INFO - Starting Game 1: Team 1 starts
+2024-11-26 23:59:57,730 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-26 23:59:57,730 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . R . .
+
+2024-11-26 23:59:57,731 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 23:59:57,731 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+
+2024-11-26 23:59:58,479 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-26 23:59:58,479 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+R . . Y R . .
+
+2024-11-26 23:59:58,480 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-26 23:59:58,480 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+R . . Y R . .
+
+2024-11-26 23:59:59,218 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-26 23:59:59,218 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+R . R Y R . .
+
+2024-11-26 23:59:59,219 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-26 23:59:59,219 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+R . R Y R . .
+
+2024-11-26 23:59:59,999 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-26 23:59:59,999 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+R R R Y R . .
+
+2024-11-27 00:00:00,000 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:00,000 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R R R Y R . .
+
+2024-11-27 00:00:00,731 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:00,732 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+. . Y Y . . .
+R R R Y R . .
+
+2024-11-27 00:00:00,732 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:00,732 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . .
+. . Y Y . . .
+R R R Y R . .
+
+2024-11-27 00:00:00,732 - __main__ - INFO - Game 1 ended with result: 2
+2024-11-27 00:00:00,732 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . .
+. . Y Y . . .
+R R R Y R . .
+
+2024-11-27 00:00:00,732 - __main__ - INFO - Starting Game 2: Team 2 starts
+2024-11-27 00:00:00,733 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:00,733 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-27 00:00:01,471 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-27 00:00:01,471 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+R . . Y . . .
+
+2024-11-27 00:00:01,472 - __main__ - INFO - Team 2 placed piece in column 4
+2024-11-27 00:00:01,474 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+R . . Y Y . .
+
+2024-11-27 00:00:02,189 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:02,189 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . R . .
+R . . Y Y . .
+
+2024-11-27 00:00:02,190 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:02,190 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+R . . Y Y . .
+
+2024-11-27 00:00:02,902 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-27 00:00:02,902 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y R . .
+R . . Y Y . .
+
+2024-11-27 00:00:02,903 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-27 00:00:02,903 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . . Y R . .
+R . Y Y Y . .
+
+2024-11-27 00:00:03,447 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:03,447 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R R . .
+. . . Y R . .
+R . Y Y Y . .
+
+2024-11-27 00:00:03,447 - __main__ - INFO - Team 2 placed piece in column 1
+2024-11-27 00:00:03,447 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R R . .
+. . . Y R . .
+R Y Y Y Y . .
+
+2024-11-27 00:00:03,447 - __main__ - INFO - Game 2 ended with result: 2
+2024-11-27 00:00:03,447 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R R . .
+. . . Y R . .
+R Y Y Y Y . .
+
+2024-11-27 00:00:03,448 - __main__ - INFO - Starting Game 3: Team 1 starts
+2024-11-27 00:00:04,191 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:04,191 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R . . . .
+
+2024-11-27 00:00:04,192 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:04,192 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+
+2024-11-27 00:00:04,982 - __main__ - INFO - Team 1 placed piece in column 3
+2024-11-27 00:00:04,982 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . R . . .
+. . R Y . . .
+
+2024-11-27 00:00:04,983 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:04,983 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . R . . .
+. . R Y . . .
+
+2024-11-27 00:00:05,712 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-27 00:00:05,713 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . R . . .
+. R R Y . . .
+
+2024-11-27 00:00:05,713 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:05,714 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . R . . .
+. R R Y . . .
+
+2024-11-27 00:00:06,454 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:06,454 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . R . . .
+. R R Y R . .
+
+2024-11-27 00:00:06,455 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:06,455 - __main__ - INFO - Board state:
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . . .
+. . . R . . .
+. R R Y R . .
+
+2024-11-27 00:00:07,195 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:07,195 - __main__ - INFO - Board state:
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . . .
+. . . R R . .
+. R R Y R . .
+
+2024-11-27 00:00:07,196 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:07,198 - __main__ - INFO - Board state:
+. . . Y . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . . .
+. . . R R . .
+. R R Y R . .
+
+2024-11-27 00:00:07,198 - __main__ - INFO - Game 3 ended with result: 2
+2024-11-27 00:00:07,198 - __main__ - INFO - Final board:
+. . . Y . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . . .
+. . . R R . .
+. R R Y R . .
+
+2024-11-27 00:00:07,198 - __main__ - INFO - Starting Game 4: Team 2 starts
+2024-11-27 00:00:07,199 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:07,199 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-27 00:00:07,943 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:07,943 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+
+2024-11-27 00:00:07,944 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:07,944 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . .
+
+2024-11-27 00:00:08,739 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-27 00:00:08,739 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . R .
+
+2024-11-27 00:00:08,740 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-27 00:00:08,740 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. . R Y . R .
+
+2024-11-27 00:00:09,480 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-27 00:00:09,480 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+R . R Y . R .
+
+2024-11-27 00:00:09,481 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:09,481 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R . R Y . R .
+
+2024-11-27 00:00:10,206 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-27 00:00:10,207 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R R R Y . R .
+
+2024-11-27 00:00:10,207 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:10,207 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+R R R Y . R .
+
+2024-11-27 00:00:10,207 - __main__ - INFO - Game 4 ended with result: 2
+2024-11-27 00:00:10,207 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+R R R Y . R .
+
+2024-11-27 00:00:10,207 - __main__ - INFO - Starting Game 5: Team 1 starts
+2024-11-27 00:00:10,996 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-27 00:00:10,996 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . . . . .
+
+2024-11-27 00:00:10,997 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:10,997 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . Y . . .
+
+2024-11-27 00:00:11,735 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-27 00:00:11,735 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. R . Y . . R
+
+2024-11-27 00:00:11,736 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:11,736 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y . . R
+
+2024-11-27 00:00:12,535 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:12,535 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y R . R
+
+2024-11-27 00:00:12,536 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:12,536 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R . Y R . R
+
+2024-11-27 00:00:13,275 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:13,275 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y R . .
+. R . Y R . R
+
+2024-11-27 00:00:13,275 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:13,275 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y R . .
+. R . Y R . R
+
+2024-11-27 00:00:13,276 - __main__ - INFO - Game 5 ended with result: 2
+2024-11-27 00:00:13,276 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y R . .
+. R . Y R . R
+
+2024-11-27 00:00:13,276 - __main__ - INFO - Starting Game 6: Team 2 starts
+2024-11-27 00:00:13,276 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:13,277 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-27 00:00:14,013 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-27 00:00:14,013 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . R .
+
+2024-11-27 00:00:14,014 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:14,014 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . R .
+
+2024-11-27 00:00:14,750 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:14,750 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y R R .
+
+2024-11-27 00:00:14,751 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:14,751 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y R R .
+
+2024-11-27 00:00:15,484 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-27 00:00:15,484 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . R .
+. . . Y R R .
+
+2024-11-27 00:00:15,485 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:15,485 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . R .
+. . . Y R R .
+
+2024-11-27 00:00:15,485 - __main__ - INFO - Game 6 ended with result: 2
+2024-11-27 00:00:15,485 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . R .
+. . . Y R R .
+
+2024-11-27 00:00:15,485 - __main__ - INFO - Starting Game 7: Team 1 starts
+2024-11-27 00:00:16,248 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:16,248 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . R . .
+
+2024-11-27 00:00:16,249 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:16,249 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+
+2024-11-27 00:00:17,031 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:17,031 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . R . .
+. . . Y R . .
+
+2024-11-27 00:00:17,032 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:17,032 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+. . . Y R . .
+
+2024-11-27 00:00:17,763 - __main__ - INFO - Team 1 placed piece in column 5
+2024-11-27 00:00:17,763 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+. . . Y R R .
+
+2024-11-27 00:00:17,764 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:17,764 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y R . .
+. . . Y R R .
+
+2024-11-27 00:00:18,469 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:18,469 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y R . .
+. . R Y R R .
+
+2024-11-27 00:00:18,470 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:18,470 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y R . .
+. . R Y R R .
+
+2024-11-27 00:00:18,470 - __main__ - INFO - Game 7 ended with result: 2
+2024-11-27 00:00:18,470 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y R . .
+. . R Y R R .
+
+2024-11-27 00:00:18,470 - __main__ - INFO - Starting Game 8: Team 2 starts
+2024-11-27 00:00:18,471 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:18,471 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-27 00:00:19,176 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:19,176 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+
+2024-11-27 00:00:19,177 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:19,177 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . .
+
+2024-11-27 00:00:19,879 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:19,879 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y R . .
+
+2024-11-27 00:00:19,880 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-27 00:00:19,880 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+. . R Y R . .
+
+2024-11-27 00:00:20,634 - __main__ - INFO - Team 1 placed piece in column 0
+2024-11-27 00:00:20,634 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . .
+R . R Y R . .
+
+2024-11-27 00:00:20,635 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:20,635 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R . R Y R . .
+
+2024-11-27 00:00:21,327 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-27 00:00:21,327 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . Y Y . . .
+R . R Y R . R
+
+2024-11-27 00:00:21,327 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:21,327 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+R . R Y R . R
+
+2024-11-27 00:00:21,327 - __main__ - INFO - Game 8 ended with result: 2
+2024-11-27 00:00:21,327 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . Y Y . . .
+R . R Y R . R
+
+2024-11-27 00:00:21,327 - __main__ - INFO - Starting Game 9: Team 1 starts
+2024-11-27 00:00:22,025 - __main__ - INFO - Team 1 placed piece in column 4
+2024-11-27 00:00:22,025 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . R . .
+
+2024-11-27 00:00:22,026 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:22,026 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . .
+
+2024-11-27 00:00:22,729 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-27 00:00:22,729 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y R . R
+
+2024-11-27 00:00:22,730 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:22,730 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y R . R
+
+2024-11-27 00:00:23,432 - __main__ - INFO - Team 1 placed piece in column 1
+2024-11-27 00:00:23,432 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. R . Y R . R
+
+2024-11-27 00:00:23,433 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:23,433 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. R . Y R . R
+
+2024-11-27 00:00:24,142 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-27 00:00:24,142 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . R
+. R . Y R . R
+
+2024-11-27 00:00:24,143 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:24,157 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . . R
+. R . Y R . R
+
+2024-11-27 00:00:24,157 - __main__ - INFO - Game 9 ended with result: 2
+2024-11-27 00:00:24,157 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . . Y . . .
+. . . Y . . R
+. R . Y R . R
+
+2024-11-27 00:00:24,157 - __main__ - INFO - Starting Game 10: Team 2 starts
+2024-11-27 00:00:24,158 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:24,158 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+
+2024-11-27 00:00:24,919 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-27 00:00:24,919 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . R
+
+2024-11-27 00:00:24,920 - __main__ - INFO - Team 2 placed piece in column 2
+2024-11-27 00:00:24,920 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . Y Y . . R
+
+2024-11-27 00:00:25,602 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:25,602 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R . . . .
+. . Y Y . . R
+
+2024-11-27 00:00:25,603 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:25,603 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+. . Y Y . . R
+
+2024-11-27 00:00:26,293 - __main__ - INFO - Team 1 placed piece in column 6
+2024-11-27 00:00:26,293 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . R
+. . Y Y . . R
+
+2024-11-27 00:00:26,294 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:26,294 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . R
+. . Y Y . . R
+
+2024-11-27 00:00:26,951 - __main__ - INFO - Team 1 placed piece in column 2
+2024-11-27 00:00:26,951 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . . . . .
+. . R Y . . .
+. . R Y . . R
+. . Y Y . . R
+
+2024-11-27 00:00:26,952 - __main__ - INFO - Team 2 placed piece in column 3
+2024-11-27 00:00:26,952 - __main__ - INFO - Board state:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . .
+. . R Y . . R
+. . Y Y . . R
+
+2024-11-27 00:00:26,952 - __main__ - INFO - Game 10 ended with result: 2
+2024-11-27 00:00:26,952 - __main__ - INFO - Final board:
+. . . . . . .
+. . . . . . .
+. . . Y . . .
+. . R Y . . .
+. . R Y . . R
+. . Y Y . . R
+
+2024-11-27 00:15:36,386 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 00:15:36,465 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 00:15:36,472 - nnbattle.agents.alphazero.utils.model_utils - INFO - Model loaded successfully from nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-27 00:15:36,472 - root - INFO - Model loaded successfully.
+2024-11-27 00:15:36,472 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 00:15:36,477 - root - INFO - Generating initial self-play games...
+2024-11-27 00:15:42,266 - root - INFO - Game 0 of 100 completed with 9 moves, result: 1
+2024-11-27 00:15:46,477 - root - INFO - Game 1 of 100 completed with 7 moves, result: 1
+2024-11-27 00:15:56,442 - root - INFO - Game 2 of 100 completed with 15 moves, result: 1
+2024-11-27 00:16:06,033 - root - INFO - Game 3 of 100 completed with 15 moves, result: 1
+2024-11-27 00:16:16,588 - root - INFO - Game 4 of 100 completed with 17 moves, result: 1
+2024-11-27 00:16:24,103 - root - INFO - Game 5 of 100 completed with 12 moves, result: 2
+2024-11-27 00:16:29,080 - root - INFO - Game 6 of 100 completed with 8 moves, result: 2
+2024-11-27 00:16:39,604 - root - INFO - Game 7 of 100 completed with 16 moves, result: 2
+2024-11-27 00:16:48,828 - root - INFO - Game 8 of 100 completed with 15 moves, result: 1
+2024-11-27 00:16:52,380 - root - INFO - Game 9 of 100 completed with 7 moves, result: 1
+2024-11-27 00:17:02,839 - root - INFO - Game 10 of 100 completed with 16 moves, result: 2
+2024-11-27 00:17:09,890 - root - INFO - Game 11 of 100 completed with 11 moves, result: 1
+2024-11-27 00:17:15,515 - root - INFO - Game 12 of 100 completed with 9 moves, result: 1
+2024-11-27 00:17:20,359 - root - INFO - Game 13 of 100 completed with 8 moves, result: 2
+2024-11-27 00:17:25,894 - root - INFO - Game 14 of 100 completed with 9 moves, result: 1
+2024-11-27 00:17:30,062 - root - INFO - Game 15 of 100 completed with 7 moves, result: 1
+2024-11-27 00:17:36,475 - root - INFO - Game 16 of 100 completed with 10 moves, result: 2
+2024-11-27 00:17:44,113 - root - INFO - Game 17 of 100 completed with 12 moves, result: 2
+2024-11-27 00:17:49,290 - root - INFO - Game 18 of 100 completed with 9 moves, result: 1
+2024-11-27 00:17:54,934 - root - INFO - Game 19 of 100 completed with 9 moves, result: 1
+2024-11-27 00:17:59,154 - root - INFO - Game 20 of 100 completed with 7 moves, result: 1
+2024-11-27 00:18:02,821 - root - INFO - Game 21 of 100 completed with 7 moves, result: 1
+2024-11-27 00:18:08,349 - root - INFO - Game 22 of 100 completed with 9 moves, result: 1
+2024-11-27 00:18:16,116 - root - INFO - Game 23 of 100 completed with 12 moves, result: 2
+2024-11-27 00:18:23,066 - root - INFO - Game 24 of 100 completed with 13 moves, result: 1
+2024-11-27 00:18:27,976 - root - INFO - Game 25 of 100 completed with 8 moves, result: 2
+2024-11-27 00:18:34,308 - root - INFO - Game 26 of 100 completed with 10 moves, result: 2
+2024-11-27 00:18:42,033 - root - INFO - Game 27 of 100 completed with 12 moves, result: 2
+2024-11-27 00:18:46,709 - root - INFO - Game 28 of 100 completed with 9 moves, result: 1
+2024-11-27 00:18:55,155 - root - INFO - Game 29 of 100 completed with 13 moves, result: 1
+2024-11-27 00:18:59,272 - root - INFO - Game 30 of 100 completed with 7 moves, result: 1
+2024-11-27 00:19:07,000 - root - INFO - Game 31 of 100 completed with 12 moves, result: 2
+2024-11-27 00:19:15,472 - root - INFO - Game 32 of 100 completed with 13 moves, result: 1
+2024-11-27 00:19:22,506 - root - INFO - Game 33 of 100 completed with 11 moves, result: 1
+2024-11-27 00:19:28,948 - root - INFO - Game 34 of 100 completed with 10 moves, result: 2
+2024-11-27 00:19:39,322 - root - INFO - Game 35 of 100 completed with 17 moves, result: 1
+2024-11-27 00:19:46,209 - root - INFO - Game 36 of 100 completed with 11 moves, result: 1
+2024-11-27 00:19:50,316 - root - INFO - Game 37 of 100 completed with 7 moves, result: 1
+2024-11-27 00:19:54,552 - root - INFO - Game 38 of 100 completed with 7 moves, result: 1
+2024-11-27 00:20:01,451 - root - INFO - Game 39 of 100 completed with 11 moves, result: 1
+2024-11-27 00:20:06,974 - root - INFO - Game 40 of 100 completed with 9 moves, result: 1
+2024-11-27 00:20:18,078 - root - INFO - Game 41 of 100 completed with 17 moves, result: 1
+2024-11-27 00:20:25,787 - root - INFO - Game 42 of 100 completed with 12 moves, result: 2
+2024-11-27 00:20:33,043 - root - INFO - Game 43 of 100 completed with 12 moves, result: 2
+2024-11-27 00:20:37,718 - root - INFO - Game 44 of 100 completed with 8 moves, result: 2
+2024-11-27 00:20:43,273 - root - INFO - Game 45 of 100 completed with 9 moves, result: 1
+2024-11-27 00:20:50,209 - root - INFO - Game 46 of 100 completed with 11 moves, result: 1
+2024-11-27 00:21:02,608 - root - INFO - Game 47 of 100 completed with 19 moves, result: 1
+2024-11-27 00:21:13,918 - root - INFO - Game 48 of 100 completed with 17 moves, result: 1
+2024-11-27 00:21:18,833 - root - INFO - Game 49 of 100 completed with 8 moves, result: 2
+2024-11-27 00:21:27,188 - root - INFO - Game 50 of 100 completed with 13 moves, result: 1
+2024-11-27 00:21:31,929 - root - INFO - Game 51 of 100 completed with 8 moves, result: 2
+2024-11-27 00:21:36,231 - root - INFO - Game 52 of 100 completed with 7 moves, result: 1
+2024-11-27 00:21:43,875 - root - INFO - Game 53 of 100 completed with 12 moves, result: 2
+2024-11-27 00:21:48,091 - root - INFO - Game 54 of 100 completed with 7 moves, result: 1
+2024-11-27 00:21:54,456 - root - INFO - Game 55 of 100 completed with 10 moves, result: 2
+2024-11-27 00:22:02,822 - root - INFO - Game 56 of 100 completed with 13 moves, result: 1
+2024-11-27 00:22:13,277 - root - INFO - Game 57 of 100 completed with 17 moves, result: 1
+2024-11-27 00:22:20,075 - root - INFO - Game 58 of 100 completed with 11 moves, result: 1
+2024-11-27 00:22:25,631 - root - INFO - Game 59 of 100 completed with 9 moves, result: 1
+2024-11-27 00:22:33,349 - root - INFO - Game 60 of 100 completed with 12 moves, result: 2
+2024-11-27 00:22:38,308 - root - INFO - Game 61 of 100 completed with 8 moves, result: 2
+2024-11-27 00:22:46,571 - root - INFO - Game 62 of 100 completed with 13 moves, result: 1
+2024-11-27 00:22:50,764 - root - INFO - Game 63 of 100 completed with 7 moves, result: 1
+2024-11-27 00:22:55,775 - root - INFO - Game 64 of 100 completed with 9 moves, result: 1
+2024-11-27 00:23:05,267 - root - INFO - Game 65 of 100 completed with 15 moves, result: 1
+2024-11-27 00:23:14,044 - root - INFO - Game 66 of 100 completed with 14 moves, result: 2
+2024-11-27 00:23:17,692 - root - INFO - Game 67 of 100 completed with 7 moves, result: 1
+2024-11-27 00:23:21,870 - root - INFO - Game 68 of 100 completed with 7 moves, result: 1
+2024-11-27 00:23:26,852 - root - INFO - Game 69 of 100 completed with 8 moves, result: 2
+2024-11-27 00:23:32,479 - root - INFO - Game 70 of 100 completed with 9 moves, result: 1
+2024-11-27 00:23:40,927 - root - INFO - Game 71 of 100 completed with 13 moves, result: 1
+2024-11-27 00:23:45,255 - root - INFO - Game 72 of 100 completed with 7 moves, result: 1
+2024-11-27 00:23:50,776 - root - INFO - Game 73 of 100 completed with 9 moves, result: 1
+2024-11-27 00:24:07,005 - root - INFO - Game 74 of 100 completed with 25 moves, result: 1
+2024-11-27 00:24:12,920 - root - INFO - Game 75 of 100 completed with 9 moves, result: 1
+2024-11-27 00:24:17,301 - root - INFO - Game 76 of 100 completed with 7 moves, result: 1
+2024-11-27 00:24:21,493 - root - INFO - Game 77 of 100 completed with 7 moves, result: 1
+2024-11-27 00:24:27,345 - root - INFO - Game 78 of 100 completed with 9 moves, result: 1
+2024-11-27 00:24:37,183 - root - INFO - Game 79 of 100 completed with 14 moves, result: 2
+2024-11-27 00:24:41,924 - root - INFO - Game 80 of 100 completed with 7 moves, result: 1
+2024-11-27 00:24:49,498 - root - INFO - Game 81 of 100 completed with 12 moves, result: 2
+2024-11-27 00:24:55,198 - root - INFO - Game 82 of 100 completed with 9 moves, result: 1
+2024-11-27 00:24:58,895 - root - INFO - Game 83 of 100 completed with 7 moves, result: 1
+2024-11-27 00:25:05,871 - root - INFO - Game 84 of 100 completed with 11 moves, result: 1
+2024-11-27 00:25:11,662 - root - INFO - Game 85 of 100 completed with 9 moves, result: 1
+2024-11-27 00:25:15,703 - root - INFO - Game 86 of 100 completed with 7 moves, result: 1
+2024-11-27 00:25:25,090 - root - INFO - Game 87 of 100 completed with 14 moves, result: 2
+2024-11-27 00:25:33,362 - root - INFO - Game 88 of 100 completed with 13 moves, result: 1
+2024-11-27 00:25:37,589 - root - INFO - Game 89 of 100 completed with 7 moves, result: 1
+2024-11-27 00:25:51,603 - root - INFO - Game 90 of 100 completed with 21 moves, result: 1
+2024-11-27 00:25:59,577 - root - INFO - Game 91 of 100 completed with 12 moves, result: 2
+2024-11-27 00:26:03,808 - root - INFO - Game 92 of 100 completed with 7 moves, result: 1
+2024-11-27 00:26:10,857 - root - INFO - Game 93 of 100 completed with 11 moves, result: 1
+2024-11-27 00:26:17,995 - root - INFO - Game 94 of 100 completed with 11 moves, result: 1
+2024-11-27 00:26:24,483 - root - INFO - Game 95 of 100 completed with 10 moves, result: 2
+2024-11-27 00:26:28,661 - root - INFO - Game 96 of 100 completed with 7 moves, result: 1
+2024-11-27 00:26:36,445 - root - INFO - Game 97 of 100 completed with 12 moves, result: 2
+2024-11-27 00:26:42,781 - root - INFO - Game 98 of 100 completed with 11 moves, result: 1
+2024-11-27 00:26:47,020 - root - INFO - Game 99 of 100 completed with 7 moves, result: 1
+2024-11-27 00:26:47,024 - pytorch_lightning.utilities.rank_zero - INFO - GPU available: True (cuda), used: True
+2024-11-27 00:26:47,034 - pytorch_lightning.utilities.rank_zero - INFO - TPU available: False, using: 0 TPU cores
+2024-11-27 00:26:47,034 - pytorch_lightning.utilities.rank_zero - INFO - HPU available: False, using: 0 HPUs
+2024-11-27 00:26:47,035 - root - INFO - === Starting Training Iteration 1/100 ===
+2024-11-27 00:26:47,035 - root - INFO - Using temperature: 1.0, c_puct: 1.4
+2024-11-27 00:26:47,035 - root - INFO - Generating 100 self-play games...
+2024-11-27 00:26:54,655 - root - INFO - Game 0 of 100 completed with 12 moves, result: 2
+2024-11-27 00:27:06,696 - root - INFO - Game 1 of 100 completed with 17 moves, result: 1
+2024-11-27 00:27:11,648 - root - INFO - Game 2 of 100 completed with 8 moves, result: 2
+2024-11-27 00:27:22,274 - root - INFO - Game 3 of 100 completed with 16 moves, result: 2
+2024-11-27 00:27:27,632 - root - INFO - Game 4 of 100 completed with 9 moves, result: 1
+2024-11-27 00:27:35,451 - root - INFO - Game 5 of 100 completed with 12 moves, result: 2
+2024-11-27 00:27:43,994 - root - INFO - Game 6 of 100 completed with 13 moves, result: 1
+2024-11-27 00:27:51,278 - root - INFO - Game 7 of 100 completed with 11 moves, result: 1
+2024-11-27 00:27:57,084 - root - INFO - Game 8 of 100 completed with 9 moves, result: 1
+2024-11-27 00:28:05,754 - root - INFO - Game 9 of 100 completed with 13 moves, result: 1
+2024-11-27 00:28:13,513 - root - INFO - Game 10 of 100 completed with 12 moves, result: 2
+2024-11-27 00:28:23,328 - root - INFO - Game 11 of 100 completed with 15 moves, result: 1
+2024-11-27 00:28:28,970 - root - INFO - Game 12 of 100 completed with 9 moves, result: 1
+2024-11-27 00:28:33,373 - root - INFO - Game 13 of 100 completed with 7 moves, result: 1
+2024-11-27 00:28:39,747 - root - INFO - Game 14 of 100 completed with 10 moves, result: 2
+2024-11-27 00:28:48,312 - root - INFO - Game 15 of 100 completed with 13 moves, result: 1
+2024-11-27 00:28:56,712 - root - INFO - Game 16 of 100 completed with 13 moves, result: 1
+2024-11-27 00:29:00,295 - root - INFO - Game 17 of 100 completed with 7 moves, result: 1
+2024-11-27 00:29:10,732 - root - INFO - Game 18 of 100 completed with 18 moves, result: 2
+2024-11-27 00:29:19,218 - root - INFO - Game 19 of 100 completed with 13 moves, result: 1
+2024-11-27 00:29:27,929 - root - INFO - Game 20 of 100 completed with 13 moves, result: 1
+2024-11-27 00:29:36,773 - root - INFO - Game 21 of 100 completed with 13 moves, result: 1
+2024-11-27 00:29:48,994 - root - INFO - Game 22 of 100 completed with 19 moves, result: 1
+2024-11-27 00:29:53,253 - root - INFO - Game 23 of 100 completed with 7 moves, result: 1
+2024-11-27 00:30:03,976 - root - INFO - Game 24 of 100 completed with 16 moves, result: 2
+2024-11-27 00:30:09,853 - root - INFO - Game 25 of 100 completed with 9 moves, result: 1
+2024-11-27 00:30:16,368 - root - INFO - Game 26 of 100 completed with 10 moves, result: 2
+2024-11-27 00:30:26,075 - root - INFO - Game 27 of 100 completed with 14 moves, result: 2
+2024-11-27 00:30:31,941 - root - INFO - Game 28 of 100 completed with 9 moves, result: 1
+2024-11-27 00:30:36,326 - root - INFO - Game 29 of 100 completed with 7 moves, result: 1
+2024-11-27 00:30:40,695 - root - INFO - Game 30 of 100 completed with 7 moves, result: 1
+2024-11-27 00:30:45,386 - root - INFO - Game 31 of 100 completed with 8 moves, result: 2
+2024-11-27 00:30:52,149 - root - INFO - Game 32 of 100 completed with 10 moves, result: 2
+2024-11-27 00:31:05,811 - root - INFO - Game 33 of 100 completed with 19 moves, result: 1
+2024-11-27 00:31:09,573 - root - INFO - Game 34 of 100 completed with 7 moves, result: 1
+2024-11-27 00:31:15,622 - root - INFO - Game 35 of 100 completed with 9 moves, result: 1
+2024-11-27 00:31:23,814 - root - INFO - Game 36 of 100 completed with 13 moves, result: 1
+2024-11-27 00:31:28,959 - root - INFO - Game 37 of 100 completed with 8 moves, result: 2
+2024-11-27 00:31:37,339 - root - INFO - Game 38 of 100 completed with 12 moves, result: 2
+2024-11-27 00:31:42,487 - root - INFO - Game 39 of 100 completed with 8 moves, result: 2
+2024-11-27 00:31:50,344 - root - INFO - Game 40 of 100 completed with 12 moves, result: 2
+2024-11-27 00:31:54,485 - root - INFO - Game 41 of 100 completed with 7 moves, result: 1
+2024-11-27 00:31:59,542 - root - INFO - Game 42 of 100 completed with 8 moves, result: 2
+2024-11-27 00:32:03,191 - root - INFO - Game 43 of 100 completed with 7 moves, result: 1
+2024-11-27 00:32:10,979 - root - INFO - Game 44 of 100 completed with 12 moves, result: 2
+2024-11-27 00:32:18,211 - root - INFO - Game 45 of 100 completed with 11 moves, result: 1
+2024-11-27 00:32:23,924 - root - INFO - Game 46 of 100 completed with 9 moves, result: 1
+2024-11-27 00:32:28,184 - root - INFO - Game 47 of 100 completed with 7 moves, result: 1
+2024-11-27 00:32:32,382 - root - INFO - Game 48 of 100 completed with 7 moves, result: 1
+2024-11-27 00:32:40,491 - root - INFO - Game 49 of 100 completed with 12 moves, result: 2
+2024-11-27 00:32:47,734 - root - INFO - Game 50 of 100 completed with 11 moves, result: 1
+2024-11-27 00:32:55,720 - root - INFO - Game 51 of 100 completed with 12 moves, result: 2
+2024-11-27 00:33:01,438 - root - INFO - Game 52 of 100 completed with 9 moves, result: 1
+2024-11-27 00:33:05,103 - root - INFO - Game 53 of 100 completed with 7 moves, result: 1
+2024-11-27 00:33:12,359 - root - INFO - Game 54 of 100 completed with 11 moves, result: 1
+2024-11-27 00:33:16,554 - root - INFO - Game 55 of 100 completed with 7 moves, result: 1
+2024-11-27 00:33:20,938 - root - INFO - Game 56 of 100 completed with 7 moves, result: 1
+2024-11-27 00:33:30,824 - root - INFO - Game 57 of 100 completed with 15 moves, result: 1
+2024-11-27 00:33:37,964 - root - INFO - Game 58 of 100 completed with 11 moves, result: 1
+2024-11-27 00:33:47,800 - root - INFO - Game 59 of 100 completed with 15 moves, result: 1
+2024-11-27 00:33:55,876 - root - INFO - Game 60 of 100 completed with 12 moves, result: 2
+2024-11-27 00:34:03,462 - root - INFO - Game 61 of 100 completed with 12 moves, result: 2
+2024-11-27 00:34:09,752 - root - INFO - Game 62 of 100 completed with 10 moves, result: 2
+2024-11-27 00:34:19,360 - root - INFO - Game 63 of 100 completed with 14 moves, result: 2
+2024-11-27 00:34:25,052 - root - INFO - Game 64 of 100 completed with 9 moves, result: 1
+2024-11-27 00:34:33,745 - root - INFO - Game 65 of 100 completed with 14 moves, result: 2
+2024-11-27 00:34:40,745 - root - INFO - Game 66 of 100 completed with 11 moves, result: 1
+2024-11-27 00:34:47,064 - root - INFO - Game 67 of 100 completed with 10 moves, result: 2
+2024-11-27 00:34:50,723 - root - INFO - Game 68 of 100 completed with 7 moves, result: 1
+2024-11-27 00:34:54,914 - root - INFO - Game 69 of 100 completed with 7 moves, result: 1
+2024-11-27 00:35:02,059 - root - INFO - Game 70 of 100 completed with 11 moves, result: 1
+2024-11-27 00:35:06,895 - root - INFO - Game 71 of 100 completed with 8 moves, result: 2
+2024-11-27 00:35:10,519 - root - INFO - Game 72 of 100 completed with 7 moves, result: 1
+2024-11-27 00:35:25,180 - root - INFO - Game 73 of 100 completed with 22 moves, result: 2
+2024-11-27 00:35:31,000 - root - INFO - Game 74 of 100 completed with 9 moves, result: 1
+2024-11-27 00:35:41,349 - root - INFO - Game 75 of 100 completed with 15 moves, result: 1
+2024-11-27 00:35:45,642 - root - INFO - Game 76 of 100 completed with 7 moves, result: 1
+2024-11-27 00:35:50,710 - root - INFO - Game 77 of 100 completed with 8 moves, result: 2
+2024-11-27 00:35:55,046 - root - INFO - Game 78 of 100 completed with 7 moves, result: 1
+2024-11-27 00:36:04,305 - root - INFO - Game 79 of 100 completed with 14 moves, result: 2
+2024-11-27 00:36:09,144 - root - INFO - Game 80 of 100 completed with 9 moves, result: 1
+2024-11-27 00:36:13,400 - root - INFO - Game 81 of 100 completed with 7 moves, result: 1
+2024-11-27 00:36:20,555 - root - INFO - Game 82 of 100 completed with 11 moves, result: 1
+2024-11-27 00:36:24,715 - root - INFO - Game 83 of 100 completed with 7 moves, result: 1
+2024-11-27 00:36:31,768 - root - INFO - Game 84 of 100 completed with 11 moves, result: 1
+2024-11-27 00:36:40,381 - root - INFO - Game 85 of 100 completed with 13 moves, result: 1
+2024-11-27 00:36:44,800 - root - INFO - Game 86 of 100 completed with 7 moves, result: 1
+2024-11-27 00:36:50,769 - root - INFO - Game 87 of 100 completed with 9 moves, result: 1
+2024-11-27 00:36:55,864 - root - INFO - Game 88 of 100 completed with 8 moves, result: 2
+2024-11-27 00:37:00,185 - root - INFO - Game 89 of 100 completed with 7 moves, result: 1
+2024-11-27 00:37:03,875 - root - INFO - Game 90 of 100 completed with 7 moves, result: 1
+2024-11-27 00:37:16,295 - root - INFO - Game 91 of 100 completed with 18 moves, result: 2
+2024-11-27 00:37:26,950 - root - INFO - Game 92 of 100 completed with 16 moves, result: 2
+2024-11-27 00:37:31,100 - root - INFO - Game 93 of 100 completed with 7 moves, result: 1
+2024-11-27 00:37:35,394 - root - INFO - Game 94 of 100 completed with 7 moves, result: 1
+2024-11-27 00:37:44,794 - root - INFO - Game 95 of 100 completed with 14 moves, result: 2
+2024-11-27 00:37:51,143 - root - INFO - Game 96 of 100 completed with 10 moves, result: 2
+2024-11-27 00:37:55,461 - root - INFO - Game 97 of 100 completed with 7 moves, result: 1
+2024-11-27 00:37:59,689 - root - INFO - Game 98 of 100 completed with 7 moves, result: 1
+2024-11-27 00:38:05,307 - root - INFO - Game 99 of 100 completed with 9 moves, result: 1
+2024-11-27 00:38:05,307 - root - INFO - Commencing training phase...
+2024-11-27 00:38:05,344 - pytorch_lightning.accelerators.cuda - INFO - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+2024-11-27 00:38:05,345 - pytorch_lightning.callbacks.model_summary - INFO - 
+  | Name  | Type        | Params | Mode 
+----------------------------------------------
+0 | model | Connect4Net | 1.5 M  | train
+----------------------------------------------
+1.5 M     Trainable params
+0         Non-trainable params
+1.5 M     Total params
+5.978     Total estimated model params size (MB)
+42        Modules in train mode
+0         Modules in eval mode

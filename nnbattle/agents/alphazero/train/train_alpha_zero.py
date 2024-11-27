@@ -94,6 +94,8 @@ def train_alphazero(
     )
     agent.model.to(agent.device)  # Ensure the model is on the correct device
     
+    log_gpu_info(agent)  # Log initial GPU state
+    
     data_module = ConnectFourDataModule(agent, num_self_play_games)
     lightning_module = ConnectFourLightningModule(agent)
     
@@ -171,6 +173,7 @@ def train_alphazero(
         iteration_start_time = time.time()
         try:
             logger.info(f"Generating {num_self_play_games} self-play games...")
+            log_gpu_info(agent)  # Before generating self-play games
             data_module.generate_self_play_games(temperature=temperature)
             
             if len(data_module.dataset) == 0:
@@ -179,8 +182,14 @@ def train_alphazero(
             
             data_module.setup('fit')  # Re-setup after adding new data
             
+            # Ensure the model is in training mode before training
+            agent.model.train()
+            lightning_module.model.train()
+
             logger.info("Commencing training phase...")
+            log_gpu_info(agent)  # Before training phase
             trainer.fit(lightning_module, data_module)
+            log_gpu_info(agent)  # After training phase
             
             # Log the training loss after each iteration
             if 'train_loss' in lightning_module.trainer.callback_metrics:
@@ -188,8 +197,8 @@ def train_alphazero(
                 logger.info(f"Iteration {iteration} Training Loss: {training_loss:.6f}")
                 logger_tb.log_metrics({
                     'training/loss': training_loss,
-                    'training/performance': performance if performance is not None else 0.0,
-                    'training/win_rate': performance if performance is not None else 0.0,
+                    'training/performance': performance,
+                    'training/win_rate': performance,
                     'training/iteration': iteration,
                     'memory/buffer_size': len(data_module.dataset),
                     'hyperparameters/learning_rate': trainer.optimizers[0].param_groups[0]['lr'],
@@ -198,6 +207,7 @@ def train_alphazero(
                 
                 # Log evaluation metrics every 10 iterations
                 if iteration % 10 == 0:
+                    log_gpu_info(agent)  # Every 10 iterations for evaluation
                     validation_metrics = evaluate_agent(agent, num_games=50)
                     logger_tb.log_metrics({
                         'validation/win_rate': validation_metrics,
@@ -268,6 +278,7 @@ def train_alphazero(
             raise
         except Exception as e:
             logger.error(f"Unexpected error during training: {e}")
+            log_gpu_info(agent)  # Log GPU state on error
             raise
         finally:
             if performance is not None:

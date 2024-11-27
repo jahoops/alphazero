@@ -25,6 +25,7 @@ class ConnectFourLightningModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
+        logger.debug(f"Training Step - Model training mode: {self.model.training}")
         states, mcts_probs, rewards = batch
         # Move tensors to device here after pin_memory has been called
         states = states.to(self.device, non_blocking=True)
@@ -79,6 +80,7 @@ class ConnectFourLightningModule(pl.LightningModule):
         return value_loss + policy_loss
 
     def validation_step(self, batch, batch_idx):
+        logger.debug(f"Validation Step - Model training mode: {self.model.training}")
         """Add a validation step to monitor performance on a separate set."""
         states, mcts_probs, rewards = batch
         # Move tensors to device here after pin_memory has been called

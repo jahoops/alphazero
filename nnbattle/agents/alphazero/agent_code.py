@@ -28,18 +28,29 @@ def deepcopy_env(env):
     """Deep copy the environment."""
     return copy.deepcopy(env)
 
+from contextlib import contextmanager
+
+@contextmanager
+def model_mode(model, training):
+    original_mode = model.training
+    model.train(training)
+    try:
+        yield
+    finally:
+        model.train(original_mode)
+
 class AlphaZeroAgent(BaseAgent):
     logger = logger
 
     def __init__(
         self,
         action_dim,
-        state_dim=3,  # Changed from 2 to 3 to match the state tensor shape
+        state_dim=3,  # Adjusted state dimension
         use_gpu=True,
         num_simulations=800,
         c_puct=1.4,
         load_model=True,
-        team=RED_TEAM  # Ensure team is initialized
+        team=RED_TEAM  # Initialized team
     ):
         super().__init__(team)
         self.state_dim = state_dim
@@ -49,13 +60,9 @@ class AlphaZeroAgent(BaseAgent):
         self.load_model_flag = load_model
         self.num_simulations = num_simulations
         self.c_puct = c_puct
-        self.team = team  # Initialize as an instance attribute
+        self.team = team
         self.memory = []
-        self.model = Connect4Net(state_dim, action_dim)
-        self.model = self.model.to(self.device)
-        for param in self.model.parameters():
-            param.data = param.data.to(self.device)
-        
+        self.model = Connect4Net(state_dim, action_dim).to(self.device)
         self.model_path = MODEL_PATH  # Added model_path attribute
 
         logger.info(f"Initialized AlphaZeroAgent on device: {self.device}")
@@ -120,22 +127,7 @@ class AlphaZeroAgent(BaseAgent):
             logger.error("No valid moves available.")
             raise InvalidMoveError("No valid moves available.")
 
-        # Use MCTS or policy to select a move
         selected_action, action_probs = self.act(game, valid_moves, temperature=temperature)
-        #logger.info(f"Agent {self.team} selected action {selected_action}.")
-
-        return selected_action, action_probs
-
-    def act(self, game: ConnectFourGame, valid_moves, temperature=1.0, **kwargs):
-        self.model.eval()  # Set to evaluation mode
-        self.model = self.model.to(self.device)  # Ensure model is on correct device
-        logger.debug(f"Model device: {next(self.model.parameters()).device}")
-        logger.debug("Starting MCTS simulation for action selection.")
-        selected_action, action_probs = mcts_simulate(self, game, valid_moves, temperature=temperature)
-        if selected_action is None:
-            logger.error("Failed to select a valid action.")
-            raise InvalidMoveError("Failed to select a valid action.")
-        logger.debug(f"MCTS simulation completed. Selected Action: {selected_action}")
         return selected_action, action_probs
 
     def self_play(self, game_number, games_max, max_moves=100, temperature=1.0):
@@ -215,6 +207,11 @@ class AlphaZeroAgent(BaseAgent):
             load_model=self.load_model_flag
         )
 
+    def act(self, game: ConnectFourGame, valid_moves, temperature=1.0, **kwargs):
+        with model_mode(self.model, training=False):  # Temporarily set to eval mode
+            selected_action, action_probs = mcts_simulate(self, game, valid_moves, temperature=temperature)
+        return selected_action, action_probs
+
 def initialize_agent(
     action_dim=7,
     state_dim=2,
@@ -231,11 +228,10 @@ def initialize_agent(
     agent = AlphaZeroAgent(
         action_dim=action_dim,
         state_dim=state_dim,
-        use_gpu=use_gpu,
-        num_simulations=num_simulations,
-        c_puct=c_puct,
-        load_model=load_model
-    )
+        use_gpu=use_gpu,        
+        num_simulations=num_simulations,        
+        c_puct=c_puct,        
+        load_model=load_model    )
     return agent
 
 __all__ = ['AlphaZeroAgent', 'initialize_agent']
