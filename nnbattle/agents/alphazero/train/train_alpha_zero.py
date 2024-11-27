@@ -92,20 +92,25 @@ def train_alphazero(
 
             torch.cuda.reset_peak_memory_stats()
 
-    # Modify DataLoader settings to be more stable
+    # Modify DataLoader settings for better training
     data_module = ConnectFourDataModule(
         agent, 
         num_games=num_self_play_games,
-        batch_size=32,
-        num_workers=23,  # Reduce from 4 to 2 for stability
+        batch_size=128,  # Increased batch size
+        num_workers=4,   # Reduced workers for stability
         persistent_workers=True
     )
 
     lightning_module = ConnectFourLightningModule(agent)  # Create the lightning module instance
 
-    # Generate self-play games using the SelfPlay class
+    # Generate self-play games using the SelfPlay class with proper agent
     game = ConnectFourGame()
-    self_play = SelfPlay(game=game, model=agent.model, num_simulations=agent.num_simulations)
+    self_play = SelfPlay(
+        game=game, 
+        model=agent.model,
+        num_simulations=agent.num_simulations,
+        agent=agent  # Pass the full agent instance
+    )
     training_data = self_play.generate_training_data(num_self_play_games)
 
     # Check if we got valid training data
@@ -119,9 +124,9 @@ def train_alphazero(
 
     data_module.setup('fit')
 
-    # Remove early stopping since we're in barebones mode
+    # Create trainer with better training parameters
     trainer = pl.Trainer(
-        max_epochs=10,
+        max_epochs=50,   # Increased epochs
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
         devices=1,
         callbacks=None,  # Remove all callbacks
@@ -133,7 +138,7 @@ def train_alphazero(
         deterministic=False,
         benchmark=True,
         inference_mode=True,
-        gradient_clip_val=None,
+        gradient_clip_val=1.0,  # Add gradient clipping
         detect_anomaly=False,
         barebones=True,
         reload_dataloaders_every_n_epochs=0

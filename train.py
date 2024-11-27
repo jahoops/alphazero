@@ -2,6 +2,7 @@ def main():
     from nnbattle.agents.alphazero.agent_code import initialize_agent  # Added import
     from nnbattle.agents.alphazero.train import train_alphazero  # Updated import path
     from nnbattle.utils.logger_config import logger  # Corrected import
+    import torch
     import torch.multiprocessing as mp
     import os
     import torch
@@ -43,20 +44,19 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    # Run training
+    # Run training with more iterations and games
     try:
         train_alphazero(
-            agent=agent,  # Pass the agent as an argument
-            max_iterations=10,
-            num_self_play_games=10,
+            agent=agent,
+            max_iterations=50,     # More iterations
+            num_self_play_games=1000,  # Keep games per iteration manageable
             use_gpu=True,
             load_model=True
         )
-        # Save the trained model
-        agent.save_model()  # Add this line
-        logger.info("Training completed. Final model saved.")  # Add this line
+        agent.save_model()
+        logger.info("Training completed. Final model saved.")
     except KeyboardInterrupt:
-        signal_handler(signal.SIGINT, None)  # Handle keyboard interrupt
+        signal_handler(signal.SIGINT, None)
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         signal_handler(signal.SIGTERM, None)  # Clean up on error

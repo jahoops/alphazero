@@ -1,80 +1,63 @@
 import numpy as np
+import copy
+from .mcts import mcts_simulate
 from typing import List, Tuple
 from ...utils.logger_config import logger
 from ...game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
 from ...constants import RED_TEAM, YEL_TEAM
 
+def deepcopy_env(env):
+    """Deep copy the environment."""
+    return copy.deepcopy(env)
+
 class SelfPlay:
-    def __init__(self, game: ConnectFourGame, model, num_simulations=100):
-        """Initialize with a ConnectFourGame instance."""
+    def __init__(self, game: ConnectFourGame, model, num_simulations=100, agent=None):
+        """Initialize with game instance and agent."""
         if not isinstance(game, ConnectFourGame):
             raise TypeError("game must be an instance of ConnectFourGame")
         self.game = game
         self.model = model
         self.num_simulations = num_simulations
+        self.agent = agent  # Store the agent reference
 
     def execute_episode(self, game_num) -> Tuple[List[np.ndarray], List[np.ndarray], List[float]]:
-        """Execute one episode of self-play until game completion."""
+        """Execute one episode of self-play using MCTS."""
+        # Create fresh game instance for this episode
+        game = ConnectFourGame()  # Each episode gets its own game instance
         states, policies, values = [], [], []
-        # Create a new game instance for this episode
-        game = ConnectFourGame()  
         game_history = []
         current_team = RED_TEAM
         
-        max_moves = 42  # Maximum possible moves in Connect Four (6x7 board)
-        move_count = 0
-        
-        while True:
-            # Check if game is actually complete
-            game_state = game.get_game_state()
-            if game_state != "ONGOING" or move_count >= max_moves:
-                #logger.info(f"Game {game_num} complete. Result: {game_state}")
-                break
-                
-            # Get valid moves before selecting action
-            valid_moves = game.get_valid_moves()
-            if not valid_moves:
-                logger.warning("No valid moves available but game is ongoing!")
-                break
-                
+        while game.get_game_state() == "ONGOING":
             try:
-                # Store current state and policy before making move
-                current_state = game.get_board().copy()
-                policy = np.zeros(7)  # 7 columns in Connect Four
-                policy[valid_moves] = 1.0 / len(valid_moves)
+                # Get move from MCTS (which will create its own game instances)
+                action, policy = mcts_simulate(self.agent, game, current_team)
                 
-                # Choose action from valid moves only
-                action = np.random.choice(valid_moves)
-                game_history.append((current_state, policy, current_team))
+                # Store current state and policy
+                game_history.append((game.get_board().copy(), policy, current_team))
                 
-                # Make the move
-                game.make_move(action, current_team)
-                move_count += 1
-                
-                # Switch teams
+                # Apply move to main game instance
+                if not game.make_move(action, current_team):
+                    break
+                    
+                # Switch teams only after successful move
                 current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
                 
-            except (InvalidMoveError, InvalidTurnError) as e:
-                logger.error(f"Invalid move during self-play: {e}")
+            except Exception as e:
+                logger.error(f"Error in self-play game {game_num}: {e}")
                 break
-        
-        # Get final game result
+
+        # Process game history with proper rewards
         result = game.get_game_state()
         if result == "ONGOING":
-            logger.error("Game ended while still ongoing!")
-            return [], [], []  # Return empty lists for invalid game
+            return [], [], []
             
-        # Process game history with proper rewards
         for state, policy, team in reversed(game_history):
-            if result == "Draw":
-                reward = 0.0
-            else:
-                reward = 1.0 if result == team else -1.0
+            reward = 0.0 if result == "Draw" else (1.0 if result == team else -1.0)
             states.append(state)
             policies.append(policy)
             values.append(reward)
-        
-        #logger.info(f"Game {game_num} completed after {move_count} moves with result: {result}")
+            
         return states, policies, values
 
     def get_mcts_policy(self, state) -> np.ndarray:
@@ -98,7 +81,7 @@ class SelfPlay:
             if states:  # Only count completed games
                 completed_games += 1
                 total_moves += len(states)
-            training_data.extend(zip(states, policies, values))
+                training_data.extend(zip(states, policies, values))
         
         avg_moves = total_moves / completed_games if completed_games > 0 else 0
         logger.info(f"Total training examples generated: {len(training_data)}")

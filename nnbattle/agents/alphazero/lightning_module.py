@@ -40,10 +40,7 @@ class ConnectFourLightningModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
-        """Handle training step with manual optimization."""
-        if self._train_dataloader is None:
-            self._train_dataloader = self.trainer.train_dataloader
-            
+        """Handle training step with improved loss calculation."""
         opt = self.optimizers()
         
         # Zero gradients and compute loss
@@ -51,18 +48,20 @@ class ConnectFourLightningModule(pl.LightningModule):
         states, mcts_probs, rewards = batch
         logits, values = self(states)
         
+        # Calculate losses with adjusted weights
         value_loss = F.mse_loss(values.squeeze(-1), rewards)
         policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
-        loss = value_loss + policy_loss
+        loss = 0.5 * value_loss + policy_loss  # Adjusted loss weights
         
         # Manual backward and optimization
         self.manual_backward(loss)
+        
+        # Gradient clipping
+        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
+        
         opt.step()
-        
-        # Store loss for manual tracking
         self.last_loss = loss.item()
-        
-        return {'loss': loss.item()}  # Return loss as dict for manual tracking
+        return {'loss': loss.item()}
 
     def on_train_epoch_end(self):
         # Get metrics that were logged during training steps
@@ -75,8 +74,13 @@ class ConnectFourLightningModule(pl.LightningModule):
             self.log('train_loss_epoch', metrics['train_loss'], on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self):
-        """Simplified optimizer configuration without scheduler."""
-        return torch.optim.Adam(self.model.parameters(), lr=0.001)
+        """Improved optimizer configuration."""
+        optimizer = torch.optim.Adam(
+            self.model.parameters(),
+            lr=0.001,
+            weight_decay=1e-4  # Add L2 regularization
+        )
+        return optimizer
 
     def loss_function(self, outputs, targets_policy, targets_value):
         logits, values = outputs

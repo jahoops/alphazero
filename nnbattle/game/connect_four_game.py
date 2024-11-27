@@ -40,25 +40,31 @@ class ConnectFourGame:
         return self.board.copy()
 
     def make_move(self, column, team):
+        """Make a move in the specified column for the given team."""
         logger.debug(f"Attempting move by Team {team} in column {column}. Last team: {self.last_team}")
+        
+        # Validate team
         if team not in [RED_TEAM, YEL_TEAM]:
             logger.error(f"Invalid team: {team}. Must be {RED_TEAM} or {YEL_TEAM}.")
             raise InvalidMoveError(f"Invalid team: {team}. Must be {RED_TEAM} or {YEL_TEAM}.")
 
-        if self.enforce_turns:
+        # Validate turn order
+        if self.enforce_turns and self.last_team is not None:
             if self.last_team == team:
                 logger.error(f"Invalid turn: team {team} cannot move twice in a row.")
                 raise InvalidTurnError(f"Invalid turn: team {team} cannot move twice in a row.")
-
+        
+        # Validate move
         if not self.is_valid_move(column):
             logger.error(f"Invalid move: Column {column} is full or out of bounds.")
             raise InvalidMoveError(f"Invalid move: Column {column} is full or out of bounds.")
 
+        # Make the move
         row = self.get_next_open_row(column)
         if row is None:
-            logger.error(f"No open rows available in column {column}.")
             return False
 
+        # Update board and last_team
         self.board[row][column] = team
         self.last_team = team
         logger.debug(f"Move made by Team {team}. Updated last_team to {self.last_team}.")

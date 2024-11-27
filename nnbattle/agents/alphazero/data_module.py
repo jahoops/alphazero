@@ -66,16 +66,20 @@ class ConnectFourDataModule(pl.LightningDataModule):
         """Generate self-play games using the SelfPlay class."""
         logger.info(f"Generating {self.num_games} self-play games with temperature {temperature}.")
         try:
-            # Create a new game instance instead of passing the agent
             game = ConnectFourGame()
-            self_play = SelfPlay(game=game, model=self.agent.model, num_simulations=self.agent.num_simulations)
+            self_play = SelfPlay(
+                game=game,
+                model=self.agent.model,
+                num_simulations=self.agent.num_simulations,
+                agent=self.agent  # Pass the full agent instance
+            )
             training_data = self_play.generate_training_data(self.num_games)
             self.dataset = ConnectFourDataset(training_data, self.agent)
             logger.info(f"Generated {len(self.dataset)} training examples.")
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
             raise
-        self.setup('fit')  # Ensure datasets are setup after generating games
+        self.setup('fit')
 
     def setup(self, stage=None):
         """Ensure data is properly split and initialized."""
