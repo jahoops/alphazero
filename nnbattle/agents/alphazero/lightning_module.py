@@ -17,6 +17,14 @@ class ConnectFourLightningModule(pl.LightningModule):
         self.loss_fn = self.loss_function
         self.save_hyperparameters()
         self.automatic_optimization = True
+        self._train_dataloader = None
+        self._val_dataloader = None
+
+    def on_fit_start(self):
+        """Called when fit begins."""
+        if self.trainer.datamodule is not None:
+            self._train_dataloader = self.trainer.datamodule.train_dataloader()
+            self._val_dataloader = self.trainer.datamodule.val_dataloader()
 
     def forward(self, x):
         # Ensure x has shape [batch_size, 3, 6, 7]
@@ -25,6 +33,10 @@ class ConnectFourLightningModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
+        """Handle training step with proper dataloader initialization."""
+        if self._train_dataloader is None:
+            self._train_dataloader = self.trainer.train_dataloader
+            
         logger.debug(f"Training Step - Model training mode: {self.model.training}")
         self.model.train()  # Ensure the model is in training mode
         states, mcts_probs, rewards = batch
@@ -79,6 +91,10 @@ class ConnectFourLightningModule(pl.LightningModule):
         return value_loss + policy_loss
 
     def validation_step(self, batch, batch_idx):
+        """Handle validation step with proper dataloader initialization."""
+        if self._val_dataloader is None:
+            self._val_dataloader = self.trainer.val_dataloader
+            
         logger.debug(f"Validation Step - Model training mode: {self.model.training}")
         self.model.eval()  # Ensure the model is in evaluation mode
         """Add a validation step to monitor performance on a separate set."""

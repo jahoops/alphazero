@@ -93,18 +93,6 @@ class AlphaZeroAgent(BaseAgent):
     def save_model(self):
         save_agent_model(self)
 
-    def log_gpu_stats(self):
-        if torch.cuda.is_available():
-            allocated = torch.cuda.memory_allocated() / 1e9
-            reserved = torch.cuda.memory_reserved() / 1e9
-            max_memory = torch.cuda.max_memory_allocated() / 1e9
-
-            logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB")
-            logger.info(f"GPU Memory - Reserved: {reserved:.2f} GB")
-            logger.info(f"GPU Memory - Peak: {max_memory:.2f} GB")
-
-            torch.cuda.reset_peak_memory_stats()
-
     def preprocess(self, board, team, to_device=None):
         board = board.copy()
         # Create a 3-channel state representation

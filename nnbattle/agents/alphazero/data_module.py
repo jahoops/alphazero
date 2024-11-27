@@ -75,51 +75,54 @@ class ConnectFourDataModule(pl.LightningDataModule):
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
             raise
+        self.setup('fit')  # Ensure datasets are setup after generating games
 
     def setup(self, stage=None):
+        """Ensure data is properly split and initialized."""
         if stage == 'fit' or stage is None:
             if len(self.dataset) == 0:
-                logger.warning("Dataset is empty. Assigning empty training and validation datasets.")
-                self.train_dataset = torch.utils.data.Subset(self.dataset, [])
-                self.val_dataset = torch.utils.data.Subset(self.dataset, [])
-            else:
-                # Split data into training and validation using random_split
-                total = len(self.dataset)
-                val_size = max(int(0.2 * total), 1)  # Ensure at least one sample
-                train_size = total - val_size
-                self.train_dataset, self.val_dataset = torch.utils.data.random_split(self.dataset, [train_size, val_size])
+                logger.error("Dataset is empty. Cannot proceed with training.")
+                raise ValueError("Dataset is empty. Generate self-play games first.")
+            
+            # Split data into training and validation
+            total = len(self.dataset)
+            val_size = max(int(0.2 * total), 1)
+            train_size = total - val_size
+            self.train_dataset, self.val_dataset = torch.utils.data.random_split(
+                self.dataset, 
+                [train_size, val_size],
+                generator=torch.Generator().manual_seed(42)  # Fixed seed for reproducibility
+            )
+            logger.info(f"Data split: {train_size} training, {val_size} validation samples")
 
     def train_dataloader(self):
-        if len(self.train_dataset) == 0:
-            logger.warning("Training dataset is empty! Training cannot proceed without data.")
-            raise ValueError("Training dataset is empty. Please generate self-play games before training.")
+        """Create and return the training dataloader."""
+        if not hasattr(self, 'train_dataset'):
+            self.setup('fit')
+            
         return DataLoader(
-            self.train_dataset, 
+            self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=True if torch.cuda.is_available() else False,  # Only pin if CUDA available
+            pin_memory=torch.cuda.is_available(),
             persistent_workers=self.persistent_workers and self.num_workers > 0,
-            prefetch_factor=2,
-            worker_init_fn=self._worker_init_fn
+            drop_last=True  # Add this to prevent issues with incomplete batches
         )
-    
+
     def val_dataloader(self):
+        """Create and return the validation dataloader."""
         if not hasattr(self, 'val_dataset'):
-            logger.error("Validation dataset has not been initialized. Ensure that `setup` is called before using val_dataloader.")
-            raise AttributeError("Validation dataset not initialized.")
-        
-        if len(self.val_dataset) == 0:
-            logger.warning("Validation dataset is empty! Validation cannot proceed without data.")
-            raise ValueError("Validation dataset is empty. Please generate self-play games before validation.")
-        
+            self.setup('fit')
+            
         return DataLoader(
-            self.val_dataset, 
+            self.val_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=4,
-            pin_memory=True if torch.cuda.is_available() else False,  # Only pin if CUDA available
-            persistent_workers=True  # Added to speed up worker initialization
+            num_workers=max(1, self.num_workers // 2),  # Reduce workers for validation
+            pin_memory=torch.cuda.is_available(),
+            persistent_workers=self.persistent_workers and self.num_workers > 0,
+            drop_last=True  # Add this to prevent issues with incomplete batches
         )
 
     def _worker_init_fn(self, worker_id: int):

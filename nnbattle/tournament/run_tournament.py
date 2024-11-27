@@ -32,12 +32,16 @@ def run_tournament(agents: List[BaseAgent], num_games=10):
                 logger.error(f"No agent found for team {current_team}")
                 break
                 
-            # Handle different return types from select_move
-            move_result = agent.select_move(game)
-            selected_action = move_result[0] if isinstance(move_result, tuple) else move_result
-            logger.debug(f"Agent {agent.__class__.__name__} ({agent.team}) selects column {selected_action}")
-            
             try:
+                # Handle different agent types
+                if isinstance(agent, AlphaZeroAgent):
+                    move_result = agent.select_move(game, agent.team)
+                else:
+                    move_result = agent.select_move(game)
+                    
+                selected_action = move_result[0] if isinstance(move_result, tuple) else move_result
+                logger.debug(f"Agent {agent.__class__.__name__} ({agent.team}) selects column {selected_action}")
+                
                 move_successful = game.make_move(selected_action, agent.team)
                 if move_successful:
                     logger.info(f"Team {agent.team} placed piece in column {selected_action}")

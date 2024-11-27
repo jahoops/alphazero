@@ -1,5 +1,41 @@
-def main():
-    # Move all imports inside the function
+def evaluate_agent(agent, num_games=20):
+    """Evaluate agent performance against random opponent."""
+    wins = 0
+    draws = 0
+    total_games = 0
+    
+    for _ in range(num_games):
+        game = ConnectFourGame()
+        while game.get_game_state() == "ONGOING":
+            try:
+                if game.last_team == agent.team:
+                    action, _ = agent.select_move(game, agent.team, temperature=0.1)
+                else:
+                    valid_moves = game.get_valid_moves()
+                    action = np.random.choice(valid_moves)
+                game.make_move(action, game.last_team if game.last_team else RED_TEAM)
+            except Exception as e:
+                logger.error(f"Error during evaluation game: {e}")
+                break
+        
+        result = game.get_game_state()
+        if result == agent.team:
+            wins += 1
+        elif result == "Draw":
+            draws += 1
+        total_games += 1
+    
+    return wins / total_games if total_games > 0 else 0.0
+
+def train_alphazero(
+    agent,  # Added agent parameter
+    max_iterations: int = 1000,
+    num_self_play_games: int = 1000,
+    use_gpu: bool = False,
+    load_model: bool = False,
+    patience: int = 10
+):
+    """Trains the AlphaZero agent using self-play and reinforcement learning."""
     from ....utils.logger_config import logger, set_log_level
     import logging
 
@@ -25,144 +61,113 @@ def main():
     from nnbattle.agents.alphazero.self_play import SelfPlay  # Import from new location if needed
 
     # Remove any existing logging configuration
-    # ...existing code...
+    import signal
+    def signal_handler(signum, frame):
+        logger.info("\nReceived shutdown signal. Cleaning up...")
+        if 'trainer' in locals():
+            trainer.should_stop = True
+        torch.cuda.empty_cache()
+        logger.info("Cleanup complete")
 
-    # Set float32 matmul precision for Tensor Cores
-    torch.set_float32_matmul_precision('high')
-
-    def log_gpu_info(agent):
-        """Log GPU information."""
+    signal.signal(signal.SIGINT, signal_handler)
+    
+    def log_gpu_info(self):
         if torch.cuda.is_available():
-            logger.warning(f"Training on GPU: {torch.cuda.get_device_name()}")
             allocated = torch.cuda.memory_allocated() / 1e9
             reserved = torch.cuda.memory_reserved() / 1e9
-            logger.warning(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
-        else:
-            logger.warning("No CUDA device available")
+            max_memory = torch.cuda.max_memory_allocated() / 1e9
 
-    def train_alphazero(
-        max_iterations: int = 1000,
-        num_self_play_games: int = 1000,
-        use_gpu: bool = False,
-        load_model: bool = False,
-        patience: int = 10
-    ):
-        """Trains the AlphaZero agent using self-play and reinforcement learning."""
-        logger.info(f"Starting training with {max_iterations} iterations, {num_self_play_games} games per iteration")
-        agent = initialize_agent(
-            action_dim=7,
-            state_dim=3,
-            use_gpu=use_gpu,
-            num_simulations=800,
-            c_puct=1.4,
-            load_model=load_model
-        )
+            logger.info(f"GPU Memory - Allocated: {allocated:.2f} GB")
+            logger.info(f"GPU Memory - Reserved: {reserved:.2f} GB")
+            logger.info(f"GPU Memory - Peak: {max_memory:.2f} GB")
 
-        if load_model:
-            logger.info("Attempted to load existing model.")
-        else:
-            logger.info("Starting with a fresh model.")
+            torch.cuda.reset_peak_memory_stats()
 
-        if agent.model is not None:
-            logger.info("Agent model is successfully initialized.")
-            agent.model.to(agent.device)
-        else:
-            logger.error("Agent model is None. Cannot proceed with training.")
-            raise AttributeError("Agent model is not initialized.")
+    # Modify DataLoader settings to be more stable
+    data_module = ConnectFourDataModule(
+        agent, 
+        num_games=num_self_play_games,
+        batch_size=32,
+        num_workers=2,  # Reduce from 4 to 2 for stability
+        persistent_workers=True
+    )
 
-        log_gpu_info(agent)
+    lightning_module = ConnectFourLightningModule(agent)  # Create the lightning module instance
 
-        # Set up graceful shutdown handler
-        import signal
-        def signal_handler(signum, frame):
-            logger.info("\nReceived shutdown signal. Cleaning up...")
-            if 'trainer' in locals():
-                trainer.should_stop = True
-            torch.cuda.empty_cache()
-            logger.info("Cleanup complete")
+    # Generate self-play games using the SelfPlay class
+    game = ConnectFourGame()
+    self_play = SelfPlay(game=game, model=agent.model, num_simulations=agent.num_simulations)
+    training_data = self_play.generate_training_data(num_self_play_games)
 
-        signal.signal(signal.SIGINT, signal_handler)
+    # Check if we got valid training data
+    if not training_data:
+        logger.error("No valid training data generated")
+        raise ValueError("No valid training data generated")
 
-        # Modify DataLoader settings to be more stable
-        data_module = ConnectFourDataModule(
-            agent, 
-            num_games=num_self_play_games,
-            batch_size=32,
-            num_workers=2,  # Reduce from 4 to 2 for stability
-            persistent_workers=True
-        )
+    data_module.dataset = ConnectFourDataset(training_data, agent)
 
-        lightning_module = ConnectFourLightningModule(agent)  # Create the lightning module instance
+    logger.info(f"Generated {len(data_module.dataset)} training examples.")
 
-        # Generate self-play games using the SelfPlay class
-        game = ConnectFourGame()
-        self_play = SelfPlay(game=game, model=agent.model, num_simulations=agent.num_simulations)
-        training_data = self_play.generate_training_data(num_self_play_games)
+    data_module.setup('fit')
 
-        # Check if we got valid training data
-        if not training_data:
-            logger.error("No valid training data generated")
-            raise ValueError("No valid training data generated")
+    # Add checkpoint callback to save best models
+    checkpoint_callback = pl.callbacks.ModelCheckpoint(
+        dirpath='nnbattle/agents/alphazero/model/checkpoints',
+        filename='alphazero-{epoch:02d}-{loss:.2f}',  # Updated to log 'loss'
+        save_top_k=3,
+        monitor='loss',  # Changed from 'train_loss' to 'loss'
+        mode='min'
+    )
 
-        data_module.dataset = ConnectFourDataset(training_data, agent)
+    # Add Early Stopping callback (Optional)
+    from pytorch_lightning.callbacks import EarlyStopping
 
-        logger.info(f"Generated {len(data_module.dataset)} training examples.")
+    # Update the EarlyStopping callback
+    early_stop_callback = EarlyStopping(
+        monitor='loss',     # Change from 'train_loss' to 'loss'
+        min_delta=0.00,
+        patience=5,
+        verbose=False,
+        mode='min'
+    )
 
-        data_module.setup('fit')
+    from pytorch_lightning.loggers import TensorBoardLogger  # Add TensorBoard logger import
 
-        # Add checkpoint callback to save best models
-        checkpoint_callback = pl.callbacks.ModelCheckpoint(
-            dirpath='nnbattle/agents/alphazero/model/checkpoints',
-            filename='alphazero-{epoch:02d}-{loss:.2f}',  # Updated to log 'loss'
-            save_top_k=3,
-            monitor='loss',  # Changed from 'train_loss' to 'loss'
-            mode='min'
-        )
+    # Initialize TensorBoard logger with more details
+    logger_tb = TensorBoardLogger(
+        save_dir="tb_logs",
+        name="alphazero",
+        version=None,  # Auto-increment version
+        default_hp_metric=False  # Don't log hp_metric
+    )
 
-        # Add Early Stopping callback (Optional)
-        from pytorch_lightning.callbacks import EarlyStopping
+    # Create trainer with proper cleanup settings
+    trainer = pl.Trainer(
+        max_epochs=10,  # Increased from 1 to 10 to allow more training on each batch
+        accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
+        devices=1,
+        callbacks=[checkpoint_callback, early_stop_callback],
+        logger=logger_tb,
+        log_every_n_steps=10,
+        detect_anomaly=False,
+        enable_checkpointing=True,
+        enable_progress_bar=True,
+        enable_model_summary=True,
+        num_sanity_val_steps=2,
+        reload_dataloaders_every_n_epochs=1  # Reload to prevent worker issues
+    )
 
-        # Update the EarlyStopping callback
-        early_stop_callback = EarlyStopping(
-            monitor='loss',     # Change from 'train_loss' to 'loss'
-            min_delta=0.00,
-            patience=5,
-            verbose=False,
-            mode='min'
-        )
+    # Disable model loading in agent's select_move during training
+    agent.load_model_flag = False
 
-        from pytorch_lightning.loggers import TensorBoardLogger  # Add TensorBoard logger import
+    best_performance = 0.0
+    no_improvement_count = 0
 
-        # Initialize TensorBoard logger with more details
-        logger_tb = TensorBoardLogger(
-            save_dir="tb_logs",
-            name="alphazero",
-            version=None,  # Auto-increment version
-            default_hp_metric=False  # Don't log hp_metric
-        )
-
-        # Create trainer with proper cleanup settings
-        trainer = pl.Trainer(
-            max_epochs=10,  # Increased from 1 to 10 to allow more training on each batch
-            accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
-            devices=1,
-            callbacks=[checkpoint_callback, early_stop_callback],
-            logger=logger_tb,
-            log_every_n_steps=10,
-            detect_anomaly=False,
-            enable_checkpointing=True,
-            enable_progress_bar=True,
-            enable_model_summary=True,
-            num_sanity_val_steps=2,
-            reload_dataloaders_every_n_epochs=1  # Reload to prevent worker issues
-        )
-
-        # Disable model loading in agent's select_move during training
-        agent.load_model_flag = False
-
-        best_performance = 0.0
-        no_improvement_count = 0
-
+    try:
+        # Set proper CUDA tensor sharing strategy
+        if use_gpu and torch.cuda.is_available():
+            torch.multiprocessing.set_sharing_strategy('file_system')
+        
         for iteration in range(1, max_iterations + 1):
             performance = None  # Initialize performance at start of each iteration
             # Adjust temperature parameter
@@ -196,7 +201,11 @@ def main():
 
                 # Optionally evaluate the model
                 if iteration % 10 == 0:
-                    performance = evaluate_agent(agent, num_games=20)
+                    # Ensure CUDA tensors are properly handled
+                    with torch.cuda.device(agent.device):
+                        performance = evaluate_agent(agent, num_games=20)
+                        torch.cuda.empty_cache()  # Clear cache after evaluation
+                    
                     logger.info(f"Iteration {iteration}: Evaluation Performance: {performance}")
                     if performance > best_performance:
                         best_performance = performance
@@ -216,69 +225,22 @@ def main():
                 continue
             except Exception as e:
                 logger.error(f"An unexpected error occurred during iteration {iteration}: {e}")
+                # Clear CUDA cache on error
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
                 continue
             finally:
                 logger.info(f"Iteration {iteration} completed in {time.time() - iteration_start_time:.2f} seconds")
 
-        logger.info("=== Training Completed Successfully ===")
-
-    def evaluate_agent(agent, num_games=20):
-        """Evaluate the agent's performance against a random opponent."""
-        wins = 0
-        for _ in range(num_games):
-            result = play_game(agent)
-            if result == agent.team:
-                wins += 1
-        performance = wins / num_games
-        return performance
-
-    def play_game(agent):
-        """Play a single game against a random opponent."""
-        game = ConnectFourGame()
-        current_team = RED_TEAM  # Start with RED_TEAM
-        while game.get_game_state() == "ONGOING":
-            if current_team == agent.team:
-                action, _ = agent.select_move(game, temperature=0)
-            else:
-                valid_moves = game.get_valid_moves()
-                action = np.random.choice(valid_moves)
-            game.make_move(action, current_team)
-            current_team = 3 - current_team  # Switch teams
-        return game.get_game_state()
-
-    # Set logging level for all modules
-    set_log_level(logging.INFO)  # Suppress INFO messages
-
-    # Set the start method inside the main guard
-    import torch.multiprocessing
-    torch.multiprocessing.set_start_method('spawn', force=True)
-
-    # Ensure CUDA_VISIBLE_DEVICES is set
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-
-    # Ensure multiprocessing is handled properly
-    import multiprocessing as mp
-    if mp.get_start_method(allow_none=True) != 'spawn':
-        mp.set_start_method('spawn', force=True)
-
-    try:
-        train_alphazero(
-            max_iterations=100,
-            num_self_play_games=100,
-            use_gpu=True,
-            load_model=True
-        )
-    except KeyboardInterrupt:
-        logger.info("\nTraining interrupted by user.")
     except Exception as e:
-        logger.error(f"Unexpected error during training: {e}")
+        logger.error(f"Training error: {e}")
+        raise
     finally:
-        # Proper cleanup
-        torch.cuda.empty_cache()
-        # Clean up multiprocessing resources
-        for p in mp.active_children():
-            p.terminate()
-        logger.info("Resources released and cleanup complete.")
+        # Ensure proper cleanup of CUDA resources
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
-if __name__ == "__main__":
-    main()
+    logger.info("=== Training Completed Successfully ===")
+
+# Ensure __all__ is defined
+__all__ = ['train_alphazero']
