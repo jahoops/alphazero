@@ -1,6 +1,11 @@
 import logging
 import sys
 
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
 def setup_logger(level=logging.INFO):
     """Configure the root logger with consistent settings."""
     
@@ -31,6 +36,13 @@ def setup_logger(level=logging.INFO):
 # Create a global logger instance
 logger = setup_logger()
 
-def set_log_level(level):
-    """Dynamically change the logging level."""
-    logger.setLevel(level)
+def set_log_level(level=logging.WARNING):
+    """Set the global log level for all loggers."""
+    logging.basicConfig(
+        level=level,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    logging.getLogger().setLevel(level)
+
+logger = logging.getLogger(__name__)
+set_log_level(logging.WARNING)  # Default log level

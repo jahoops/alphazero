@@ -48069,3 +48069,96 @@ R . R Y R . R
 5.978     Total estimated model params size (MB)
 42        Modules in train mode
 0         Modules in eval mode
+2024-11-27 00:49:33,342 - pytorch_lightning.utilities.rank_zero - INFO - 
+Detected KeyboardInterrupt, attempting graceful shutdown ...
+2024-11-27 00:49:33,354 - root - INFO - === Iteration 1 completed (performance not measured) ===
+2024-11-27 00:49:33,355 - root - INFO - CUDA resources have been released.
+2024-11-27 00:49:37,813 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 00:49:37,891 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 00:49:37,896 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Failed to load model: 'NoneType' object has no attribute 'load_state_dict'
+2024-11-27 00:49:37,896 - root - ERROR - Unexpected error during training: 'NoneType' object has no attribute 'load_state_dict'
+2024-11-27 00:49:37,896 - root - INFO - CUDA resources have been released.
+2024-11-27 00:54:05,434 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 00:54:05,522 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 00:54:05,527 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Failed to load model: 'NoneType' object has no attribute 'load_state_dict'
+2024-11-27 00:54:05,527 - root - ERROR - An error occurred while loading the model: 'NoneType' object has no attribute 'load_state_dict'
+2024-11-27 00:54:05,527 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 00:54:05,527 - root - ERROR - Agent model is not initialized.
+2024-11-27 00:54:05,527 - root - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 00:54:05,528 - root - INFO - CUDA resources have been released.
+2024-11-27 00:57:14,028 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 00:57:14,103 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 00:57:14,109 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Agent model is not initialized.
+2024-11-27 00:57:14,109 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Failed to load model: Agent model is not initialized.
+2024-11-27 00:57:14,110 - root - ERROR - An error occurred while loading the model: Agent model is not initialized.
+2024-11-27 00:57:14,110 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 00:57:14,110 - root - ERROR - Agent model is not initialized.
+2024-11-27 00:57:14,110 - root - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 00:57:14,110 - root - INFO - CUDA resources have been released.
+2024-11-27 01:03:44,101 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:03:44,177 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:03:44,177 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Agent model is not initialized.
+2024-11-27 01:03:44,177 - root - ERROR - An error occurred while loading the model: Agent model is not initialized.
+2024-11-27 01:03:44,177 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 01:03:44,177 - root - ERROR - Agent model is not initialized.
+2024-11-27 01:03:44,177 - root - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:03:44,177 - root - INFO - CUDA resources have been released.
+2024-11-27 01:08:53,551 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:08:53,635 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:08:53,635 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model file not found at nnbattle/agents/alphazero/model/alphazero_model_final.pth. Cannot load model.
+2024-11-27 01:08:53,635 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:08:53,635 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 01:08:53,635 - root - ERROR - Agent model is not initialized.
+2024-11-27 01:08:53,635 - root - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:08:53,636 - root - INFO - CUDA resources have been released.
+2024-11-27 01:12:23,720 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:12:23,805 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:12:23,805 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model file not found at nnbattle/agents/alphazero/model/alphazero_model_final.pth. Cannot load model.
+2024-11-27 01:12:23,805 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:12:23,805 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 01:12:23,805 - root - ERROR - Agent model is not initialized.
+2024-11-27 01:12:23,805 - root - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:12:23,805 - root - INFO - CUDA resources have been released.
+2024-11-27 01:17:02,578 - root - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:17:02,655 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model file not found at nnbattle/agents/alphazero/model/alphazero_model_final.pth. Cannot load model.
+2024-11-27 01:17:02,656 - root - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:17:02,656 - root - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:17:02,656 - root - INFO - Initialized AlphaZeroAgent.
+2024-11-27 01:17:02,656 - root - ERROR - Agent model is not initialized.
+2024-11-27 01:17:02,656 - root - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:17:02,656 - root - INFO - CUDA resources have been released.
+2024-11-27 01:19:16,320 - nnbattle.utils.logger_config - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:19:16,406 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model file not found at nnbattle/agents/alphazero/model/alphazero_model_final.pth. Cannot load model.
+2024-11-27 01:19:16,406 - nnbattle.utils.logger_config - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:19:16,406 - nnbattle.utils.logger_config - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:19:16,406 - nnbattle.utils.logger_config - INFO - AlphaZeroAgent setup complete.
+2024-11-27 01:19:16,406 - nnbattle.utils.logger_config - INFO - No existing model found. Starting with a fresh model.
+2024-11-27 01:19:16,406 - nnbattle.utils.logger_config - ERROR - Unexpected error during training: 'NoneType' object has no attribute 'to'
+2024-11-27 01:19:16,407 - nnbattle.utils.logger_config - INFO - CUDA resources have been released.
+2024-11-27 01:21:58,695 - nnbattle.utils.logger_config - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:21:58,780 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model file not found at nnbattle/agents/alphazero/model/alphazero_model_final.pth. Cannot load model.
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - INFO - AlphaZeroAgent setup complete.
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - INFO - No existing model found. Starting with a fresh model.
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - ERROR - Agent model is None. Cannot proceed with training.
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:21:58,780 - nnbattle.utils.logger_config - INFO - CUDA resources have been released.
+2024-11-27 01:23:50,623 - nnbattle.utils.logger_config - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:23:50,701 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path does not exist: nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - INFO - AlphaZeroAgent setup complete.
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - INFO - No existing model found. Starting with a fresh model.
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - ERROR - Agent model is not initialized.
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:23:50,702 - nnbattle.utils.logger_config - INFO - CUDA resources have been released.
+2024-11-27 01:25:19,973 - nnbattle.utils.logger_config - INFO - Starting training with 100 iterations, 100 games per iteration
+2024-11-27 01:25:20,053 - nnbattle.agents.alphazero.utils.model_utils - ERROR - Model path does not exist: nnbattle/agents/alphazero/model/alphazero_model_final.pth
+2024-11-27 01:25:20,053 - nnbattle.utils.logger_config - WARNING - No model file found, starting with a fresh model.
+2024-11-27 01:25:20,053 - nnbattle.utils.logger_config - INFO - Initialized AlphaZeroAgent on device: cuda
+2024-11-27 01:25:20,053 - nnbattle.utils.logger_config - INFO - AlphaZeroAgent setup complete.
+2024-11-27 01:25:20,053 - nnbattle.utils.logger_config - INFO - No existing model found. Starting with a fresh model.
+2024-11-27 01:25:20,053 - nnbattle.utils.logger_config - ERROR - Agent model is not initialized.
+2024-11-27 01:25:20,053 - nnbattle.utils.logger_config - ERROR - Unexpected error during training: Agent model is not initialized.
+2024-11-27 01:25:20,054 - nnbattle.utils.logger_config - INFO - CUDA resources have been released.

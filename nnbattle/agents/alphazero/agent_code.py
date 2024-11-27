@@ -40,7 +40,7 @@ def model_mode(model, training):
         model.train(original_mode)
 
 class AlphaZeroAgent(BaseAgent):
-    logger = logger
+    logger = logging.getLogger(__name__)
 
     def __init__(
         self,
@@ -56,27 +56,33 @@ class AlphaZeroAgent(BaseAgent):
         self.state_dim = state_dim
         self.action_dim = action_dim
         self.device = torch.device("cuda" if use_gpu and torch.cuda.is_available() else "cpu")
-        self.model_loaded = True
+        self.model_loaded = False  # Initialize as False
         self.load_model_flag = load_model
         self.num_simulations = num_simulations
         self.c_puct = c_puct
         self.team = team
         self.memory = []
-        self.model = Connect4Net(state_dim, action_dim).to(self.device)
         self.model_path = MODEL_PATH  # Added model_path attribute
 
-        logger.info(f"Initialized AlphaZeroAgent on device: {self.device}")
-        
+        self.model = Connect4Net(state_dim, action_dim).to(self.device)
         if load_model:
             try:
                 load_agent_model(self)
-                self.model_loaded = True
-                logger.info("Model loaded successfully.")
+                if not self.model_loaded:
+                    logger.info("Starting with a freshly initialized model.")
             except FileNotFoundError:
                 logger.warning("No model file found, starting with a fresh model.")
                 self.model_loaded = False
+            except Exception as e:
+                logger.error(f"An error occurred while loading the model: {e}")
+                self.model_loaded = False
 
-        logger.info("Initialized AlphaZeroAgent.")
+        # Log initialization after attempting to load the model
+        logger.info(f"Initialized AlphaZeroAgent on device: {self.device}")
+        logger.info("AlphaZeroAgent setup complete.")
+
+    def save_model(self):
+        save_agent_model(self)
 
     def log_gpu_stats(self):
         if torch.cuda.is_available():
@@ -126,6 +132,10 @@ class AlphaZeroAgent(BaseAgent):
         if not valid_moves:
             logger.error("No valid moves available.")
             raise InvalidMoveError("No valid moves available.")
+
+        if self.model is None:
+            logger.error("Agent model is not initialized.")
+            raise AttributeError("Agent model is not initialized.")
 
         selected_action, action_probs = self.act(game, valid_moves, temperature=temperature)
         return selected_action, action_probs
@@ -181,12 +191,12 @@ class AlphaZeroAgent(BaseAgent):
         for _ in range(num_evaluations):
             game = ConnectFourGame()
             while game.get_game_state() == "ONGOING":
-                action, _ = self.select_move(game)
-                game.make_move(action, self.team)
-                if game.get_game_state() != "ONGOING":
-                    break
-                opponent_action = np.random.choice(game.get_valid_moves())
-                game.make_move(opponent_action, 3 - self.team)
+                if game.last_team == self.team:
+                    action, _ = self.select_move(game, temperature=0)
+                else:
+                    valid_moves = game.get_valid_moves()
+                    action = np.random.choice(valid_moves)
+                game.make_move(action, game.last_team if game.last_team else RED_TEAM)
             result = game.get_game_state()
             if result == self.team:
                 wins += 1
@@ -231,7 +241,8 @@ def initialize_agent(
         use_gpu=use_gpu,        
         num_simulations=num_simulations,        
         c_puct=c_puct,        
-        load_model=load_model    )
+        load_model=load_model
+    )
     return agent
 
 __all__ = ['AlphaZeroAgent', 'initialize_agent']

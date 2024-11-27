@@ -26,6 +26,7 @@ class ConnectFourLightningModule(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         logger.debug(f"Training Step - Model training mode: {self.model.training}")
+        self.model.train()  # Ensure the model is in training mode
         states, mcts_probs, rewards = batch
         # Move tensors to device here after pin_memory has been called
         states = states.to(self.device, non_blocking=True)
@@ -44,9 +45,9 @@ class ConnectFourLightningModule(pl.LightningModule):
         policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
         
         loss = value_loss + policy_loss
-        self.log('loss', loss)
+        self.log('loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         # If you prefer to monitor 'train_loss', add the following:
-        self.log('train_loss', loss)
+        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
 
     def on_train_epoch_end(self):
@@ -54,12 +55,10 @@ class ConnectFourLightningModule(pl.LightningModule):
         metrics = self.trainer.callback_metrics
         
         # Log epoch-level metrics if they exist
-        if 'value_loss_step' in metrics:
-            self.log('value_loss_epoch', metrics['value_loss_step'], on_epoch=True, prog_bar=True)
-        if 'policy_loss_step' in metrics:
-            self.log('policy_loss_epoch', metrics['policy_loss_step'], on_epoch=True, prog_bar=True)
-        if 'train_loss_step' in metrics:
-            self.log('train_loss_epoch', metrics['train_loss_step'], on_epoch=True, prog_bar=True)
+        if 'loss' in metrics:
+            self.log('train_loss_epoch', metrics['loss'], on_epoch=True, prog_bar=True)
+        if 'train_loss' in metrics:
+            self.log('train_loss_epoch', metrics['train_loss'], on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self):
         # The optimizer will now include model parameters
@@ -81,6 +80,7 @@ class ConnectFourLightningModule(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         logger.debug(f"Validation Step - Model training mode: {self.model.training}")
+        self.model.eval()  # Ensure the model is in evaluation mode
         """Add a validation step to monitor performance on a separate set."""
         states, mcts_probs, rewards = batch
         # Move tensors to device here after pin_memory has been called

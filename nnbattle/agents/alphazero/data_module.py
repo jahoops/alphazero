@@ -60,8 +60,8 @@ class ConnectFourDataModule(pl.LightningDataModule):
         """Generate self-play games and append to the main dataset."""
         logger.info(f"Generating {self.num_games} self-play games with temperature {temperature}.")
         try:
-            for game_number in range(self.num_games):
-                self.agent.self_play(game_number,self.num_games, max_moves=100, temperature=temperature)
+            for game_number in range(1, self.num_games + 1):
+                self.agent.self_play(game_number, self.num_games, max_moves=100, temperature=temperature)
             if self.agent.memory:
                 self.dataset.data.extend(self.agent.memory)
                 logger.info(f"Appending {len(self.agent.memory)} game samples to the dataset.")
@@ -69,10 +69,12 @@ class ConnectFourDataModule(pl.LightningDataModule):
                 logger.info(f"Dataset size after self-play: {len(self.dataset.data)} samples")
             else:
                 logger.warning("Agent memory is empty. No games were added to the dataset.")
+                raise ValueError("Agent memory is empty. No data available for training.")
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
             # Handle exceptions as needed
         self.agent.log_gpu_stats()
+
     def setup(self, stage=None):
         if stage == 'fit' or stage is None:
             if len(self.dataset) == 0:

@@ -43,7 +43,7 @@ def self_play(agent, num_games):
     game_history = []
     for game_num in range(num_games):
         game.reset()
-        agent.team = 1  # Initialize current player at the start of the game
+        agent.team = RED_TEAM  # Initialize current player at the start of the game
         logger.info(f"Starting game {game_num + 1}/{num_games}")
         game_start_time = time.time()
         while game.get_game_state() == "ONGOING":
@@ -51,7 +51,6 @@ def self_play(agent, num_games):
             selected_action, action_probs = agent.select_move(game, temperature=1.0)
             logger.info(f"Move {selected_action}/{agent.team}")
             game_history.append((game.get_board(), action_probs, agent.team))
-            agent.team = 3 - agent.team  # switch team
             agent.team = 3 - agent.team  # switch team
         game_end_time = time.time()
         logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
@@ -61,7 +60,7 @@ def self_play(agent, num_games):
                 reward = 0.0
             else:
                 reward = 1.0 if result == team else -1.0  # Corrected reward assignment
-        memory.append((state, mcts_prob, float(reward)))
+            memory.append((state, mcts_prob, float(reward)))
         # Ensure that agent.memory has been populated
         if not agent.memory:
             logger.warning("No self-play games were generated.")
@@ -69,7 +68,7 @@ def self_play(agent, num_games):
             # Ensure that state is preprocessed correctly
             preprocessed_state = agent.preprocess(game.get_board())  # Changed from game.get_state() to game.get_board()
             mcts_prob = torch.zeros(agent.action_dim, dtype=torch.float32)  # Initialize as Tensor
-            memory.append((preprocessed_state, mcts_prob, result))
+            memory.append((preprocessed_state, mcts_prob, reward))
             logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
     agent.memory.extend(memory)  # Assuming agent.memory is a list
     return memory
@@ -92,7 +91,27 @@ def train_alphazero(
         c_puct=1.4,
         load_model=load_model  # Only load once at initialization
     )
-    agent.model.to(agent.device)  # Ensure the model is on the correct device
+    
+    # Remove or comment out the following lines to allow training without an existing model
+    # if agent.model is None:
+    #     logger.error("Agent model is not initialized.")
+    #     raise ValueError("Agent model is not initialized.")
+    
+    # Add logging based on whether the model was loaded
+    if agent.model_loaded:
+        logger.info("Loaded existing model successfully.")
+    else:
+        logger.info("No existing model found. Starting with a fresh model.")
+    
+    if agent.model is None or not agent.model_loaded:
+        logger.error("Agent model is not initialized.")
+        raise AttributeError("Agent model is not initialized.")
+    
+    if agent.model is not None:
+        agent.model.to(agent.device)  # Ensure the model is on the correct device
+    else:
+        logger.error("Agent model is None. Cannot proceed with training.")
+        raise AttributeError("Agent model is not initialized.")
     
     log_gpu_info(agent)  # Log initial GPU state
     
@@ -177,117 +196,39 @@ def train_alphazero(
             data_module.generate_self_play_games(temperature=temperature)
             
             if len(data_module.dataset) == 0:
-                logger.error("No self-play games were generated in this iteration. Skipping training.")
-                continue  # Skip training this iteration
+                # Handle the case where no data was generated
+                logger.error("No data generated during self-play. Skipping this iteration.")
+                continue
             
-            data_module.setup('fit')  # Re-setup after adding new data
+            # Proceed with training
+            trainer.fit(lightning_module, datamodule=data_module)
             
-            # Ensure the model is in training mode before training
-            agent.model.train()
-            lightning_module.model.train()
-
-            logger.info("Commencing training phase...")
-            log_gpu_info(agent)  # Before training phase
-            trainer.fit(lightning_module, data_module)
-            log_gpu_info(agent)  # After training phase
-            
-            # Log the training loss after each iteration
-            if 'train_loss' in lightning_module.trainer.callback_metrics:
-                training_loss = lightning_module.trainer.callback_metrics['train_loss']
-                logger.info(f"Iteration {iteration} Training Loss: {training_loss:.6f}")
-                logger_tb.log_metrics({
-                    'training/loss': training_loss,
-                    'training/performance': performance,
-                    'training/win_rate': performance,
-                    'training/iteration': iteration,
-                    'memory/buffer_size': len(data_module.dataset),
-                    'hyperparameters/learning_rate': trainer.optimizers[0].param_groups[0]['lr'],
-                    'hyperparameters/c_puct': agent.c_puct
-                }, step=iteration)
-                
-                # Log evaluation metrics every 10 iterations
-                if iteration % 10 == 0:
-                    log_gpu_info(agent)  # Every 10 iterations for evaluation
-                    validation_metrics = evaluate_agent(agent, num_games=50)
-                    logger_tb.log_metrics({
-                        'validation/win_rate': validation_metrics,
-                        'validation/iteration': iteration,
-                    }, step=iteration)
-            else:
-                logger.warning(f"Training loss not available for iteration {iteration}")
-            
-            # First evaluate performance
-            performance = evaluate_agent(agent, num_games=50)
-            logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
-            
-            # Then save model if performance improved
-            if performance > best_performance:
-                best_performance = performance
-                no_improvement_count = 0
-                logger.info("Performance improved. Saving model and resetting no_improvement_count.")
-                save_agent_model(agent, MODEL_PATH)
-                logger.info(f"Model saved for iteration {iteration} at {MODEL_PATH}")
-            else:
-                no_improvement_count += 1
-                logger.info(f"No improvement for {no_improvement_count} iterations.")
-            
-            # Log metrics after we have performance
-            logger_tb.log_metrics({
-                'training/loss': training_loss,
-                'training/performance': performance,
-                'training/win_rate': performance,
-                'training/iteration': iteration,
-                'memory/buffer_size': len(data_module.dataset),
-                'hyperparameters/learning_rate': trainer.optimizers[0].param_groups[0]['lr'],
-                'hyperparameters/c_puct': agent.c_puct
-            }, step=iteration)
-
-            # Evaluate the agent's performance after training iteration
+            # Optionally evaluate the model
             if iteration % 10 == 0:
-                logger.info("Evaluating agent's performance...")
-                performance = evaluate_agent(agent, num_games=50)  # Increase evaluation games
-                logger.info(f"Iteration {iteration} Performance: {performance:.2%}")
+                performance = evaluate_agent(agent, num_games=20)
+                logger.info(f"Iteration {iteration}: Evaluation Performance: {performance}")
+                if performance > best_performance:
+                    best_performance = performance
+                    no_improvement_count = 0
+                    # Optionally save the best model
+                    save_agent_model(agent)
+                    logger.info(f"New best performance: {best_performance}. Model saved.")
+                else:
+                    no_improvement_count += 1
+                    logger.info(f"No improvement in performance. ({no_improvement_count}/{patience})")
+                    if no_improvement_count >= patience:
+                        logger.info("Early stopping triggered due to no improvement.")
+                        break
 
-                # Log validation metrics separately
-                validation_metrics = evaluate_agent(agent, num_games=50)
-                logger_tb.log_metrics({
-                    'validation/win_rate': validation_metrics['win_rate'],
-                    'validation/draw_rate': validation_metrics['draw_rate'],
-                    'validation/avg_game_length': validation_metrics['avg_game_length']
-                }, step=iteration)
-
-            # Check for improvement
-            if performance > best_performance:
-                best_performance = performance
-                no_improvement_count = 0
-                logger.info("Performance improved. Resetting no_improvement_count.")
-            else:
-                no_improvement_count += 1
-                logger.info(f"No improvement for {no_improvement_count} iterations.")
-
-            # Early stopping condition
-            if no_improvement_count >= patience:
-                logger.info("Early stopping triggered. Terminating training.")
-                break
-
-            iteration_end_time = time.time()
-            logger.info(f"=== Iteration {iteration} completed in {timedelta(seconds=iteration_end_time - iteration_start_time)} ===")
-            
         except (InvalidMoveError, InvalidTurnError) as e:
-            logger.error(f"An error occurred during training: {e}")
-            raise
+            logger.error(f"Game error during iteration {iteration}: {e}")
+            continue
         except Exception as e:
-            logger.error(f"Unexpected error during training: {e}")
-            log_gpu_info(agent)  # Log GPU state on error
-            raise
+            logger.error(f"An unexpected error occurred during iteration {iteration}: {e}")
+            continue
         finally:
-            if performance is not None:
-                logger.info(f"=== Iteration {iteration} completed with performance: {performance:.2%} ===")
-            else:
-                logger.info(f"=== Iteration {iteration} completed (performance not measured) ===")
-            # Clear CUDA cache to release memory
-            torch.cuda.empty_cache()
-    
+            logger.info(f"Iteration {iteration} completed in {time.time() - iteration_start_time:.2f} seconds")
+
     logger.info("=== Training Completed Successfully ===")
 
 def evaluate_agent(agent, num_games=20):

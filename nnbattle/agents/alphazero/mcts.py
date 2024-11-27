@@ -51,7 +51,11 @@ class MCTSNode:
         for action in legal_actions:
             if action not in self.children:
                 new_env = deepcopy_env(self.env)
-                new_env.make_move(action, self.team)  # self.team is now valid
+                try:
+                    new_env.make_move(action, self.team)  # self.team is now valid
+                except InvalidMoveError as e:
+                    logger.error(f"Invalid move during expansion: {e}")
+                    continue
                 child_node = MCTSNode(parent=self, action=action, env=new_env)
                 child_node.prior = action_probs[action].item()
                 self.children[action] = child_node
@@ -63,6 +67,10 @@ class MCTSNode:
             self.parent.backpropagate(-reward)
 
 def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
+    if not agent.model_loaded:
+        logger.error("Agent's model is not loaded. Cannot perform MCTS simulation.")
+        raise AttributeError("Agent's model is not loaded.")
+
     # Save the original mode
     original_mode = agent.model.training
     agent.model.eval()
@@ -101,37 +109,38 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
             if node is None:
                 logger.debug("No child nodes available during selection.")
                 break
-            if env.last_team is None:
-                env.make_move(node.action, RED_TEAM)
-            else:
-                env.make_move(node.action, 3 - env.last_team)
+            try:
+                env.make_move(node.action, node.team)
+            except InvalidMoveError as e:
+                logger.error(f"Invalid move during simulation: {e}")
+                break
             logger.debug(f"Moved to child node: Team {node.team}, Action {node.action}")
 
         # **Expansion**
-        if env.get_game_state() == "ONGOING":
-            with torch.cuda.device(agent.device):
-                # Ensure state tensor and model are on same device
-                model_device = next(agent.model.parameters()).device
-                state = agent.preprocess(env.get_board()).to(model_device)
+        if env.get_game_state() == "ONGOING" and node.is_leaf():
+            try:
                 with torch.no_grad():
-                    agent.model.eval()  # Set model to eval mode
-                    action_probs, value = agent.model(state.unsqueeze(0))
-                    # Extract scalar value from tensor
-                    value = value.squeeze().item()  # Fix: properly extract scalar value
-                    action_probs = action_probs.squeeze().detach()
+                    state_tensor = agent.preprocess(env.get_board()).to(agent.device)
+                    action_logits, value = agent.model(state_tensor.unsqueeze(0))
+                    value = value.squeeze().item()  # Extract scalar value
+                    action_probs_network = F.softmax(action_logits, dim=1).squeeze()
+            except Exception as e:
+                logger.error(f"Model inference failed during simulation: {e}")
+                value = 0.0
+                action_probs_network = torch.zeros(agent.action_dim, device=agent.device)
 
             # Mask invalid moves
-            valid_actions = env.get_valid_moves()
-            action_mask = torch.zeros(agent.action_dim, device=agent.device)
+            action_mask = torch.zeros(agent.action_dim, dtype=torch.float32, device=agent.device)
             action_mask[valid_actions] = 1
-            action_probs *= action_mask
-            if action_probs.sum() > 0:
-                action_probs /= action_probs.sum()
+            action_probs_network *= action_mask
+            if action_probs_network.sum() > 0:
+                action_probs_network /= action_probs_network.sum()
             else:
                 # If all probabilities are zero, assign equal probability to valid actions
-                action_probs[valid_actions] = 1.0 / len(valid_actions)
-            node.expand(action_probs, valid_actions)
-            reward = value  # **Use the network's value prediction as reward**
+                action_probs_network[valid_actions] = 1.0 / len(valid_actions)
+
+            node.expand(action_probs_network.cpu(), valid_actions)
+            reward = value  # Use the network's value prediction as reward
             logger.debug(f"Assigned reward {reward} to the node based on network prediction.")
 
         else:
@@ -167,10 +176,10 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
         probs = probs / np.sum(probs)
         selected_action = np.random.choice(actions, p=probs)
 
-    # Restore the original mode
+    # Restore the model's original training mode
     agent.model.train(original_mode)
 
-    return selected_action, action_probs
+    return selected_action, action_probs_network.cpu()
 
 __all__ = ['MCTSNode', 'mcts_simulate']
 

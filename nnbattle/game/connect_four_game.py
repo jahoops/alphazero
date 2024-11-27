@@ -1,7 +1,7 @@
 # game/connect_four_game.py
 
 import copy
-import logging
+import logging, invalid_move_error, invalid_turn_error
 import numpy as np
 from nnbattle.constants import RED_TEAM, YEL_TEAM, EMPTY, ROW_COUNT, COLUMN_COUNT
 
@@ -13,7 +13,7 @@ class InvalidMoveError(Exception):
     pass
 
 class InvalidTurnError(Exception):
-    """Exception raised when a player tries to move out of turn."""
+    """Exception raised when an invalid turn is attempted."""
     pass
 
 class ConnectFourGame:
