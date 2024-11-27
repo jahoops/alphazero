@@ -53,7 +53,7 @@ class SelfPlay:
             return [], [], []
             
         for state, policy, team in reversed(game_history):
-            reward = 0.0 if result == "Draw" else (1.0 if result == team else -1.0)
+            reward = np.float32(0.0 if result == "Draw" else (1.0 if result == team else -1.0))  # Ensure float32
             states.append(state)
             policies.append(policy)
             values.append(reward)
@@ -64,7 +64,7 @@ class SelfPlay:
         """Get policy from MCTS search using valid moves from the game."""
         valid_moves = self.game.get_valid_moves()  # Get valid moves from the game instance
         # Create a policy array of zeros
-        policy = np.zeros(7)  # Connect Four has 7 columns
+        policy = np.zeros(7, dtype=np.float32)  # Ensure float32
         # Set equal probability for valid moves
         if len(valid_moves) > 0:
             policy[valid_moves] = 1.0 / len(valid_moves)

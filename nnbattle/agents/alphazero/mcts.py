@@ -143,7 +143,7 @@ def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
         return np.random.choice(valid_moves), torch.zeros(agent.action_dim)
 
     actions, visits = zip(*valid_children)
-    visits = np.array(visits)
+    visits = np.array(visits, dtype=np.float32)  # Ensure float32
 
     if temperature < 0.01:
         action = actions[np.argmax(visits)]
@@ -153,6 +153,6 @@ def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
         action = np.random.choice(actions, p=probs)
 
     # Return selected action and normalized visit counts as policy
-    policy = torch.zeros(agent.action_dim)
-    policy[list(actions)] = torch.tensor(visits / visits.sum())
+    policy = torch.zeros(agent.action_dim, dtype=torch.float32)  # Explicitly set dtype
+    policy[list(actions)] = torch.tensor(visits / visits.sum(), dtype=torch.float32)  # Match dtype
     return action, policy
