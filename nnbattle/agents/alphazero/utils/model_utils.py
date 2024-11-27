@@ -4,6 +4,7 @@ import torch
 import numpy as np
 from typing import TYPE_CHECKING, Optional
 
+# Use type hinting carefully to avoid circular imports
 if TYPE_CHECKING:
     from ..agent_code import AlphaZeroAgent
 
@@ -22,20 +23,19 @@ def load_agent_model(agent: 'AlphaZeroAgent'):
 
     :param agent: Instance of AlphaZeroAgent.
     """
-    if not os.path.exists(MODEL_PATH):
-        logger.error(f"Model path does not exist: {MODEL_PATH}")
-        raise FileNotFoundError(f"Model path does not exist: {MODEL_PATH}")
-    
     try:
-        # Load the state_dict with appropriate device mapping
-        state_dict = torch.load(MODEL_PATH, map_location=agent.device)
+        state_dict = torch.load(agent.model_path, map_location=agent.device)
         agent.model.load_state_dict(state_dict)
         agent.model.to(agent.device)
-        agent.model_loaded = True
-        logger.info(f"Model loaded successfully from {MODEL_PATH}.")
+        logger.info("Model loaded successfully.")
+    except FileNotFoundError:
+        logger.warning("Model file not found. Using initialized model.")
     except Exception as e:
-        logger.error(f"Failed to load the model from {MODEL_PATH}: {e}")
-        agent.model_loaded = False
+        logger.error(f"Error loading model: {e}")
+        # Ensure the model remains initialized even if loading fails
+    # Add check after attempting to load state_dict
+    if agent.model is None:
+        logger.error("Agent model is None after attempting to load the model.")
 
 def save_agent_model(agent: 'AlphaZeroAgent', path: str = MODEL_PATH):
     """

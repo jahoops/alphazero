@@ -1,4 +1,4 @@
-from nnbattle.utils.logger_config import logger, set_log_level
+from ....utils.logger_config import logger, set_log_level
 import logging
 
 # Set global log level at the start of your program
@@ -11,15 +11,16 @@ import torch
 import numpy as np
 import pytorch_lightning as pl
 from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
-from nnbattle.agents.alphazero.agent_code import initialize_agent  # Moved import here
+from ..agent_code import initialize_agent  # Moved import here
 from nnbattle.constants import RED_TEAM
-from nnbattle.agents.alphazero.data_module import ConnectFourDataModule
-from nnbattle.agents.alphazero.lightning_module import ConnectFourLightningModule
-from nnbattle.agents.alphazero.utils.model_utils import (
+from ..data_module import ConnectFourDataModule
+from ..lightning_module import ConnectFourLightningModule
+from ..utils.model_utils import (
     MODEL_PATH,
     load_agent_model,
     save_agent_model
 )
+from nnbattle.agents.alphazero.self_play import SelfPlay  # Import from new location if needed
 
 # Remove any existing logging configuration
 # ...existing code...
@@ -36,42 +37,6 @@ def log_gpu_info(agent):
         logger.warning(f"GPU Memory - Allocated: {allocated:.2f} GB, Reserved: {reserved:.2f} GB")
     else:
         logger.warning("No CUDA device available")
-
-def self_play(agent, num_games):
-    memory = []
-    game = ConnectFourGame()
-    game_history = []
-    for game_num in range(num_games):
-        game.reset()
-        agent.team = RED_TEAM  # Initialize current player at the start of the game
-        logger.info(f"Starting game {game_num + 1}/{num_games}")
-        game_start_time = time.time()
-        while game.get_game_state() == "ONGOING":
-            # Pass the temperature parameter
-            selected_action, action_probs = agent.select_move(game, temperature=1.0)
-            logger.info(f"Move {selected_action}/{agent.team}")
-            game_history.append((game.get_board(), action_probs, agent.team))
-            agent.team = 3 - agent.team  # switch team
-        game_end_time = time.time()
-        logger.info(f"Time taken for game {game_num + 1}: {game_end_time - game_start_time:.4f} seconds")
-        result = game.get_game_state()
-        for idx, (state, mcts_prob, team) in enumerate(reversed(game_history)):
-            if result == "Draw":
-                reward = 0.0
-            else:
-                reward = 1.0 if result == team else -1.0  # Corrected reward assignment
-            memory.append((state, mcts_prob, float(reward)))
-        # Ensure that agent.memory has been populated
-        if not agent.memory:
-            logger.warning("No self-play games were generated.")
-        else:
-            # Ensure that state is preprocessed correctly
-            preprocessed_state = agent.preprocess(game.get_board())  # Changed from game.get_state() to game.get_board()
-            mcts_prob = torch.zeros(agent.action_dim, dtype=torch.float32)  # Initialize as Tensor
-            memory.append((preprocessed_state, mcts_prob, reward))
-            logger.info(f"Finished game {game_num + 1}/{num_games} with result: {result}")
-    agent.memory.extend(memory)  # Assuming agent.memory is a list
-    return memory
 
 def train_alphazero(
     max_iterations: int = 1000,
@@ -91,28 +56,25 @@ def train_alphazero(
         c_puct=1.4,
         load_model=load_model  # Only load once at initialization
     )
-    
-    # Remove or comment out the following lines to allow training without an existing model
-    # if agent.model is None:
-    #     logger.error("Agent model is not initialized.")
-    #     raise ValueError("Agent model is not initialized.")
-    
+       
     # Add logging based on whether the model was loaded
-    if agent.model_loaded:
-        logger.info("Loaded existing model successfully.")
+    if load_model:
+        logger.info("Attempted to load existing model.")
     else:
-        logger.info("No existing model found. Starting with a fresh model.")
+        logger.info("Starting with a fresh model.")
     
-    if agent.model is None or not agent.model_loaded:
-        logger.error("Agent model is not initialized.")
-        raise AttributeError("Agent model is not initialized.")
-    
+    # Add debug statement to check agent.model
     if agent.model is not None:
+        logger.info("Agent model is successfully initialized.")
         agent.model.to(agent.device)  # Ensure the model is on the correct device
     else:
         logger.error("Agent model is None. Cannot proceed with training.")
         raise AttributeError("Agent model is not initialized.")
     
+    # Let's add the following debug statement
+    logger.debug(f"Type of agent.model: {type(agent.model)}")
+    logger.debug(f"agent.model device: {agent.model._device}")
+
     log_gpu_info(agent)  # Log initial GPU state
     
     data_module = ConnectFourDataModule(agent, num_self_play_games)
@@ -279,4 +241,6 @@ if __name__ == "__main__":
     finally:
         # Release all CUDA resources
         torch.cuda.empty_cache()
+        torch.cuda.empty_cache()
+        logger.info("CUDA resources have been released.")
         logger.info("CUDA resources have been released.")

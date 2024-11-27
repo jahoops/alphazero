@@ -1,7 +1,7 @@
 # game/connect_four_game.py
 
 import copy
-import logging, invalid_move_error, invalid_turn_error
+import logging
 import numpy as np
 from nnbattle.constants import RED_TEAM, YEL_TEAM, EMPTY, ROW_COUNT, COLUMN_COUNT
 
@@ -36,13 +36,13 @@ class ConnectFourGame:
         return self.board.copy()
 
     def make_move(self, column, team):
-        """Make a move for the given team in the specified column."""
+        logger.debug(f"Attempting move by Team {team} in column {column}. Last team: {self.last_team}")
         if team not in [RED_TEAM, YEL_TEAM]:
             logger.error(f"Invalid team: {team}. Must be {RED_TEAM} or {YEL_TEAM}.")
             raise InvalidMoveError(f"Invalid team: {team}. Must be {RED_TEAM} or {YEL_TEAM}.")
 
         if self.enforce_turns:
-            if self.last_team is not None and team == self.last_team:
+            if self.last_team == team:
                 logger.error(f"Invalid turn: team {team} cannot move twice in a row.")
                 raise InvalidTurnError(f"Invalid turn: team {team} cannot move twice in a row.")
 
@@ -57,7 +57,7 @@ class ConnectFourGame:
 
         self.board[row][column] = team
         self.last_team = team
-        logger.debug(f"Team {team} placed in column {column}, row {row}.")
+        logger.debug(f"Move made by Team {team}. Updated last_team to {self.last_team}.")
         return True
 
     def is_valid_move(self, column):

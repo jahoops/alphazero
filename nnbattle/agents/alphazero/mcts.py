@@ -6,10 +6,11 @@ import copy
 from typing import Optional, List
 
 import torch
+import torch.nn.functional as F  # Add this import
 import numpy as np  # Add numpy import if not already present
-from nnbattle.game import ConnectFourGame, InvalidMoveError
-from nnbattle.constants import RED_TEAM, YEL_TEAM
-from nnbattle.agents.alphazero.utils.model_utils import preprocess_board
+from ...game.connect_four_game import ConnectFourGame, InvalidMoveError
+from ...constants import RED_TEAM, YEL_TEAM
+from .utils.model_utils import preprocess_board
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +19,10 @@ def deepcopy_env(env):
     return copy.deepcopy(env)
 
 class MCTSNode:
-    def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], env: ConnectFourGame):
+    def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], env: ConnectFourGame, team: int):
         self.parent = parent
         self.action = action
-        # Determine the team that will make the next move
-        if env.last_team is None:
-            self.team = RED_TEAM  # Starting team
-        else:
-            self.team = 3 - env.last_team  # Switch team
+        self.team = team  # Current team to move
         self.env = env
         self.children = {}
         self.visits = 0
@@ -52,13 +49,16 @@ class MCTSNode:
             if action not in self.children:
                 new_env = deepcopy_env(self.env)
                 try:
-                    new_env.make_move(action, self.team)  # self.team is now valid
-                except InvalidMoveError as e:
+                    # Make move with current team
+                    new_env.make_move(action, self.team)
+                    # Next team is opposite of last_team (which was just set by make_move)
+                    next_team = YEL_TEAM if new_env.last_team == RED_TEAM else RED_TEAM
+                    child_node = MCTSNode(parent=self, action=action, env=new_env, team=next_team)
+                    child_node.prior = action_probs[action].item()
+                    self.children[action] = child_node
+                except (InvalidMoveError, InvalidTurnError) as e:
                     logger.error(f"Invalid move during expansion: {e}")
                     continue
-                child_node = MCTSNode(parent=self, action=action, env=new_env)
-                child_node.prior = action_probs[action].item()
-                self.children[action] = child_node
 
     def backpropagate(self, reward: float):
         self.visits += 1
@@ -66,17 +66,17 @@ class MCTSNode:
         if self.parent:
             self.parent.backpropagate(-reward)
 
-def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
-    if not agent.model_loaded:
-        logger.error("Agent's model is not loaded. Cannot perform MCTS simulation.")
-        raise AttributeError("Agent's model is not loaded.")
-
+def mcts_simulate(agent, game: ConnectFourGame, valid_moves, team: int, temperature=1.0):
+    # Verify it's the correct team's turn
+    if game.last_team == team:
+        raise InvalidTurnError(f"Invalid turn: team {team} cannot move after itself")
+    
     # Save the original mode
     original_mode = agent.model.training
     agent.model.eval()
 
     #logger.info("Starting MCTS simulation...")
-    root = MCTSNode(parent=None, action=None, env=deepcopy_env(game))
+    root = MCTSNode(parent=None, action=None, env=deepcopy_env(game), team=team)
     root.visits = 1
 
     # Add Dirichlet noise to the root node's priors
@@ -98,10 +98,16 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
         action_probs[valid_actions] = 1.0 / len(valid_actions)
     root.expand(action_probs, valid_actions)
 
+    # Add debug logging to track team progression
+    logger.debug(f"Starting MCTS for team {team}, last move by: {game.last_team}")
+
     for simulation in range(agent.num_simulations):
         node = root
         env = deepcopy_env(game)
-        logger.debug(f"Simulation {simulation + 1}/{agent.num_simulations} started.")
+        
+        # Add team tracking debug
+        current_team = team
+        logger.debug(f"Simulation {simulation}: Starting with team {current_team}")
 
         # **Selection**
         while not node.is_leaf():
@@ -111,6 +117,7 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
                 break
             try:
                 env.make_move(node.action, node.team)
+                logger.debug(f"Move by team {node.team} in column {node.action}")
             except InvalidMoveError as e:
                 logger.error(f"Invalid move during simulation: {e}")
                 break
@@ -120,7 +127,8 @@ def mcts_simulate(agent, game: ConnectFourGame, valid_moves, temperature=1.0):
         if env.get_game_state() == "ONGOING" and node.is_leaf():
             try:
                 with torch.no_grad():
-                    state_tensor = agent.preprocess(env.get_board()).to(agent.device)
+                    # Pass the correct team to preprocess
+                    state_tensor = agent.preprocess(env.get_board(), node.team, to_device=agent.device)
                     action_logits, value = agent.model(state_tensor.unsqueeze(0))
                     value = value.squeeze().item()  # Extract scalar value
                     action_probs_network = F.softmax(action_logits, dim=1).squeeze()

@@ -1,11 +1,13 @@
 import pytorch_lightning as pl
+from typing import Optional
 import torch
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import logging
+from nnbattle.agents.alphazero.self_play import SelfPlay  # Updated import
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.WARNING)  # Changed from DEBUG to INFO
+logger.setLevel(logging.DEBUG)  # Changed from DEBUG to INFO
 
 # Ensure __all__ is defined
 __all__ = ['ConnectFourDataset', 'ConnectFourDataModule']
@@ -49,31 +51,22 @@ class ConnectFourDataset(Dataset):
 
 
 class ConnectFourDataModule(pl.LightningDataModule):
-    def __init__(self, agent, num_games):
+    def __init__(self, agent, num_games, batch_size=32):
         super().__init__()
         self.agent = agent
         self.num_games = num_games
+        self.batch_size = batch_size
         self.dataset = ConnectFourDataset([], agent)
-        self.batch_size = 32  # Add explicit batch size
 
     def generate_self_play_games(self, temperature=1.0):
-        """Generate self-play games and append to the main dataset."""
+        """Generate self-play games using the centralized SelfPlay function."""
         logger.info(f"Generating {self.num_games} self-play games with temperature {temperature}.")
         try:
-            for game_number in range(1, self.num_games + 1):
-                self.agent.self_play(game_number, self.num_games, max_moves=100, temperature=temperature)
-            if self.agent.memory:
-                self.dataset.data.extend(self.agent.memory)
-                logger.info(f"Appending {len(self.agent.memory)} game samples to the dataset.")
-                self.agent.memory.clear()
-                logger.info(f"Dataset size after self-play: {len(self.dataset.data)} samples")
-            else:
-                logger.warning("Agent memory is empty. No games were added to the dataset.")
-                raise ValueError("Agent memory is empty. No data available for training.")
+            num_examples = SelfPlay(self.agent, self.num_games, temperature)
+            logger.info(f"Generated {num_examples} training examples.")
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
-            # Handle exceptions as needed
-        self.agent.log_gpu_stats()
+            raise
 
     def setup(self, stage=None):
         if stage == 'fit' or stage is None:

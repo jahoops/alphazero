@@ -36,7 +36,7 @@ def setup_logger(level=logging.INFO):
 # Create a global logger instance
 logger = setup_logger()
 
-def set_log_level(level=logging.WARNING):
+def set_log_level(level=logging.DEBUG):
     """Set the global log level for all loggers."""
     logging.basicConfig(
         level=level,
@@ -45,4 +45,4 @@ def set_log_level(level=logging.WARNING):
     logging.getLogger().setLevel(level)
 
 logger = logging.getLogger(__name__)
-set_log_level(logging.WARNING)  # Default log level
+set_log_level(logging.DEBUG)  # Default log level

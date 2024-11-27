@@ -52,6 +52,7 @@ class Connect4Net(nn.Module):
     def to(self, device):
         super().to(device)
         self._device = device
+        return self  # Ensure to return self for chaining
 
     def forward(self, x):
         # Ensure x is on the correct device
