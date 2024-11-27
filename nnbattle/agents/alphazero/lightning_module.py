@@ -16,9 +16,16 @@ class ConnectFourLightningModule(pl.LightningModule):
         self.model = agent.model
         self.loss_fn = self.loss_function
         self.save_hyperparameters()
-        self.automatic_optimization = True
+        self.automatic_optimization = False  # Manual optimization for speed
         self._train_dataloader = None
         self._val_dataloader = None
+        
+        # Disable validation by default for speed
+        self.should_validate = False
+        
+        # Add performance configurations
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = False
 
     def on_fit_start(self):
         """Called when fit begins."""
@@ -33,34 +40,29 @@ class ConnectFourLightningModule(pl.LightningModule):
         return self.model(x)
 
     def training_step(self, batch, batch_idx):
-        """Handle training step with proper dataloader initialization."""
+        """Handle training step with manual optimization."""
         if self._train_dataloader is None:
             self._train_dataloader = self.trainer.train_dataloader
             
-        logger.debug(f"Training Step - Model training mode: {self.model.training}")
-        self.model.train()  # Ensure the model is in training mode
-        states, mcts_probs, rewards = batch
-        # Move tensors to device here after pin_memory has been called
-        states = states.to(self.device, non_blocking=True)
-        mcts_probs = mcts_probs.to(self.device, non_blocking=True)
-        rewards = rewards.to(self.device, non_blocking=True).view(-1)
+        opt = self.optimizers()
         
-        # Forward pass
+        # Zero gradients and compute loss
+        opt.zero_grad()
+        states, mcts_probs, rewards = batch
         logits, values = self(states)
         
-        # Ensure proper shapes
-        values = values.squeeze(-1)
-        rewards = rewards.float()
-        
-        # Calculate losses with added small epsilon to prevent log(0)
-        value_loss = F.mse_loss(values, rewards)
+        value_loss = F.mse_loss(values.squeeze(-1), rewards)
         policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
-        
         loss = value_loss + policy_loss
-        self.log('loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        # If you prefer to monitor 'train_loss', add the following:
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        return loss
+        
+        # Manual backward and optimization
+        self.manual_backward(loss)
+        opt.step()
+        
+        # Store loss for manual tracking
+        self.last_loss = loss.item()
+        
+        return {'loss': loss.item()}  # Return loss as dict for manual tracking
 
     def on_train_epoch_end(self):
         # Get metrics that were logged during training steps
@@ -73,16 +75,8 @@ class ConnectFourLightningModule(pl.LightningModule):
             self.log('train_loss_epoch', metrics['train_loss'], on_epoch=True, prog_bar=True)
 
     def configure_optimizers(self):
-        # The optimizer will now include model parameters
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode='min', factor=0.1, patience=10, verbose=True
-        )
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": scheduler,
-            "monitor": "loss"  # Ensure this matches the logged metric
-        }
+        """Simplified optimizer configuration without scheduler."""
+        return torch.optim.Adam(self.model.parameters(), lr=0.001)
 
     def loss_function(self, outputs, targets_policy, targets_value):
         logits, values = outputs
@@ -91,34 +85,43 @@ class ConnectFourLightningModule(pl.LightningModule):
         return value_loss + policy_loss
 
     def validation_step(self, batch, batch_idx):
-        """Handle validation step with proper dataloader initialization."""
+        """Handle validation with MCTS-generated data."""
         if self._val_dataloader is None:
             self._val_dataloader = self.trainer.val_dataloader
             
-        logger.debug(f"Validation Step - Model training mode: {self.model.training}")
-        self.model.eval()  # Ensure the model is in evaluation mode
-        """Add a validation step to monitor performance on a separate set."""
-        states, mcts_probs, rewards = batch
-        # Move tensors to device here after pin_memory has been called
-        states = states.to(self.device, non_blocking=True)
-        mcts_probs = mcts_probs.to(self.device, non_blocking=True)
-        rewards = rewards.to(self.device, non_blocking=True).view(-1)
+        logger.debug(f"Validation Step - Processing MCTS batch {batch_idx}")
         
-        logits, values = self.forward(states)
-        values = values.squeeze(-1)
-        rewards = rewards.float()
+        # Store original mode
+        was_training = self.model.training
         
-        value_loss = F.mse_loss(values, rewards)
-        policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
-        total_loss = value_loss + policy_loss
-        
-        self.log('validation_value_loss', value_loss, on_step=False, on_epoch=True, prog_bar=True)
-        self.log('validation_policy_loss', policy_loss, on_step=False, on_epoch=True, prog_bar=True)
-        self.log('validation_train_loss', total_loss, on_step=False, on_epoch=True, prog_bar=True)
-        
-        # Add detailed logging for validation
-        if batch_idx % 10 == 0:
-            logger.info(f"Validation Batch {batch_idx}: Value Loss={value_loss.item():.6f}, Policy Loss={policy_loss.item():.6f}, Total Loss={total_loss.item():.6f}")
+        # Set eval mode for validation
+        self.model.eval()
+
+        try:
+            # Process MCTS validation data
+            with torch.no_grad():
+                states, mcts_probs, rewards = batch
+                logits, values = self.forward(states)
+                values = values.squeeze(-1)
+                
+                # Calculate validation metrics from MCTS data
+                value_loss = F.mse_loss(values, rewards)
+                policy_loss = -torch.mean(torch.sum(mcts_probs * F.log_softmax(logits + 1e-8, dim=1), dim=1))
+                total_loss = value_loss + policy_loss
+                
+                self.log('val_mcts_value_loss', value_loss, on_step=False, on_epoch=True, prog_bar=True)
+                self.log('val_mcts_policy_loss', policy_loss, on_step=False, on_epoch=True, prog_bar=True)
+                self.log('val_loss', total_loss, on_step=False, on_epoch=True, prog_bar=True)
+                
+        finally:
+            # Restore original mode
+            self.model.train(was_training)
+
+    # Remove unnecessary hooks and callbacks
+    def on_train_start(self): pass
+    def on_train_end(self): pass
+    def on_validation_start(self): pass
+    def on_validation_end(self): pass
 
 # Ensure __all__ is defined for easier imports
 __all__ = ['ConnectFourLightningModule']

@@ -28,7 +28,7 @@ class SelfPlay:
             # Check if game is actually complete
             game_state = game.get_game_state()
             if game_state != "ONGOING" or move_count >= max_moves:
-                logger.info(f"Game {game_num} complete. Result: {game_state}")
+                #logger.info(f"Game {game_num} complete. Result: {game_state}")
                 break
                 
             # Get valid moves before selecting action
@@ -74,7 +74,7 @@ class SelfPlay:
             policies.append(policy)
             values.append(reward)
         
-        logger.info(f"Game {game_num} completed after {move_count} moves with result: {result}")
+        #logger.info(f"Game {game_num} completed after {move_count} moves with result: {result}")
         return states, policies, values
 
     def get_mcts_policy(self, state) -> np.ndarray:
@@ -90,10 +90,17 @@ class SelfPlay:
     def generate_training_data(self, num_episodes: int) -> List[Tuple]:
         """Generate training data through self-play."""
         training_data = []
+        total_moves = 0
+        completed_games = 0
         
         for game_num in range(num_episodes):
             states, policies, values = self.execute_episode(game_num)
+            if states:  # Only count completed games
+                completed_games += 1
+                total_moves += len(states)
             training_data.extend(zip(states, policies, values))
         
+        avg_moves = total_moves / completed_games if completed_games > 0 else 0
         logger.info(f"Total training examples generated: {len(training_data)}")
+        logger.info(f"Average moves per game: {avg_moves:.2f} over {completed_games} completed games")
         return training_data

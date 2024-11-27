@@ -5,6 +5,8 @@ def main():
     import torch.multiprocessing as mp
     import os
     import torch
+    import signal
+    import sys
 
     # Initialize the agent
     agent = initialize_agent(
@@ -21,6 +23,26 @@ def main():
     if mp.get_start_method(allow_none=True) != 'spawn':
         mp.set_start_method('spawn', force=True)
 
+    def signal_handler(signum, frame):
+        logger.info("\nReceived interrupt signal. Cleaning up...")
+        try:
+            # Clean up CUDA resources
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                logger.info("CUDA memory cleaned up.")
+
+            # Clean up multiprocessing resources
+            mp.freeze_support()
+            logger.info("Multiprocessing resources cleaned up.")
+
+        finally:
+            logger.info("Exiting program...")
+            sys.exit(0)  # Force clean exit
+
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+
     # Run training
     try:
         train_alphazero(
@@ -30,23 +52,14 @@ def main():
             use_gpu=True,
             load_model=True
         )
+        # Save the trained model
+        agent.save_model()  # Add this line
+        logger.info("Training completed. Final model saved.")  # Add this line
     except KeyboardInterrupt:
-        print("\nTraining interrupted by user.")
+        signal_handler(signal.SIGINT, None)  # Handle keyboard interrupt
     except Exception as e:
-        logger.error(f"An error occurred: {e}")  # Now correctly uses logger.error
-    finally:
-        # CUDA memory cleanup
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-            logger.info("CUDA memory has been cleaned up.")  # Now correctly uses logger.info
-
-        # Multiprocessing cleanup
-        import multiprocessing as mp
-        mp.freeze_support()
-        logger.info("Multiprocessing resources have been cleaned up.")  # Now correctly uses logger.info
-
-        # More informative completion message
-        logger.info("Training completed successfully. All resources have been released.")  # Now correctly uses logger.info
+        logger.error(f"An error occurred: {e}")
+        signal_handler(signal.SIGTERM, None)  # Clean up on error
 
 if __name__ == "__main__":
     main()

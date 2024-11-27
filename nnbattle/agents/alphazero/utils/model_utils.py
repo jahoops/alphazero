@@ -12,32 +12,21 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)  # Set appropriate logging level
 
-# Define model directory and path
-MODEL_DIR = "nnbattle/agents/alphazero/model"
-MODEL_PATH = os.path.join(MODEL_DIR, "alphazero_model_final.pth")
-os.makedirs(MODEL_DIR, exist_ok=True)
-
 def load_agent_model(agent: 'AlphaZeroAgent'):
-    """
-    Loads the agent's model from the predefined MODEL_PATH.
-
-    :param agent: Instance of AlphaZeroAgent.
-    """
     try:
         state_dict = torch.load(agent.model_path, map_location=agent.device)
         agent.model.load_state_dict(state_dict)
         agent.model.to(agent.device)
-        logger.info("Model loaded successfully.")
+        agent.model_loaded = True
+        agent.logger.info(f"Model loaded successfully from {agent.model_path}.")
     except FileNotFoundError:
-        logger.warning("Model file not found. Using initialized model.")
+        agent.logger.warning(f"Model file not found at {agent.model_path}.")
+        agent.model_loaded = False
     except Exception as e:
-        logger.error(f"Error loading model: {e}")
-        # Ensure the model remains initialized even if loading fails
-    # Add check after attempting to load state_dict
-    if agent.model is None:
-        logger.error("Agent model is None after attempting to load the model.")
+        agent.logger.error(f"Error loading model from {agent.model_path}: {e}")
+        agent.model_loaded = False
 
-def save_agent_model(agent: 'AlphaZeroAgent', path: str = MODEL_PATH):
+def save_agent_model(agent: 'AlphaZeroAgent'):
     """
     Saves the agent's model state dictionary to the specified path.
 
@@ -45,10 +34,12 @@ def save_agent_model(agent: 'AlphaZeroAgent', path: str = MODEL_PATH):
     :param path: Destination path for the model weights.
     """
     try:
-        torch.save(agent.model.state_dict(), path)
-        logger.info(f"Model saved successfully to {path}.")
+        torch.save(agent.model.state_dict(), agent.model_path)
+        logger.info(f"Model saved successfully to {agent.model_path}.")
     except Exception as e:
-        logger.error(f"Failed to save the model to {path}: {e}")
+        logger.error(f"Failed to save the model to {agent.model_path}: {e}")
+
+EMPTY = 0  # Define the EMPTY constant
 
 def preprocess_board(board_state: np.ndarray, team: int) -> torch.Tensor:
     """
@@ -70,4 +61,4 @@ def preprocess_board(board_state: np.ndarray, team: int) -> torch.Tensor:
     tensor = torch.from_numpy(state)
     return tensor.unsqueeze(0)  # Add batch dimension if required
 
-__all__ = ['load_agent_model', 'save_agent_model', 'preprocess_board', 'MODEL_PATH']
+__all__ = ['load_agent_model', 'save_agent_model', 'preprocess_board']

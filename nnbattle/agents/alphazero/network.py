@@ -49,12 +49,26 @@ class Connect4Net(nn.Module):
         # Ensure device attribute is set
         self._device = torch.device('cpu')
 
+        # Set appropriate default modes for different components
+        self.train()  # Set default mode to train
+        self.bn1.eval()  # BatchNorm layers should typically be in eval during inference
+        self.policy_bn.eval()
+        self.value_bn.eval()
+        
+        # Set dropout if used (for example)
+        self.training = True  # Explicitly set training mode
+
     def to(self, device):
         super().to(device)
         self._device = device
         return self  # Ensure to return self for chaining
 
     def forward(self, x):
+        # Ensure batch norm layers are in correct mode during forward pass
+        self.bn1.train(self.training)
+        self.policy_bn.train(self.training)
+        self.value_bn.train(self.training)
+        
         # Ensure x is on the correct device
         x = x.to(self._device)
 
@@ -76,5 +90,15 @@ class Connect4Net(nn.Module):
         value = torch.tanh(self.value_fc2(value))
 
         return policy, value
+
+    def train(self, mode=True):
+        """Override train method to handle batch norm layers correctly."""
+        super().train(mode)
+        if not mode:
+            # When setting to eval mode, ensure batch norms are properly configured
+            self.bn1.eval()
+            self.policy_bn.eval()
+            self.value_bn.eval()
+        return self
 
 __all__ = ['Connect4Net']

@@ -15,6 +15,10 @@ from nnbattle.agents.base_agent import BaseAgent
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Define paths to the models
+FINAL_MODEL_PATH = 'nnbattle/agents/alphazero/model/alphazero_model_final.pth'      # Replace with actual path
+BASELINE_MODEL_PATH = 'nnbattle/agents/alphazero/model/alphazero_model_baseline.pth'  # Replace with actual path
+
 def run_tournament(agents: List[BaseAgent], num_games=10):
     # Format agent names with team strings instead of numbers
     results = {f"{agent.__class__.__name__} ({'RED_TEAM' if agent.team == RED_TEAM else 'YEL_TEAM'})": 0 for agent in agents}
@@ -76,15 +80,29 @@ def run_tournament(agents: List[BaseAgent], num_games=10):
     print("Tournament completed. Results saved to tournament/results/tournament_results.json")
 
 if __name__ == "__main__":
-    agent1 = MinimaxAgent(depth=1, team=YEL_TEAM)  # Set MinimaxAgent to YEL_TEAM
-    agent2 = AlphaZeroAgent(
+    # Initialize Baseline Agent (e.g., YEL_TEAM)
+    agent_baseline = AlphaZeroAgent(
         action_dim=7,
         state_dim=3,
         use_gpu=True,
         num_simulations=800,
         c_puct=1.4,
         load_model=True,
-        team=RED_TEAM  # Set AlphaZeroAgent to RED_TEAM
+        model_path=BASELINE_MODEL_PATH,  # Load baseline model
+        team=YEL_TEAM  # Assign YEL_TEAM
     )
-    agents = [agent1, agent2]
+
+    # Initialize Final Agent (e.g., RED_TEAM)
+    agent_final = AlphaZeroAgent(
+        action_dim=7,
+        state_dim=3,
+        use_gpu=True,
+        num_simulations=800,
+        c_puct=1.4,
+        load_model=True,
+        model_path=FINAL_MODEL_PATH,  # Load final model
+        team=RED_TEAM  # Assign RED_TEAM
+    )
+
+    agents = [agent_baseline, agent_final]
     run_tournament(agents, num_games=10)

@@ -32,7 +32,7 @@ class ConnectFourDataset(Dataset):
         if isinstance(state, np.ndarray):
             if state.shape != (3, 6, 7):
                 preprocessed_state = self.agent.preprocess(state, self.agent.team)
-                logger.info("Preprocessing state to shape (3, 6, 7).")
+                #logger.info("Preprocessing state to shape (3, 6, 7).")
                 state = preprocessed_state.cpu().numpy()  # Move to CPU before converting to numpy
                 if state.shape != (3, 6, 7):
                     logger.error(f"Invalid state shape after preprocessing: {state.shape}. Expected (3, 6, 7).")
@@ -53,7 +53,7 @@ class ConnectFourDataset(Dataset):
 
 
 class ConnectFourDataModule(pl.LightningDataModule):
-    def __init__(self, agent, num_games, batch_size=32, num_workers=2, persistent_workers=True):
+    def __init__(self, agent, num_games, batch_size=32, num_workers=23, persistent_workers=True):
         super().__init__()
         self.agent = agent
         self.num_games = num_games
@@ -105,9 +105,9 @@ class ConnectFourDataModule(pl.LightningDataModule):
             batch_size=self.batch_size,
             shuffle=True,
             num_workers=self.num_workers,
-            pin_memory=torch.cuda.is_available(),
+            pin_memory=False,  # Changed from True to False
             persistent_workers=self.persistent_workers and self.num_workers > 0,
-            drop_last=True  # Add this to prevent issues with incomplete batches
+            drop_last=True
         )
 
     def val_dataloader(self):
@@ -119,10 +119,10 @@ class ConnectFourDataModule(pl.LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             shuffle=False,
-            num_workers=max(1, self.num_workers // 2),  # Reduce workers for validation
-            pin_memory=torch.cuda.is_available(),
+            num_workers=max(1, self.num_workers // 2),
+            pin_memory=False,  # Changed from True to False
             persistent_workers=self.persistent_workers and self.num_workers > 0,
-            drop_last=True  # Add this to prevent issues with incomplete batches
+            drop_last=True
         )
 
     def _worker_init_fn(self, worker_id: int):

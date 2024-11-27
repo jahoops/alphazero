@@ -1,3 +1,8 @@
+from nnbattle.game.connect_four_game import ConnectFourGame
+from nnbattle.constants import RED_TEAM
+from ....utils.logger_config import logger  # Add this import
+import numpy as np  # Add this import
+
 def evaluate_agent(agent, num_games=20):
     """Evaluate agent performance against random opponent."""
     wins = 0
@@ -38,14 +43,19 @@ def train_alphazero(
     """Trains the AlphaZero agent using self-play and reinforcement learning."""
     from ....utils.logger_config import logger, set_log_level
     import logging
+    import torch
 
     # Set global log level at the start of your program
     set_log_level(logging.INFO)
 
+    # Enable tensor cores for better performance on CUDA devices
+    if use_gpu and torch.cuda.is_available():
+        torch.set_float32_matmul_precision('high')
+        logger.info("Enabled high-precision tensor cores for CUDA device")
+
     import os
     import time
     from datetime import timedelta
-    import torch
     import numpy as np
     import pytorch_lightning as pl
     from nnbattle.game.connect_four_game import ConnectFourGame, InvalidMoveError, InvalidTurnError
@@ -54,7 +64,6 @@ def train_alphazero(
     from ..data_module import ConnectFourDataModule, ConnectFourDataset  # Moved import here
     from ..lightning_module import ConnectFourLightningModule
     from ..utils.model_utils import (
-        MODEL_PATH,
         load_agent_model,
         save_agent_model
     )
@@ -88,7 +97,7 @@ def train_alphazero(
         agent, 
         num_games=num_self_play_games,
         batch_size=32,
-        num_workers=2,  # Reduce from 4 to 2 for stability
+        num_workers=23,  # Reduce from 4 to 2 for stability
         persistent_workers=True
     )
 
@@ -110,52 +119,42 @@ def train_alphazero(
 
     data_module.setup('fit')
 
-    # Add checkpoint callback to save best models
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        dirpath='nnbattle/agents/alphazero/model/checkpoints',
-        filename='alphazero-{epoch:02d}-{loss:.2f}',  # Updated to log 'loss'
-        save_top_k=3,
-        monitor='loss',  # Changed from 'train_loss' to 'loss'
-        mode='min'
-    )
-
-    # Add Early Stopping callback (Optional)
-    from pytorch_lightning.callbacks import EarlyStopping
-
-    # Update the EarlyStopping callback
-    early_stop_callback = EarlyStopping(
-        monitor='loss',     # Change from 'train_loss' to 'loss'
-        min_delta=0.00,
-        patience=5,
-        verbose=False,
-        mode='min'
-    )
-
-    from pytorch_lightning.loggers import TensorBoardLogger  # Add TensorBoard logger import
-
-    # Initialize TensorBoard logger with more details
-    logger_tb = TensorBoardLogger(
-        save_dir="tb_logs",
-        name="alphazero",
-        version=None,  # Auto-increment version
-        default_hp_metric=False  # Don't log hp_metric
-    )
-
-    # Create trainer with proper cleanup settings
+    # Remove early stopping since we're in barebones mode
     trainer = pl.Trainer(
-        max_epochs=10,  # Increased from 1 to 10 to allow more training on each batch
+        max_epochs=10,
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
         devices=1,
-        callbacks=[checkpoint_callback, early_stop_callback],
-        logger=logger_tb,
-        log_every_n_steps=10,
+        callbacks=None,  # Remove all callbacks
+        logger=None,
+        enable_checkpointing=False,
+        enable_progress_bar=False,
+        enable_model_summary=False,
+        num_sanity_val_steps=0,
+        deterministic=False,
+        benchmark=True,
+        inference_mode=True,
+        gradient_clip_val=None,
         detect_anomaly=False,
-        enable_checkpointing=True,
-        enable_progress_bar=True,
-        enable_model_summary=True,
-        num_sanity_val_steps=2,
-        reload_dataloaders_every_n_epochs=1  # Reload to prevent worker issues
+        barebones=True,
+        reload_dataloaders_every_n_epochs=0
     )
+
+    # Add manual early stopping logic
+    best_loss = float('inf')
+    patience_counter = 0
+
+    # Add manual progress reporting
+    def log_progress(iteration, total_iterations, elapsed_time):
+        if iteration % 1 == 0:  # Log every iteration
+            logger.info(f"Progress: {iteration}/{total_iterations} iterations "
+                       f"({iteration/total_iterations*100:.1f}%) "
+                       f"[{elapsed_time:.1f}s elapsed]")
+
+    # Create a separate checkpoint saver that doesn't interfere with barebones mode
+    def save_checkpoint_manually(agent, iteration, performance):
+        if performance > best_performance:
+            save_agent_model(agent)
+            logger.info(f"Manually saved checkpoint at iteration {iteration}")
 
     # Disable model loading in agent's select_move during training
     agent.load_model_flag = False
@@ -199,6 +198,21 @@ def train_alphazero(
                 # Proceed with training
                 trainer.fit(lightning_module, datamodule=data_module)
 
+                # Inside the training loop, after trainer.fit:
+                train_results = trainer.fit(lightning_module, datamodule=data_module)
+                current_loss = lightning_module.last_loss
+
+                if current_loss < best_loss:
+                    best_loss = current_loss
+                    patience_counter = 0
+                    save_agent_model(agent)
+                    logger.info(f"New best loss: {best_loss}. Model saved.")
+                else:
+                    patience_counter += 1
+                    if patience_counter >= patience:
+                        logger.info("Manual early stopping triggered.")
+                        break
+
                 # Optionally evaluate the model
                 if iteration % 10 == 0:
                     # Ensure CUDA tensors are properly handled
@@ -239,6 +253,10 @@ def train_alphazero(
         # Ensure proper cleanup of CUDA resources
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
+
+        # Save the trained model
+        save_agent_model(agent)
+        logger.info("Training completed. Final model saved.")
 
     logger.info("=== Training Completed Successfully ===")
 
