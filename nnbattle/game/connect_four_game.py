@@ -35,6 +35,10 @@ class ConnectFourGame:
         self.last_team = None
         return self.board.copy()
 
+    def get_initial_state(self):
+        """Return the initial state of the board."""
+        return self.board.copy()
+
     def make_move(self, column, team):
         logger.debug(f"Attempting move by Team {team} in column {column}. Last team: {self.last_team}")
         if team not in [RED_TEAM, YEL_TEAM]:
@@ -115,13 +119,45 @@ class ConnectFourGame:
             return "Draw"
         return "ONGOING"
 
-    def get_valid_moves(self):
-        """Return list of valid column moves."""
-        return [col for col in range(COLUMN_COUNT) if self.is_valid_move(col)]
+    def get_valid_moves(self, state=None):
+        """Get a list of valid moves based on the current state."""
+        if state is None:
+            state = self.board
+        valid_moves = []
+        for col in range(COLUMN_COUNT):
+            if state[0][col] == EMPTY:
+                valid_moves.append(col)
+        return valid_moves
+
+    def get_next_state(self, current_state, action):
+        """Return the next state after applying the action."""
+        next_state = current_state.copy()
+        for row in range(ROW_COUNT-1, -1, -1):
+            if next_state[row][action] == EMPTY:
+                next_state[row][action] = self.last_team  # Current team has already been set
+                self.last_team = 3 - self.last_team  # Switch team
+                break
+        return next_state
 
     def get_board(self):
         """Return copy of current board state."""
         return self.board.copy()
+
+    def get_value(self, state):
+        """Evaluate the board state and return the value."""
+        # Implement a heuristic or game outcome evaluation
+        # For simplicity, return 1.0 for a win, -1.0 for a loss, 0.0 for draw
+        game_state = self.get_game_state()
+        if game_state == RED_TEAM:
+            return 1.0
+        elif game_state == YEL_TEAM:
+            return -1.0
+        else:
+            return 0.0
+
+    def is_terminal(self, state):
+        """Check if the game is over."""
+        return self.get_game_state() != "ONGOING"
 
     def board_to_string(self):
         """Return string representation of board with colored circles."""

@@ -50,20 +50,20 @@ def save_agent_model(agent: 'AlphaZeroAgent', path: str = MODEL_PATH):
     except Exception as e:
         logger.error(f"Failed to save the model to {path}: {e}")
 
-def preprocess_board(board_state: np.ndarray) -> torch.Tensor:
+def preprocess_board(board_state: np.ndarray, team: int) -> torch.Tensor:
     """
     Preprocesses the board state into a tensor suitable for the model.
 
     :param board_state: Numpy array representing the board.
+    :param team: Current team's identifier.
     :return: Preprocessed tensor.
     """
-    # Example preprocessing; adjust based on your model's requirements
-    current_board = (board_state == 1).astype(np.float32)
-    opponent_board = (board_state == 2).astype(np.float32)
+    current_board = (board_state == team).astype(np.float32)
+    opponent_board = (board_state == (3 - team)).astype(np.float32)
     valid_moves = np.zeros_like(current_board)
     for col in range(board_state.shape[1]):
         for row in range(board_state.shape[0]-1, -1, -1):
-            if board_state[row][col] == 0:
+            if board_state[row][col] == EMPTY:
                 valid_moves[row][col] = 1
                 break
     state = np.stack([current_board, opponent_board, valid_moves])

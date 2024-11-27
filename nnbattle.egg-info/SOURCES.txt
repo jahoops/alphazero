@@ -12,13 +12,14 @@ nnbattle/agents/base_agent.py
 nnbattle/agents/alphazero/__init__.py
 nnbattle/agents/alphazero/agent_code.py
 nnbattle/agents/alphazero/data_module.py
+nnbattle/agents/alphazero/initialize_agent.py
 nnbattle/agents/alphazero/lightning_module.py
 nnbattle/agents/alphazero/mcts.py
 nnbattle/agents/alphazero/network.py
+nnbattle/agents/alphazero/self_play.py
 nnbattle/agents/alphazero/model/__init__.py
 nnbattle/agents/alphazero/train/__init__.py
 nnbattle/agents/alphazero/train/train_alpha_zero.py
-nnbattle/agents/alphazero/train/trainer.py
 nnbattle/agents/alphazero/utils/__init__.py
 nnbattle/agents/alphazero/utils/model_utils.py
 nnbattle/agents/minimax/__init__.py

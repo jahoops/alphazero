@@ -60,7 +60,7 @@ class AlphaZeroAgent(BaseAgent):
         self.num_simulations = num_simulations
         self.c_puct = c_puct
         self.team = team
-        self.memory = []
+        self.memory = []  # Initialize memory as an empty list
         self.model_path = MODEL_PATH  # Added model_path attribute
 
         # Initialize the model
@@ -125,25 +125,39 @@ class AlphaZeroAgent(BaseAgent):
         return tensor.cpu()
 
     def select_move(self, game: ConnectFourGame, team: int, temperature=1.0):
-        #logger.info(f"Agent {team} selecting a move.")
-        # Ensure it's the correct team's turn
-        if game.last_team is not None:  # Only check if not first move
-            if game.last_team == team:
-                logger.error(f"It's not Team {team}'s turn.")
-                raise InvalidTurnError(f"It's not Team {team}'s turn.")
-
-        # Get the current valid moves
+        """Select a valid move for the current game state."""
+        if game.get_game_state() != "ONGOING":
+            raise InvalidMoveError("Game is not ongoing.")
+            
+        # Get valid moves first
         valid_moves = game.get_valid_moves()
         if not valid_moves:
-            logger.error("No valid moves available.")
-            raise InvalidMoveError("No valid moves available.")
-
-        if self.model is None:
-            logger.error("Agent model is not initialized.")
-            raise AttributeError("Agent model is not initialized.")
-
-        selected_action, action_probs = self.act(game, valid_moves, team, temperature=temperature)
-        return selected_action, action_probs
+            raise InvalidMoveError("No valid moves available")
+            
+        try:
+            # Verify it's our turn
+            if game.last_team == team:
+                raise InvalidTurnError(f"Invalid turn: team {team} cannot move after itself")
+                
+            selected_action, action_probs = self.act(game, team, temperature=temperature)
+            
+            # Ensure selected action is valid
+            if selected_action not in valid_moves:
+                logger.warning(f"Selected invalid move {selected_action}, falling back to random valid move")
+                selected_action = np.random.choice(valid_moves)
+                
+            # Test move validity before returning
+            game_copy = deepcopy_env(game)
+            game_copy.make_move(selected_action, team)
+            
+            self.memory.append((self.preprocess(game.get_board(), team), action_probs, 0.0))
+            return selected_action, action_probs
+            
+        except (InvalidMoveError, InvalidTurnError) as e:
+            logger.error(f"Error selecting move: {e}")
+            if valid_moves:  # If we have valid moves, make a random one as fallback
+                return np.random.choice(valid_moves), torch.zeros(self.action_dim)
+            raise
 
     def evaluate_model(self):
         """Evaluate the model on a set of validation games to monitor learning progress."""
@@ -171,9 +185,8 @@ class AlphaZeroAgent(BaseAgent):
                 losses += 1
         logger.info(f"Evaluation Results over {num_evaluations} games: Wins={wins}, Draws={draws}, Losses={losses}")
 
-    def act(self, game: ConnectFourGame, valid_moves, team: int, temperature=1.0, **kwargs):
-        with model_mode(self.model, training=False):  # Temporarily set to eval mode
-            selected_action, action_probs = mcts_simulate(self, game, valid_moves, team, temperature=temperature)
+    def act(self, game: ConnectFourGame, team: int, temperature=1.0, **kwargs):
+        selected_action, action_probs = mcts_simulate(self, game, team, temperature=temperature)
         return selected_action, action_probs
 
 def initialize_agent(

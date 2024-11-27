@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader, Dataset
 import numpy as np
 import logging
 from nnbattle.agents.alphazero.self_play import SelfPlay  # Updated import
+from nnbattle.game.connect_four_game import ConnectFourGame
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)  # Changed from DEBUG to INFO
@@ -22,6 +23,7 @@ class ConnectFourDataset(Dataset):
 
     def __getitem__(self, idx):
         state, mcts_prob, reward = self.data[idx]
+        # Include team information in the state if not already present
         # Ensure reward is a float
         if not isinstance(reward, float):
             logger.error(f"Invalid reward type at index {idx}: {type(reward)}. Expected float.")
@@ -29,7 +31,7 @@ class ConnectFourDataset(Dataset):
         # Ensure state has the correct shape [3, 6, 7]
         if isinstance(state, np.ndarray):
             if state.shape != (3, 6, 7):
-                preprocessed_state = self.agent.preprocess(state)
+                preprocessed_state = self.agent.preprocess(state, self.agent.team)
                 logger.info("Preprocessing state to shape (3, 6, 7).")
                 state = preprocessed_state.cpu().numpy()  # Move to CPU before converting to numpy
                 if state.shape != (3, 6, 7):
@@ -51,19 +53,25 @@ class ConnectFourDataset(Dataset):
 
 
 class ConnectFourDataModule(pl.LightningDataModule):
-    def __init__(self, agent, num_games, batch_size=32):
+    def __init__(self, agent, num_games, batch_size=32, num_workers=2, persistent_workers=True):
         super().__init__()
         self.agent = agent
         self.num_games = num_games
         self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.persistent_workers = persistent_workers
         self.dataset = ConnectFourDataset([], agent)
 
     def generate_self_play_games(self, temperature=1.0):
-        """Generate self-play games using the centralized SelfPlay function."""
+        """Generate self-play games using the SelfPlay class."""
         logger.info(f"Generating {self.num_games} self-play games with temperature {temperature}.")
         try:
-            num_examples = SelfPlay(self.agent, self.num_games, temperature)
-            logger.info(f"Generated {num_examples} training examples.")
+            # Create a new game instance instead of passing the agent
+            game = ConnectFourGame()
+            self_play = SelfPlay(game=game, model=self.agent.model, num_simulations=self.agent.num_simulations)
+            training_data = self_play.generate_training_data(self.num_games)
+            self.dataset = ConnectFourDataset(training_data, self.agent)
+            logger.info(f"Generated {len(self.dataset)} training examples.")
         except Exception as e:
             logger.error(f"An error occurred during self-play generation: {e}")
             raise
@@ -89,9 +97,11 @@ class ConnectFourDataModule(pl.LightningDataModule):
             self.train_dataset, 
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=4,  # Set to 4 for multiprocessing efficiency
+            num_workers=self.num_workers,
             pin_memory=True if torch.cuda.is_available() else False,  # Only pin if CUDA available
-            persistent_workers=True
+            persistent_workers=self.persistent_workers and self.num_workers > 0,
+            prefetch_factor=2,
+            worker_init_fn=self._worker_init_fn
         )
     
     def val_dataloader(self):
@@ -111,3 +121,9 @@ class ConnectFourDataModule(pl.LightningDataModule):
             pin_memory=True if torch.cuda.is_available() else False,  # Only pin if CUDA available
             persistent_workers=True  # Added to speed up worker initialization
         )
+
+    def _worker_init_fn(self, worker_id: int):
+        """Initialize each worker with a different seed."""
+        worker_seed = torch.initial_seed() % 2**32
+        np.random.seed(worker_seed)
+        torch.manual_seed(worker_seed)
