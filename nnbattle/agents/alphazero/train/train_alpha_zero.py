@@ -140,7 +140,7 @@ def train_alphazero(
         inference_mode=True,
         gradient_clip_val=1.0,  # Add gradient clipping
         detect_anomaly=False,
-        barebones=True,
+        barebones=False,  # Changed to False to enable epoch end logging
         reload_dataloaders_every_n_epochs=0
     )
 
@@ -250,6 +250,9 @@ def train_alphazero(
                 continue
             finally:
                 logger.info(f"Iteration {iteration} completed in {time.time() - iteration_start_time:.2f} seconds")
+                logger.info(f"=== Completed Iteration {iteration} ===")
+                if use_gpu and torch.cuda.is_available():
+                    lightning_module.log_gpu_stats()
 
     except Exception as e:
         logger.error(f"Training error: {e}")

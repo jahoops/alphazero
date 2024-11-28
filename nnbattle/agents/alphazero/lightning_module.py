@@ -27,6 +27,9 @@ class ConnectFourLightningModule(pl.LightningModule):
         torch.backends.cudnn.benchmark = True
         torch.backends.cudnn.deterministic = False
 
+        self.epoch_losses = []
+        self.last_gpu_log = 0
+
     def on_fit_start(self):
         """Called when fit begins."""
         if self.trainer.datamodule is not None:
@@ -61,9 +64,26 @@ class ConnectFourLightningModule(pl.LightningModule):
         
         opt.step()
         self.last_loss = loss.item()
+        
+        # Store loss for epoch averaging
+        self.epoch_losses.append(loss.item())
         return {'loss': loss.item()}
 
     def on_train_epoch_end(self):
+        """Log epoch-level metrics and GPU stats."""
+        epoch = self.current_epoch
+        avg_loss = sum(self.epoch_losses) / len(self.epoch_losses) if self.epoch_losses else 0
+        
+        logger.info(f"Epoch {epoch}: Average Loss = {avg_loss:.4f}")
+        self.log_gpu_stats()
+        
+        # Reset epoch losses
+        self.epoch_losses = []
+        
+        # Clear GPU cache periodically
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         # Get metrics that were logged during training steps
         metrics = self.trainer.callback_metrics
         
@@ -72,6 +92,14 @@ class ConnectFourLightningModule(pl.LightningModule):
             self.log('train_loss_epoch', metrics['loss'], on_epoch=True, prog_bar=True)
         if 'train_loss' in metrics:
             self.log('train_loss_epoch', metrics['train_loss'], on_epoch=True, prog_bar=True)
+
+    def log_gpu_stats(self):
+        """Log GPU memory statistics."""
+        if torch.cuda.is_available():
+            allocated = torch.cuda.memory_allocated() / 1e9
+            reserved = torch.cuda.memory_reserved() / 1e9
+            max_memory = torch.cuda.max_memory_allocated() / 1e9
+            logger.info(f"GPU Memory [GB] - Allocated: {allocated:.2f}, Reserved: {reserved:.2f}, Peak: {max_memory:.2f}")
 
     def configure_optimizers(self):
         """Improved optimizer configuration."""
