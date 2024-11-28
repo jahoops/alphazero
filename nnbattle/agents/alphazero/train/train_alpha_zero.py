@@ -2,6 +2,10 @@ from nnbattle.game.connect_four_game import ConnectFourGame
 from nnbattle.constants import RED_TEAM
 from ....utils.logger_config import logger  # Add this import
 import numpy as np  # Add this import
+import logging
+
+# Set up logging to output to console at INFO level
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 def evaluate_agent(agent, num_games=20):
     """Evaluate agent performance against random opponent."""
@@ -34,8 +38,8 @@ def evaluate_agent(agent, num_games=20):
 
 def train_alphazero(
     agent,  # Added agent parameter
-    max_iterations: int = 1000,
-    num_self_play_games: int = 1000,
+    max_iterations: int = 10,
+    num_self_play_games: int = 10,
     use_gpu: bool = False,
     load_model: bool = False,
     patience: int = 10
@@ -50,8 +54,8 @@ def train_alphazero(
 
     # Enable tensor cores for better performance on CUDA devices
     if use_gpu and torch.cuda.is_available():
-        torch.set_float32_matmul_precision('high')
-        logger.info("Enabled high-precision tensor cores for CUDA device")
+        torch.set_float32_matmul_precision('medium')
+        logger.info("Enabled medium-precision tensor cores for CUDA device")
 
     import os
     import time
@@ -92,6 +96,7 @@ def train_alphazero(
 
             torch.cuda.reset_peak_memory_stats()
 
+    logger.info("Initializing data module...")
     # Modify DataLoader settings for better training
     data_module = ConnectFourDataModule(
         agent, 
@@ -100,18 +105,38 @@ def train_alphazero(
         num_workers=4,   # Reduced workers for stability
         persistent_workers=True
     )
+    logger.info("Data module initialized.")
 
+    logger.info("Initializing lightning module...")
     lightning_module = ConnectFourLightningModule(agent)  # Create the lightning module instance
 
-    # Generate self-play games using the SelfPlay class with proper agent
+    logger.info("Creating self-play instance...")
     game = ConnectFourGame()
     self_play = SelfPlay(
-        game=game, 
+        game=game,
         model=agent.model,
-        num_simulations=agent.num_simulations,
-        agent=agent  # Pass the full agent instance
+        num_simulations=50,  # Reduced for testing
+        agent=agent
     )
-    training_data = self_play.generate_training_data(num_self_play_games)
+    
+    logger.info("Starting training loop...")
+    try:
+        training_data = self_play.generate_training_data(num_self_play_games)
+        logger.info(f"Generated {len(training_data)} training examples")
+        
+        if not training_data:
+            logger.error("No training data generated")
+            return
+            
+        data_module.dataset = ConnectFourDataset(training_data, agent)
+        logger.info(f"Dataset created with {len(data_module.dataset)} examples")
+        
+        data_module.setup('fit')
+        logger.info("Data module setup completed")
+        
+    except Exception as e:
+        logger.error(f"Error during training initialization: {e}")
+        raise
 
     # Check if we got valid training data
     if not training_data:
@@ -194,14 +219,16 @@ def train_alphazero(
                 logger.info(f"Generating {num_self_play_games} self-play games...")
                 log_gpu_info(agent)  # Before generating self-play games
                 data_module.generate_self_play_games(temperature=temperature)
+                logger.info("Self-play games generated.")
 
                 if len(data_module.dataset) == 0:
                     # Handle the case where no data was generated
                     logger.error("No data generated during self-play. Skipping this iteration.")
                     continue
 
-                # Proceed with training
+                logger.info("Starting training...")
                 trainer.fit(lightning_module, datamodule=data_module)
+                logger.info("Training completed.")
 
                 # Inside the training loop, after trainer.fit:
                 train_results = trainer.fit(lightning_module, datamodule=data_module)
@@ -219,10 +246,10 @@ def train_alphazero(
                         break
 
                 # Optionally evaluate the model
-                if iteration % 10 == 0:
+                if iteration % 1 == 0:  # Evaluate every iteration
                     # Ensure CUDA tensors are properly handled
                     with torch.cuda.device(agent.device):
-                        performance = evaluate_agent(agent, num_games=20)
+                        performance = evaluate_agent(agent, num_games=5)
                         torch.cuda.empty_cache()  # Clear cache after evaluation
                     
                     logger.info(f"Iteration {iteration}: Evaluation Performance: {performance}")
@@ -264,6 +291,7 @@ def train_alphazero(
 
         # Save the trained model
         save_agent_model(agent)
+        logger.info("=== Training Completed Successfully ===")
         logger.info("Training completed. Final model saved.")
 
     logger.info("=== Training Completed Successfully ===")

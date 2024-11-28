@@ -47,7 +47,7 @@ class AlphaZeroAgent(BaseAgent):
         action_dim,
         state_dim=3,  # Adjusted state dimension
         use_gpu=True,
-        num_simulations=800,
+        num_simulations=50,  # Reduced from 800 to 100
         c_puct=1.4,
         load_model=True,
         team=RED_TEAM,  # Initialized team
