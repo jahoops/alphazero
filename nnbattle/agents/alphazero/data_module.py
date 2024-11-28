@@ -44,11 +44,11 @@ class ConnectFourDataset(Dataset):
         if torch.is_tensor(mcts_prob) and mcts_prob.device.type == 'cuda':
             mcts_prob = mcts_prob.cpu()
         
-        # Convert to tensors on CPU
+        # Return tensors without specifying a device
         return (
-            torch.tensor(state, dtype=torch.float32),  # Remove device
-            torch.tensor(mcts_prob, dtype=torch.float32),  # Remove device
-            torch.tensor(reward, dtype=torch.float32)  # Remove device
+            torch.tensor(state, dtype=torch.float32),
+            torch.tensor(mcts_prob, dtype=torch.float32),
+            torch.tensor(reward, dtype=torch.float32)
         )
 
 
@@ -100,17 +100,14 @@ class ConnectFourDataModule(pl.LightningDataModule):
             logger.info(f"Data split: {train_size} training, {val_size} validation samples")
 
     def train_dataloader(self):
-        """Create and return the training dataloader."""
-        if not hasattr(self, 'train_dataset'):
-            self.setup('fit')
-            
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
             shuffle=True,
-            num_workers=self.num_workers,
-            pin_memory=False,  # Changed from True to False
-            persistent_workers=self.persistent_workers and self.num_workers > 0,
+            num_workers=8,  # More workers for your CPU
+            pin_memory=True,  # Pin memory for faster GPU transfer
+            persistent_workers=True,
+            prefetch_factor=3,  # Prefetch batches
             drop_last=True
         )
 

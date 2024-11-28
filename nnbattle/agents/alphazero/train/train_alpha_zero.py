@@ -1,5 +1,5 @@
 from nnbattle.game.connect_four_game import ConnectFourGame
-from nnbattle.constants import RED_TEAM
+from nnbattle.constants import RED_TEAM, YEL_TEAM
 from ....utils.logger_config import logger  # Add this import
 import numpy as np  # Add this import
 import logging
@@ -7,7 +7,7 @@ import logging
 # Set up logging to output to console at INFO level
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-def evaluate_agent(agent, num_games=5):
+def evaluate_agent(agent, num_games=5, temperature=0.1):
     """Evaluate agent performance against random opponent."""
     wins = 0
     draws = 0
@@ -15,19 +15,32 @@ def evaluate_agent(agent, num_games=5):
     
     for game_num in range(num_games):
         game = ConnectFourGame()
+        current_team = RED_TEAM  # Always start with RED_TEAM
+        
         while game.get_game_state() == "ONGOING":
             try:
-                if game.last_team == agent.team:
-                    action, _ = agent.select_move(game, agent.team, temperature=0.1)
+                # Get valid moves
+                valid_moves = game.get_valid_moves()
+                if not valid_moves:
+                    break
+                    
+                # Decide which player moves
+                if current_team == agent.team:
+                    # Agent's turn
+                    action, _ = agent.select_move(game, current_team, temperature=temperature)
                 else:
-                    # Random opponent
-                    valid_moves = game.get_valid_moves()
+                    # Random opponent's turn
                     action = np.random.choice(valid_moves)
-                game.make_move(action, game.last_team if game.last_team else RED_TEAM)
+                
+                # Make move and switch teams
+                game.make_move(action, current_team)
+                current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
+                
             except Exception as e:
                 logger.error(f"Error during evaluation game {game_num}: {e}")
                 break
         
+        # Process game result
         result = game.get_game_state()
         if result == agent.team:
             wins += 1
@@ -36,7 +49,7 @@ def evaluate_agent(agent, num_games=5):
         else:
             losses += 1
             
-    win_rate = wins / num_games
+    win_rate = wins / num_games if num_games > 0 else 0.0
     logger.info(f"Evaluation results: Wins: {wins}, Draws: {draws}, Losses: {losses}")
     return win_rate
 
@@ -51,7 +64,8 @@ def train_alphazero(
     evaluation_frequency=1,
     use_gpu=False,
     save_checkpoint=True,
-    checkpoint_frequency=1
+    checkpoint_frequency=1,
+    data_module_params=None  # Add this parameter
 ):
     """Trains the AlphaZero agent using self-play and reinforcement learning."""
     from ....utils.logger_config import logger, set_log_level
@@ -113,13 +127,21 @@ def train_alphazero(
 
             torch.cuda.reset_peak_memory_stats()
 
+    # Use provided data_module_params or default values
+    if data_module_params is None:
+        data_module_params = {
+            'batch_size': 32,
+            'num_workers': 4,
+            'pin_memory': True
+        }
+
     logger.info("Initializing data module...")
     # Modify DataLoader settings for better training
     data_module = ConnectFourDataModule(
         agent, 
         num_games=num_self_play_games,
-        batch_size=128,  # Increased batch size
-        num_workers=4,   # Reduced workers for stability
+        batch_size=data_module_params.get('batch_size', 32),
+        num_workers=data_module_params.get('num_workers', 4),
         persistent_workers=True
     )
     logger.info("Data module initialized.")
@@ -166,12 +188,12 @@ def train_alphazero(
 
     data_module.setup('fit')
 
-    # Create trainer with better training parameters
+    # Create trainer with fixed configuration
     trainer = pl.Trainer(
-        max_epochs=50,   # Increased epochs
+        max_epochs=50,
         accelerator='gpu' if use_gpu and torch.cuda.is_available() else 'cpu',
         devices=1,
-        callbacks=None,  # Remove all callbacks
+        callbacks=None,
         logger=None,
         enable_checkpointing=False,
         enable_progress_bar=False,
@@ -180,9 +202,9 @@ def train_alphazero(
         deterministic=False,
         benchmark=True,
         inference_mode=True,
-        gradient_clip_val=1.0,  # Add gradient clipping
+        gradient_clip_val=None,  # Remove gradient clipping since we're using manual optimization
         detect_anomaly=False,
-        barebones=False,  # Changed to False to enable epoch end logging
+        barebones=True,  # Changed to True for simpler training
         reload_dataloaders_every_n_epochs=0
     )
 

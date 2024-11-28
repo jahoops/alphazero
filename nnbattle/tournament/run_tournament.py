@@ -81,11 +81,12 @@ def run_tournament(agents: List[BaseAgent], num_games=10):
 
 if __name__ == "__main__":
     # Initialize Baseline Agent (e.g., YEL_TEAM)
+    #agent_baseline = MinimaxAgent(depth=1, team=YEL_TEAM)
     agent_baseline = AlphaZeroAgent(
         action_dim=7,
         state_dim=3,
         use_gpu=True,
-        num_simulations=800,
+        num_simulations=0,
         c_puct=1.4,
         load_model=True,
         model_path=BASELINE_MODEL_PATH,  # Load baseline model
@@ -97,7 +98,7 @@ if __name__ == "__main__":
         action_dim=7,
         state_dim=3,
         use_gpu=True,
-        num_simulations=800,
+        num_simulations=100,
         c_puct=1.4,
         load_model=True,
         model_path=FINAL_MODEL_PATH,  # Load final model

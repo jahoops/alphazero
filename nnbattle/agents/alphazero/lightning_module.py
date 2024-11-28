@@ -27,6 +27,10 @@ class ConnectFourLightningModule(pl.LightningModule):
         torch.backends.cudnn.benchmark = True
         torch.backends.cudnn.deterministic = False
 
+        # Enable GPU optimizations
+        torch.backends.cuda.matmul.allow_tf32 = True
+        torch.backends.cudnn.allow_tf32 = True
+
         self.epoch_losses = []
         self.last_gpu_log = 0
 
@@ -49,6 +53,9 @@ class ConnectFourLightningModule(pl.LightningModule):
         # Zero gradients and compute loss
         opt.zero_grad()
         states, mcts_probs, rewards = batch
+        states = states.to(self.device)
+        mcts_probs = mcts_probs.to(self.device)
+        rewards = rewards.to(self.device)
         logits, values = self(states)
         
         # Calculate losses with adjusted weights
@@ -106,7 +113,10 @@ class ConnectFourLightningModule(pl.LightningModule):
         optimizer = torch.optim.Adam(
             self.model.parameters(),
             lr=0.001,
-            weight_decay=1e-4  # Add L2 regularization
+            weight_decay=1e-4,
+            betas=(0.9, 0.999),
+            eps=1e-8,
+            amsgrad=True  # Enable AMSGrad for better training
         )
         return optimizer
 
@@ -133,6 +143,9 @@ class ConnectFourLightningModule(pl.LightningModule):
             # Process MCTS validation data
             with torch.no_grad():
                 states, mcts_probs, rewards = batch
+                states = states.to(self.device)
+                mcts_probs = mcts_probs.to(self.device)
+                rewards = rewards.to(self.device)
                 logits, values = self.forward(states)
                 values = values.squeeze(-1)
                 

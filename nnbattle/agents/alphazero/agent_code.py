@@ -65,21 +65,31 @@ class AlphaZeroAgent(BaseAgent):
         self.memory = []
         self.model_path = model_path if model_path else "nnbattle/agents/alphazero/model/alphazero_model_final.pth"  # Use provided path or default
 
-        # Initialize the model
-        self.model = Connect4Net(state_dim, action_dim).to(self.device)
-        logger.info("Model instance created.")
-
+        # Initialize the model and explicitly move everything to GPU
+        self.model = Connect4Net(state_dim, action_dim)
+        if use_gpu and torch.cuda.is_available():
+            self.model = self.model.cuda()
+            # Ensure model weights are on CUDA
+            self.model = self.model.to(self.device)
+            for param in self.model.parameters():
+                param.data = param.data.to(self.device)
+        
         if load_model:
             try:
-                load_agent_model(self)
-                if not self.model_loaded:
-                    logger.info("Starting with a freshly initialized model.")
+                # Ensure loaded state dict goes to correct device
+                state_dict = torch.load(self.model_path, map_location=self.device)
+                self.model.load_state_dict(state_dict)
+                self.model_loaded = True
+                logger.info(f"Model loaded and moved to {self.device}")
             except FileNotFoundError:
                 logger.warning("No model file found, starting with a fresh model.")
                 self.model_loaded = False
             except Exception as e:
                 logger.error(f"An error occurred while loading the model: {e}")
                 self.model_loaded = False
+
+        # Move the model to the correct device
+        self.model.to(self.device)
 
         # Log initialization after attempting to load the model
         logger.info(f"Initialized AlphaZeroAgent on device: {self.device}")
@@ -114,10 +124,10 @@ class AlphaZeroAgent(BaseAgent):
         
         state = np.stack([current_board, opponent_board, valid_moves])
         tensor = torch.FloatTensor(state)
-
-        if to_device:
-            return tensor.to(to_device)
-        return tensor.cpu()
+        # Move tensor to the correct device
+        device = to_device if to_device else self.device
+        tensor = tensor.to(device)
+        return tensor
 
     def select_move(self, game: ConnectFourGame, team: int, temperature=1.0):
         """Select a valid move for the current game state."""
@@ -182,6 +192,8 @@ class AlphaZeroAgent(BaseAgent):
 
     def act(self, game: ConnectFourGame, team: int, temperature=1.0, **kwargs):
         """Use MCTS to select moves in both training and tournament play."""
+        # Ensure temperature is not zero
+        temperature = max(temperature, 1e-8)  # Add small epsilon to prevent zero
         logger.debug(f"Acting with temperature {temperature}")
         try:
             with model_mode(self.model, False):  # Ensure model is in eval mode

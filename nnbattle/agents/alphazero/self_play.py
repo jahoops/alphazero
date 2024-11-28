@@ -21,66 +21,47 @@ class SelfPlay:
         self.agent = agent  # Store the agent reference
 
     def execute_episode(self, episode_num: int) -> Tuple[List[np.ndarray], List[np.ndarray], List[float]]:
-        """Execute one episode of self-play."""
-        logger.info(f"Starting episode {episode_num} execution")
+        """Execute one episode of self-play with performance optimization."""
         game = ConnectFourGame()
         states, policies, values = [], [], []
         game_history = []
-        current_team = RED_TEAM
+        current_team = RED_TEAM  # Start with RED_TEAM
         move_count = 0
         
         try:
             while game.get_game_state() == "ONGOING":
-                logger.info(f"Episode {episode_num} - Move {move_count + 1}, Team {current_team}")
+                # Reduced logging
+                if move_count % 5 == 0:
+                    logger.debug(f"Episode {episode_num} - Move {move_count}")
                 
-                # Log game state for debugging
-                logger.debug(f"Current board state:\n{game.board_to_string()}")
-                
-                # Get valid moves
+                # Get valid moves and make sure we have some
                 valid_moves = game.get_valid_moves()
-                logger.debug(f"Valid moves: {valid_moves}")
-                
                 if not valid_moves:
-                    logger.error("No valid moves available")
+                    break
+
+                # Get move from MCTS
+                action, policy = mcts_simulate(self.agent, game, current_team)
+                
+                # Make the move
+                if not game.make_move(action, current_team):
+                    logger.error(f"Invalid move {action} for team {current_team}")
                     break
                 
-                try:
-                    # Perform MCTS simulation with timeout protection
-                    action, policy = mcts_simulate(self.agent, game, current_team)
-                    logger.info(f"Selected action: {action}")
-                    
-                    # Make move
-                    if not game.make_move(action, current_team):
-                        logger.error(f"Invalid move {action} for team {current_team}")
-                        break
-                    
-                    # Store state and policy
-                    game_history.append((
-                        game.get_board().copy(),
-                        policy,
-                        current_team
-                    ))
-                    
-                    # Switch teams
-                    current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
-                    move_count += 1
-                    
-                except Exception as e:
-                    logger.error(f"Error during move {move_count}: {str(e)}")
-                    raise
+                # Store the state and policy
+                game_history.append((
+                    game.get_board().copy(),
+                    policy,
+                    current_team
+                ))
+                
+                move_count += 1
+                # Switch teams - only do this once!
+                current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
                 
             # Process game result
             result = game.get_game_state()
-            logger.info(f"Episode {episode_num} finished with result: {result} after {move_count} moves")
-            
-            # Process game history
-            for state, policy, team in game_history:
-                reward = 0.0 if result == "Draw" else (1.0 if result == team else -1.0)
-                states.append(state)
-                policies.append(policy)
-                values.append(reward)
-            
-            return states, policies, values
+            logger.info(f"Episode {episode_num} finished after {move_count} moves with result: {result}")
+            return self._process_game_history(game_history, result)
             
         except Exception as e:
             logger.error(f"Episode {episode_num} failed: {str(e)}")

@@ -1,7 +1,8 @@
 def main():
     from nnbattle.agents.alphazero.agent_code import initialize_agent  # Added import
-    from nnbattle.agents.alphazero.train import train_alphazero  # Updated import path
+    from nnbattle.agents.alphazero.train.train_alpha_zero import train_alphazero  # Updated import path
     from nnbattle.utils.logger_config import logger  # Corrected import
+    from nnbattle.agents.alphazero.train import evaluate_agent  # Added import
     import torch
     import torch.multiprocessing as mp
     import os
@@ -10,19 +11,35 @@ def main():
     import sys
     import glob  # Added import
 
-    # Progressive MCTS simulations based on training stage
-    initial_simulations = 10  # Start with very few simulations
-    max_simulations = 800    # Maximum simulations for later training
+    # Hardware-optimized parameters
+    initial_simulations = 50     # More initial sims since we have GPU power
+    max_simulations = 400       # Higher max sims
+    num_games_per_iteration = 50  # More parallel games
+    test_games_per_eval = 20
+    max_iterations = 5
 
-    # Initialize the agent with minimal simulations
+    # Create model directory and backup untrained model
+    model_dir = "nnbattle/agents/alphazero/model"
+    os.makedirs(model_dir, exist_ok=True)
+    untrained_model_path = os.path.join(model_dir, "untrained_baseline.pth")
+
+    # Initialize agent with GPU optimization
     agent = initialize_agent(
         action_dim=7,
         state_dim=3,
         use_gpu=True,
-        num_simulations=initial_simulations,  # Start with few simulations
-        c_puct=1.4,
-        load_model=True
+        num_simulations=initial_simulations,
+        c_puct=1.4
     )
+
+    # Save untrained model for comparison
+    torch.save(agent.model.state_dict(), untrained_model_path)
+    logger.info(f"Saved untrained model to {untrained_model_path}")
+
+    # Test untrained model against random
+    logger.info("Testing untrained model against random player...")
+    initial_performance = evaluate_agent(agent, num_games=test_games_per_eval, temperature=0.1)
+    logger.info(f"Untrained model win rate: {initial_performance:.2f}")
 
     # Set up CUDA and multiprocessing
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -48,42 +65,32 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
 
-    # Add checkpoint handling
+    # Add checkpoint directory
     checkpoint_dir = "nnbattle/agents/alphazero/model/checkpoints"
     os.makedirs(checkpoint_dir, exist_ok=True)
-    
-    # Look for latest checkpoint
-    checkpoints = sorted(glob.glob(f"{checkpoint_dir}/checkpoint_*.pth"))
-    start_iteration = 0
-    if checkpoints and load_model:
-        latest_checkpoint = checkpoints[-1]
-        iteration_num = int(latest_checkpoint.split('_')[-1].split('.')[0])
-        logger.info(f"Found checkpoint from iteration {iteration_num}")
-        agent.model_path = latest_checkpoint
-        start_iteration = iteration_num + 1
 
-    # Run training with balanced parameters
     try:
-        os.makedirs("nnbattle/agents/alphazero/model", exist_ok=True)
-        
-        # Run training with smaller batches but more frequent evaluation
+        # Run training with GPU optimized parameters
         train_alphazero(
             agent=agent,
-            max_iterations=10,
-            num_self_play_games=50,
+            max_iterations=max_iterations,
+            num_self_play_games=num_games_per_iteration,
             initial_simulations=initial_simulations,
             max_simulations=max_simulations,
-            simulation_increase_interval=2,  # Increase simulations every 2 iterations
+            simulation_increase_interval=1,
+            num_evaluation_games=test_games_per_eval,
+            evaluation_frequency=1,
             use_gpu=True,
-            load_model=True,
-            save_checkpoint=True,
-            checkpoint_frequency=1
+            save_checkpoint=True
         )
         
-        # Save final model
-        final_model_path = "nnbattle/agents/alphazero/model/alphazero_model_final.pth"
-        torch.save(agent.model.state_dict(), final_model_path)
-        logger.info(f"Final model saved to {final_model_path}")
+        # Test trained model
+        logger.info("Testing trained model against random player...")
+        final_performance = evaluate_agent(agent, num_games=test_games_per_eval)
+        logger.info(f"Training Results:")
+        logger.info(f"Initial win rate: {initial_performance:.2f}")
+        logger.info(f"Final win rate: {final_performance:.2f}")
+        logger.info(f"Improvement: {final_performance - initial_performance:.2f}")
         
     except KeyboardInterrupt:
         logger.info("Training interrupted by user.")

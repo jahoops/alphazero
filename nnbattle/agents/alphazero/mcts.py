@@ -52,9 +52,11 @@ class MCTSNode:
     def best_child(self, c_puct: float) -> Optional['MCTSNode']:
         best_score = -float('inf')
         best_node = None
+        epsilon = 1e-8  # Small value to prevent division by zero
         for child in self.children.values():
-            u = c_puct * child.prior * math.sqrt(self.visits) / (1 + child.visits)
-            q = child.value / (1 + child.visits)
+            # Adjust denominator to add epsilon
+            u = c_puct * child.prior * math.sqrt(self.visits + epsilon) / (1 + child.visits + epsilon)
+            q = child.value / (1 + child.visits + epsilon)
             score = q + u
             if score > best_score:
                 best_score = score
@@ -71,12 +73,20 @@ class MCTSNode:
             if action not in self.children:
                 new_env = deepcopy_env(self.env)
                 try:
-                    # Make move with current team
-                    new_env.make_move(action, self.team)
-                    # Next team is opposite of last_team
-                    next_team = YEL_TEAM if new_env.last_team == RED_TEAM else RED_TEAM
-                    child_node = MCTSNode(parent=self, action=action, env=new_env, team=next_team)
-                    child_node.prior = action_probs[action].item()
+                    next_board = self.board.copy()
+                    # Simulate the action
+                    next_game = ConnectFourGame()
+                    next_game.board = next_board
+                    next_game.last_team = self.team
+                    next_team = YEL_TEAM if self.team == RED_TEAM else RED_TEAM
+                    next_game.make_move(action, self.team)
+                    child_node = MCTSNode(
+                        parent=self,
+                        action=action,
+                        board=next_game.get_board(),
+                        team=next_team
+                    )
+                    child_node.prior = action_probs[action]
                     self.children[action] = child_node
                 except (InvalidMoveError, InvalidTurnError) as e:
                     logger.error(f"Invalid move during expansion: {e}")
@@ -89,33 +99,28 @@ class MCTSNode:
             self.parent.backpropagate(-reward)
 
 def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
-    """Monte Carlo Tree Search simulation."""
-    logger.debug(f"Starting MCTS simulation for team {team}")
+    """Monte Carlo Tree Search simulation with early-stage optimization."""
+    valid_moves = game.get_valid_moves()
     
+    # Early in training, use mostly random play
+    if agent.num_simulations < 25:
+        action = np.random.choice(valid_moves)
+        policy = torch.zeros(agent.action_dim, dtype=torch.float32, device=agent.device)
+        policy[valid_moves] = 1.0 / len(valid_moves)
+        return action, policy
+
+    # Regular MCTS for when the model is more trained
     try:
         if game.last_team == team:
             raise InvalidTurnError(f"Invalid turn: team {team} cannot move after itself")
 
-        # Create a fresh game instance for MCTS
-        root_game = ConnectFourGame()
-        root_game.board = game.get_board().copy()
-        root_game.last_team = game.last_team  # Copy the last_team state
-
-        # Initialize root with root_game
-        root = MCTSNode(None, None, root_game.get_board(), team)
+        # Create the root node
+        root = MCTSNode(None, None, game.get_board(), team)
         root.visits = 1
 
-        # Run simulations
         for sim in range(agent.num_simulations):
-            if sim % 10 == 0:  # Log progress every 10 simulations
-                logger.debug(f"Simulation {sim + 1}/{agent.num_simulations}")
-            
-            # Create new game instance for this simulation path
-            sim_game = ConnectFourGame()
-            sim_game.board = root_game.get_board().copy()
-            sim_game.last_team = root_game.last_team
-            
             node = root
+            sim_game = deepcopy_env(game)
             current_team = team
 
             # Selection
@@ -123,44 +128,33 @@ def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
                 node = node.best_child(agent.c_puct)
                 if node is None:
                     break
-                # Apply action to simulation game
                 sim_game.make_move(node.action, current_team)
                 current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
 
-            # Expansion and evaluation
-            if sim_game.get_game_state() == "ONGOING" and node.is_leaf():
-                sim_valid_moves = sim_game.get_valid_moves()
-                if sim_valid_moves:
-                    # Create new game instances for each child
-                    for move in sim_valid_moves:
-                        child_game = ConnectFourGame()
-                        child_game.board = sim_game.get_board().copy()
-                        child_game.last_team = sim_game.last_team
-                        if child_game.make_move(move, current_team):
-                            child = MCTSNode(
-                                parent=node,
-                                action=move,
-                                board=child_game.get_board(),
-                                team=(YEL_TEAM if current_team == RED_TEAM else RED_TEAM)
-                            )
-                            # Get network predictions
-                            with torch.no_grad():
-                                state_tensor = agent.preprocess(child_game.get_board(), current_team, to_device=agent.device)
-                                action_logits, value = agent.model(state_tensor.unsqueeze(0))
-                                action_probs = F.softmax(action_logits.squeeze(), dim=0)
-                                child.prior = action_probs[move].item()
-                            node.children[move] = child
-
-            # Backpropagation
-            game_result = sim_game.get_game_state()
-            if game_result == "ONGOING":
+            # Expansion
+            if sim_game.get_game_state() == "ONGOING":
                 with torch.no_grad():
                     state_tensor = agent.preprocess(sim_game.get_board(), current_team, to_device=agent.device)
-                    _, value = agent.model(state_tensor.unsqueeze(0))
-                    value = value.item()
+                    action_logits, value = agent.model(state_tensor.unsqueeze(0))
+                    action_probs = F.softmax(action_logits.squeeze(), dim=0)
+                valid_moves = sim_game.get_valid_moves()
+                action_probs = action_probs.cpu().numpy()
+                node.expand(action_probs, valid_moves)
+
+            # Simulation / Evaluation
+            game_result = sim_game.get_game_state()
+            if game_result == "ONGOING":
+                leaf_value = value.item()
             else:
-                value = 1.0 if game_result == team else (-1.0 if game_result in (RED_TEAM, YEL_TEAM) else 0.0)
-            node.backpropagate(-value)  # Negative because we're alternating perspectives
+                if game_result == team:
+                    leaf_value = 1.0
+                elif game_result == "Draw":
+                    leaf_value = 0.0
+                else:
+                    leaf_value = -1.0
+
+            # Backpropagation
+            node.backpropagate(-leaf_value)
 
         # Select move based on visit counts and temperature
         valid_children = [(child.action, child.visits) for child in root.children.values()]
@@ -171,18 +165,29 @@ def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
         actions, visits = zip(*valid_children)
         visits = np.array(visits, dtype=np.float32)
 
-        # Select action based on temperature
-        if temperature < 0.01:
-            action = actions[np.argmax(visits)]
-        else:
-            probs = visits ** (1.0 / temperature)
-            probs = probs / probs.sum()
-            action = np.random.choice(actions, p=probs)
+        # Ensure total visits are not zero to prevent division by zero
+        total_visits = visits.sum()
+        if total_visits == 0:
+            logger.error("Total visits are zero, cannot compute probabilities")
+            visits += 1e-8  # Add a small value to prevent zero division
+            total_visits = visits.sum()
 
-        # Create policy
-        policy = torch.zeros(agent.action_dim, dtype=torch.float32)
-        policy[list(actions)] = torch.tensor(visits / visits.sum(), dtype=torch.float32)
-        
+        # Compute probabilities safely
+        probs = visits ** (1.0 / max(temperature, 1e-8))  # Prevent division by zero
+        probs_sum = probs.sum()
+        if probs_sum == 0 or np.isnan(probs_sum):
+            logger.error("Sum of probabilities is zero or NaN, assigning uniform probabilities")
+            probs = np.ones_like(probs) / len(probs)
+        else:
+            probs = probs / probs_sum
+
+        # Select action based on computed probabilities
+        action = np.random.choice(actions, p=probs)
+
+        # Create policy tensor on the correct device
+        policy = torch.zeros(agent.action_dim, dtype=torch.float32, device=agent.device)
+        policy[list(actions)] = torch.tensor(visits / total_visits, dtype=torch.float32, device=agent.device)
+
         return action, policy
 
     except Exception as e:
