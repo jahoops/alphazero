@@ -116,26 +116,30 @@ class SelfPlay:
         training_data = []
         completed_games = 0
         
-        for episode in range(num_episodes):
-            logger.info(f"Starting episode {episode + 1}/{num_episodes}")
-            try:
-                states, policies, values = self.execute_episode(episode)
-                if states:  # Only add data if episode completed successfully
-                    training_data.extend(zip(states, policies, values))
-                    completed_games += 1
-                    logger.info(f"Episode {episode + 1} completed successfully. "
-                              f"Generated {len(states)} examples.")
-                else:
-                    logger.warning(f"Episode {episode + 1} failed to generate data")
-            except Exception as e:
-                logger.error(f"Error in episode {episode + 1}: {e}")
-                continue
-            
-            if episode % 5 == 0:  # Log progress every 5 episodes
-                logger.info(f"Progress: {episode + 1}/{num_episodes} episodes "
-                          f"({(episode + 1)/num_episodes*100:.1f}%). "
-                          f"Total examples: {len(training_data)}")
-
-        logger.info(f"Self-play completed. Generated {len(training_data)} examples "
-                   f"from {completed_games} successful games.")
-        return training_data
+        try:
+            for episode in range(num_episodes):
+                if hasattr(self, '_interrupt_requested'):
+                    logger.info("Interrupt requested, saving current progress...")
+                    break
+                    
+                logger.info(f"Starting episode {episode + 1}/{num_episodes}")
+                try:
+                    states, policies, values = self.execute_episode(episode)
+                    if states:
+                        training_data.extend(zip(states, policies, values))
+                        completed_games += 1
+                        
+                    if episode % 5 == 0:
+                        logger.info(f"Progress: {episode + 1}/{num_episodes} episodes, "
+                                  f"Examples: {len(training_data)}")
+                        
+                except KeyboardInterrupt:
+                    logger.info("Interrupt received during episode, saving progress...")
+                    break
+                    
+        except KeyboardInterrupt:
+            logger.info("Interrupt received, saving current progress...")
+        finally:
+            logger.info(f"Self-play ended with {len(training_data)} examples "
+                       f"from {completed_games} games")
+            return training_data

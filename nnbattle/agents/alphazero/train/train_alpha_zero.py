@@ -7,24 +7,25 @@ import logging
 # Set up logging to output to console at INFO level
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-def evaluate_agent(agent, num_games=20):
+def evaluate_agent(agent, num_games=5):
     """Evaluate agent performance against random opponent."""
     wins = 0
     draws = 0
-    total_games = 0
+    losses = 0
     
-    for _ in range(num_games):
+    for game_num in range(num_games):
         game = ConnectFourGame()
         while game.get_game_state() == "ONGOING":
             try:
                 if game.last_team == agent.team:
                     action, _ = agent.select_move(game, agent.team, temperature=0.1)
                 else:
+                    # Random opponent
                     valid_moves = game.get_valid_moves()
                     action = np.random.choice(valid_moves)
                 game.make_move(action, game.last_team if game.last_team else RED_TEAM)
             except Exception as e:
-                logger.error(f"Error during evaluation game: {e}")
+                logger.error(f"Error during evaluation game {game_num}: {e}")
                 break
         
         result = game.get_game_state()
@@ -32,17 +33,25 @@ def evaluate_agent(agent, num_games=20):
             wins += 1
         elif result == "Draw":
             draws += 1
-        total_games += 1
-    
-    return wins / total_games if total_games > 0 else 0.0
+        else:
+            losses += 1
+            
+    win_rate = wins / num_games
+    logger.info(f"Evaluation results: Wins: {wins}, Draws: {draws}, Losses: {losses}")
+    return win_rate
 
 def train_alphazero(
-    agent,  # Added agent parameter
-    max_iterations: int = 10,
-    num_self_play_games: int = 10,
-    use_gpu: bool = False,
-    load_model: bool = False,
-    patience: int = 10
+    agent,
+    max_iterations=10,
+    num_self_play_games=50,
+    initial_simulations=10,      # Add this parameter
+    max_simulations=800,         # Add this parameter
+    simulation_increase_interval=2,  # Add this parameter
+    num_evaluation_games=5,
+    evaluation_frequency=1,
+    use_gpu=False,
+    save_checkpoint=True,
+    checkpoint_frequency=1
 ):
     """Trains the AlphaZero agent using self-play and reinforcement learning."""
     from ....utils.logger_config import logger, set_log_level
@@ -76,11 +85,19 @@ def train_alphazero(
     # Remove any existing logging configuration
     import signal
     def signal_handler(signum, frame):
-        logger.info("\nReceived shutdown signal. Cleaning up...")
-        if 'trainer' in locals():
-            trainer.should_stop = True
-        torch.cuda.empty_cache()
-        logger.info("Cleanup complete")
+        logger.info("\nReceived shutdown signal. Saving current state...")
+        if hasattr(self_play, '_interrupt_requested'):
+            self_play._interrupt_requested = True
+        
+        # Save current model state even if only partially trained
+        interrupted_path = "nnbattle/agents/alphazero/model/interrupted_model.pth"
+        torch.save(agent.model.state_dict(), interrupted_path)
+        logger.info(f"Saved interrupted model to {interrupted_path}")
+        
+        # Cleanup
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        sys.exit(0)
 
     signal.signal(signal.SIGINT, signal_handler)
     
@@ -191,6 +208,7 @@ def train_alphazero(
 
     best_performance = 0.0
     no_improvement_count = 0
+    best_win_rate = 0.0
 
     try:
         # Set proper CUDA tensor sharing strategy
@@ -211,6 +229,19 @@ def train_alphazero(
             # Alternate starting team each iteration
             starting_team = RED_TEAM if iteration % 2 == 1 else YEL_TEAM
 
+            # Update number of MCTS simulations progressively
+            current_simulations = min(
+                initial_simulations * (2 ** (iteration // simulation_increase_interval)),
+                max_simulations
+            )
+            agent.num_simulations = current_simulations
+            logger.info(f"Using {current_simulations} MCTS simulations for iteration {iteration}")
+            
+            # Log training parameters
+            logger.info(f"=== Starting Training Iteration {iteration}/{max_iterations} ===")
+            logger.info(f"MCTS Simulations: {current_simulations}")
+            logger.info(f"Temperature: {temperature}, c_puct: {agent.c_puct}")
+            
             logger.info(f"=== Starting Training Iteration {iteration}/{max_iterations} ===")
             logger.info(f"Using temperature: {temperature}, c_puct: {agent.c_puct}")
             logger.info(f"Starting team: {starting_team}")
@@ -256,15 +287,36 @@ def train_alphazero(
                     if performance > best_performance:
                         best_performance = performance
                         no_improvement_count = 0
-                        # Optionally save the best model
-                        save_agent_model(agent)
-                        logger.info(f"New best performance: {best_performance}. Model saved.")
+                        if save_checkpoint:
+                            # Save both checkpoint and best model
+                            checkpoint_path = f"nnbattle/agents/alphazero/model/alphazero_model_checkpoint_{iteration}.pth"
+                            best_model_path = "nnbattle/agents/alphazero/model/alphazero_model_best.pth"
+                            torch.save(agent.model.state_dict(), checkpoint_path)
+                            torch.save(agent.model.state_dict(), best_model_path)
+                            logger.info(f"New best performance: {best_performance}. Models saved.")
                     else:
                         no_improvement_count += 1
                         logger.info(f"No improvement in performance. ({no_improvement_count}/{patience})")
                         if no_improvement_count >= patience:
                             logger.info("Early stopping triggered due to no improvement.")
                             break
+
+                # Evaluate and save more frequently
+                if iteration % evaluation_frequency == 0:
+                    win_rate = evaluate_agent(agent, num_evaluation_games)
+                    logger.info(f"Iteration {iteration}: Win Rate = {win_rate:.2f}")
+                    
+                    if win_rate > best_win_rate:
+                        best_win_rate = win_rate
+                        best_model_path = f"nnbattle/agents/alphazero/model/best_model_{win_rate:.2f}.pth"
+                        torch.save(agent.model.state_dict(), best_model_path)
+                        logger.info(f"New best model saved with win rate {win_rate:.2f}")
+
+                # Save checkpoint regularly
+                if save_checkpoint and iteration % checkpoint_frequency == 0:
+                    checkpoint_path = f"nnbattle/agents/alphazero/model/checkpoint_{iteration}.pth"
+                    torch.save(agent.model.state_dict(), checkpoint_path)
+                    logger.info(f"Checkpoint saved at iteration {iteration}")
 
             except (InvalidMoveError, InvalidTurnError) as e:
                 logger.error(f"Game error during iteration {iteration}: {e}")
