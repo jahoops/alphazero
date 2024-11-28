@@ -35,12 +35,12 @@ def deepcopy_env(env):
     return copy.deepcopy(env)
 
 class MCTSNode:
-    def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], board: np.ndarray, team: int):
-        """Initialize node with board state instead of game instance."""
+    def __init__(self, parent: Optional['MCTSNode'], action: Optional[int], board: np.ndarray, player: int):
+        """Initialize node with board state and player whose turn it is."""
         self.parent = parent
         self.action = action
-        self.board = board.copy()  # Store board state instead of game instance
-        self.team = team
+        self.board = board.copy()
+        self.player = player  # The player to move at this node
         self.children = {}
         self.visits = 0
         self.value = 0.0
@@ -67,24 +67,22 @@ class MCTSNode:
         """
         Expand node with valid moves from the game state.
         """
-        # Get valid moves directly from the environment
-        valid_moves = self.env.get_valid_moves()
-        for action in valid_moves:  # Only iterate over valid moves
+        for action in legal_actions:
             if action not in self.children:
-                new_env = deepcopy_env(self.env)
                 try:
                     next_board = self.board.copy()
                     # Simulate the action
                     next_game = ConnectFourGame()
                     next_game.board = next_board
-                    next_game.last_team = self.team
-                    next_team = YEL_TEAM if self.team == RED_TEAM else RED_TEAM
-                    next_game.make_move(action, self.team)
+                    # Do not set next_game.last_team manually
+                    next_game.make_move(action, self.player)
+                    # Switch player for the child node
+                    next_player = YEL_TEAM if self.player == RED_TEAM else RED_TEAM
                     child_node = MCTSNode(
                         parent=self,
                         action=action,
                         board=next_game.get_board(),
-                        team=next_team
+                        player=next_player
                     )
                     child_node.prior = action_probs[action]
                     self.children[action] = child_node
@@ -114,32 +112,31 @@ def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
         if game.last_team == team:
             raise InvalidTurnError(f"Invalid turn: team {team} cannot move after itself")
 
-        # Create the root node
-        root = MCTSNode(None, None, game.get_board(), team)
+        # Create the root node with the current player
+        root = MCTSNode(None, None, game.get_board(), player=team)
         root.visits = 1
 
         for sim in range(agent.num_simulations):
-            node = root
+            current_node = root
             sim_game = deepcopy_env(game)
-            current_team = team
 
             # Selection
-            while not node.is_leaf():
-                node = node.best_child(agent.c_puct)
-                if node is None:
+            while not current_node.is_leaf():
+                current_node = current_node.best_child(agent.c_puct)
+                if current_node is None:
                     break
-                sim_game.make_move(node.action, current_team)
-                current_team = YEL_TEAM if current_team == RED_TEAM else RED_TEAM
+                sim_game.make_move(current_node.action, current_node.player)
 
             # Expansion
             if sim_game.get_game_state() == "ONGOING":
                 with torch.no_grad():
-                    state_tensor = agent.preprocess(sim_game.get_board(), current_team, to_device=agent.device)
-                    action_logits, value = agent.model(state_tensor.unsqueeze(0))
-                    action_probs = F.softmax(action_logits.squeeze(), dim=0)
+                    state_tensor = agent.preprocess(
+                        sim_game.get_board(), current_node.player, to_device=agent.device
+                    )
+                action_logits, value = agent.model(state_tensor.unsqueeze(0))
+                action_probs = F.softmax(action_logits.squeeze(), dim=0)
                 valid_moves = sim_game.get_valid_moves()
-                action_probs = action_probs.cpu().numpy()
-                node.expand(action_probs, valid_moves)
+                current_node.expand(action_probs, valid_moves)
 
             # Simulation / Evaluation
             game_result = sim_game.get_game_state()
@@ -154,7 +151,7 @@ def mcts_simulate(agent, game: ConnectFourGame, team: int, temperature=1.0):
                     leaf_value = -1.0
 
             # Backpropagation
-            node.backpropagate(-leaf_value)
+            current_node.backpropagate(-leaf_value)
 
         # Select move based on visit counts and temperature
         valid_children = [(child.action, child.visits) for child in root.children.values()]

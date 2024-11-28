@@ -114,8 +114,6 @@ class ConnectFourLightningModule(pl.LightningModule):
             self.model.parameters(),
             lr=0.001,
             weight_decay=1e-4,
-            betas=(0.9, 0.999),
-            eps=1e-8,
             amsgrad=True  # Enable AMSGrad for better training
         )
         return optimizer

@@ -65,15 +65,11 @@ class AlphaZeroAgent(BaseAgent):
         self.memory = []
         self.model_path = model_path if model_path else "nnbattle/agents/alphazero/model/alphazero_model_final.pth"  # Use provided path or default
 
-        # Initialize the model and explicitly move everything to GPU
+        # Initialize the model
         self.model = Connect4Net(state_dim, action_dim)
-        if use_gpu and torch.cuda.is_available():
-            self.model = self.model.cuda()
-            # Ensure model weights are on CUDA
-            self.model = self.model.to(self.device)
-            for param in self.model.parameters():
-                param.data = param.data.to(self.device)
-        
+        # Move the model to the correct device
+        self.model.to(self.device)
+
         if load_model:
             try:
                 # Ensure loaded state dict goes to correct device
@@ -88,7 +84,7 @@ class AlphaZeroAgent(BaseAgent):
                 logger.error(f"An error occurred while loading the model: {e}")
                 self.model_loaded = False
 
-        # Move the model to the correct device
+        # Move the model to the correct device again after loading
         self.model.to(self.device)
 
         # Log initialization after attempting to load the model
